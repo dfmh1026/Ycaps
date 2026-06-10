@@ -487,6 +487,7 @@ footer a:hover {
         gap: 0.75rem;
         justify-content: space-between;
         align-items: center;
+        position: relative; /* permitir posicionar absolute el botón */
     }
 
     .logo {
@@ -494,6 +495,7 @@ footer a:hover {
         flex: 1 1 auto;
         min-width: 0;
         align-items: center;
+        padding-right: 4.5rem; /* dejar espacio para el botón absoluto */
     }
 
     .texto-logo {
@@ -521,8 +523,11 @@ footer a:hover {
         border-radius: 999px;
         box-shadow: 0 8px 14px rgba(212, 175, 55, 0.14);
         min-width: auto;
-        order: 2;
-        align-self: flex-end;
+        position: absolute;
+        right: 1rem;
+        top: 50%;
+        transform: translateY(-50%);
+        order: 0;
         white-space: nowrap;
     }
 
@@ -581,13 +586,15 @@ footer a:hover {
         padding: 0.6rem 0.75rem;
         justify-content: space-between;
         gap: 0.5rem;
+        position: relative;
     }
 
     .logo {
-        width: 100%;
+        width: auto;
         gap: 0.35rem;
-        flex: 1 1 100%;
+        flex: 1 1 auto;
         justify-content: flex-start;
+        padding-right: 4rem;
     }
 
     .imagen-logo {
@@ -612,8 +619,11 @@ footer a:hover {
     .boton-carrito {
         padding: 0.45rem 0.75rem;
         font-size: 0.78rem;
-        order: 2;
-        align-self: flex-end;
+        position: absolute;
+        right: 0.75rem;
+        top: 50%;
+        transform: translateY(-50%);
+        order: 0;
         white-space: nowrap;
     }
 
