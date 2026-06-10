@@ -13,33 +13,34 @@
     margin: 0;
     padding: 0;
     box-sizing: border-box;
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    font-family: 'Poppins', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    scroll-behavior: smooth;
 }
 
 body {
-    background-color: var(--negro-principal);
+    min-height: 100vh;
+    background: linear-gradient(180deg, #090909 0%, #111111 65%, #151515 100%);
     color: var(--blanco);
+    line-height: 1.6;
 }
+
 
 /* --- ENCABEZADO (NAVBAR) --- */
 /* Modifica la clase .logo para que use flexbox y alinee la imagen con el texto */
 /* --- ENCABEZADO (NAVBAR) --- */
 header {
-    background-color: var(--negro-secundario);
-    border-bottom: 2px solid var(--dorado);
-    padding: 0.5rem 2rem;
-    
-    /* ESTAS TRES LÍNEAS HACEN QUE SE QUEDE FIJO ARRIBA */
-    position: fixed;   /* Cambiamos sticky por fixed para asegurar que no se mueva */
+    background-color: rgba(26, 26, 26, 0.96);
+    border-bottom: 1px solid rgba(212, 175, 55, 0.18);
+    padding: 1rem 2rem;
+    position: fixed;
     top: 0;
     left: 0;
-    width: 100%;       /* Ocupa todo el ancho de la pantalla */
-    
-    z-index: 1000;     /* Un número alto para que pase por encima de todas las fotos de las gorras */
-    
+    width: 100%;
+    backdrop-filter: blur(12px);
+    z-index: 1000;
     display: flex;
-   
     align-items: center;
+    justify-content: space-between;
 }
 
 .logo {
@@ -47,15 +48,16 @@ header {
     align-items: center;
     gap: 1rem;
     flex: 1;
-    justify-content: space-between;
 }
+
 
 /* Controla el tamaño de tu logo para que se adapte perfectamente a la barra */
 .imagen-logo {
-    height: 70px; /* Ajusta la altura a tu gusto (50px o 60px queda ideal) */
-    width: auto;  /* Mantiene la proporción original de la imagen sin deformarla */
+    height: 60px;
+    width: auto;
     object-fit: contain;
     order: 2;
+    margin-left: auto;
 }
 
 /* Agrupamos el título y subtítulo para que mantengan su orden vertical */
@@ -67,9 +69,20 @@ header {
 
 .logo h1 {
     font-family: 'Bebas Neue', sans-serif;
-    color: goldenrod;
-    font-size: 3.2rem;
-    letter-spacing: 3px;
+    font-size: 3rem;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    font-weight: 800;
+    color: transparent;
+    background: linear-gradient(90deg, rgba(255, 215, 0, 0.95), rgba(212, 175, 55, 0.95), rgba(255, 255, 255, 0.9));
+    -webkit-background-clip: text;
+    background-clip: text;
+    text-shadow: 0 0 18px rgba(212, 175, 55, 0.22);
+    margin: 0;
+}
+
+.logo h1 span {
+    color: var(--blanco);
 }
 
 .logo span {
@@ -77,60 +90,68 @@ header {
 }
 
 .subtitulo-logo {
-    font-family: 'Montserrat', sans-serif;
+    font-family: 'Poppins', sans-serif;
     font-size: 0.85rem;
     letter-spacing: 1.5px;
     color: var(--gris-claro);
     text-transform: uppercase;
+    opacity: 0.9;
 }
 
-.subtitulo-logo {
-    font-size: 0.8rem;
-    color: var(--gris-claro);
-    text-transform: uppercase;
-    letter-spacing: 1px;
-}
 
 .boton-carrito {
-    background: none;
-    border: 2px solid var(--dorado);
-    color: var(--blanco);
-    padding: 0.1rem 1.0rem;
+    background: linear-gradient(135deg, rgba(212, 175, 55, 0.95), rgba(189, 160, 50, 0.95));
+    border: none;
+    color: var(--negro-principal);
+    padding: 0.85rem 1.25rem;
     cursor: pointer;
-    font-weight: bold;
-    border-radius: 8px;
-    transition: 0.3s;
+    font-weight: 700;
+    border-radius: 999px;
+    transition: transform 0.25s ease, box-shadow 0.25s ease;
+    letter-spacing: 0.8px;
+    box-shadow: 0 12px 20px rgba(212, 175, 55, 0.16);
 }
 
 .boton-carrito:hover {
-    background-color: var(--dorado);
-    color: var(--negro-principal);
+    transform: translateY(-1px);
+    box-shadow: 0 16px 26px rgba(212, 175, 55, 0.22);
 }
+
 
 /* --- HERO BANNER --- */
 .hero {
     text-align: center;
-    padding: 4rem 1rem;
-    background: linear-gradient(rgba(0,0,0,0.7), rgba(17,17,17,1)), url('https://images.unsplash.com/photo-1533240332313-0db49b459ad6?auto=format&fit=crop&w=1200&q=80') center/cover;
-    border-bottom: 1px solid #333;
+    padding: 7rem 1rem 5rem;
+    margin-top: 100px;
+    min-height: 560px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    background: linear-gradient(180deg, rgba(0,0,0,0.75), rgba(17,17,17,0.95)), url('https://images.unsplash.com/photo-1533240332313-0db49b459ad6?auto=format&fit=crop&w=1500&q=80') center/cover;
+    background-size: cover;
+    border-bottom: 1px solid rgba(255,255,255,0.08);
 }
 
 .hero h2 {
-    font-size: 2.5rem;
+    font-size: 3rem;
     color: var(--blanco);
-    margin-bottom: 0.5rem;
+    margin-bottom: 0.75rem;
 }
 
 .hero p {
     color: var(--dorado);
-    font-size: 1.2rem;
+    font-size: 1.15rem;
     font-style: italic;
+    max-width: 700px;
+    margin: 0 auto;
 }
+
 
 /* --- CATÁLOGO DE PRODUCTOS (GRID RESPONSIVO) --- */
 .contenedor-productos {
     max-width: 1200px;
-    margin: 3rem auto;
+    margin: 4.5rem auto 3rem;
     padding: 0 1rem;
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
@@ -138,18 +159,20 @@ header {
 }
 
 .tarjeta-producto {
-    background-color: var(--negro-secundario);
-    border: 1px solid #333;
-    border-radius: 8px;
+    background-color: rgba(17, 17, 17, 0.96);
+    border: 1px solid rgba(212, 175, 55, 0.25);
+    border-radius: 16px;
     overflow: hidden;
     text-align: center;
     padding-bottom: 1.5rem;
-    transition: transform 0.3s, border-color 0.3s;
+    box-shadow: 0 18px 40px rgba(0, 0, 0, 0.35);
+    transition: transform 0.3s, border-color 0.3s, box-shadow 0.3s;
 }
 
 .tarjeta-producto:hover {
-    transform: translateY(-5px);
+    transform: translateY(-6px);
     border-color: var(--dorado);
+    box-shadow: 0 22px 48px rgba(0, 0, 0, 0.45);
 }
 
 /* Placeholder para fotos con el logo del caballo */
@@ -187,20 +210,23 @@ header {
 }
 
 .btn-agregar {
-    background-color: transparent;
-    border: 2px solid var(--dorado);
-    color: var(--dorado);
-    padding: 0.6rem 1.5rem;
-    font-weight: bold;
-    border-radius: 4px;
+    background: linear-gradient(135deg, var(--dorado), var(--dorado-hover));
+    border: none;
+    color: var(--negro-principal);
+    padding: 0.85rem 1.6rem;
+    font-weight: 700;
+    border-radius: 999px;
     cursor: pointer;
-    transition: 0.3s;
+    transition: transform 0.25s ease, box-shadow 0.25s ease;
+    box-shadow: 0 12px 22px rgba(212, 175, 55, 0.18);
+    letter-spacing: 0.8px;
 }
 
 .btn-agregar:hover {
-    background-color: var(--dorado);
-    color: var(--negro-principal);
+    transform: translateY(-1px);
+    box-shadow: 0 16px 28px rgba(212, 175, 55, 0.24);
 }
+
 
 /* --- PANEL LATERAL DEL CARRITO --- */
 .carrito-panel {
@@ -210,14 +236,14 @@ header {
     width: 100%;
     max-width: 400px;
     height: 100%;
-    background-color: var(--negro-secundario);
-    box-shadow: -5px 0 15px rgba(0,0,0,0.5);
+    background: rgba(17, 17, 17, 0.98);
+    box-shadow: -8px 0 30px rgba(0,0,0,0.35);
     transition: right 0.3s ease;
     z-index: 150;
     padding: 2rem;
     display: flex;
     flex-direction: column;
-    border-left: 2px solid var(--dorado);
+    border-left: 1px solid rgba(212, 175, 55, 0.18);
 }
 
 .carrito-panel.activo {
@@ -255,8 +281,8 @@ header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 0.8rem 0;
-    border-bottom: 1px solid #222;
+    padding: 0.9rem 0;
+    border-bottom: 1px solid rgba(255,255,255,0.08);
 }
 
 .item-detalles h4 {
@@ -292,20 +318,23 @@ header {
 }
 
 .btn-checkout {
-    background-color: var(--dorado);
+    background: linear-gradient(135deg, var(--dorado), var(--dorado-hover));
     color: var(--negro-principal);
     border: none;
-    padding: 1rem;
-    font-weight: bold;
+    padding: 1rem 1.25rem;
+    font-weight: 700;
     font-size: 1rem;
-    border-radius: 4px;
+    border-radius: 999px;
     cursor: pointer;
-    transition: 0.3s;
+    transition: transform 0.25s ease, box-shadow 0.25s ease;
     text-align: center;
+    box-shadow: 0 14px 24px rgba(212, 175, 55, 0.18);
 }
 
 .btn-checkout:hover {
-    background-color: var(--dorado-hover);
+    transform: translateY(-1px);
+    box-shadow: 0 18px 28px rgba(212, 175, 55, 0.24);
+    background: linear-gradient(135deg, var(--dorado-hover), var(--dorado));
 }
 
 /* --- FOOTER --- */
@@ -319,19 +348,31 @@ footer {
     font-size: 0.9rem;
 }
 
+footer a {
+    color: var(--dorado);
+    text-decoration: none;
+    transition: color 0.3s ease;
+}
+
+footer a:hover {
+    color: var(--blanco);
+}
+
 /* Estilo para las fotos reales de las gorras */
 .imagen-producto {
     width: 100%;
-    height: 250px;       /* Mantiene la misma altura que tenía el cuadro gris */
-    object-fit: cover;   /* Corta y adapta la foto para que llene el espacio sin estirarse ni verse mal */
-    border-bottom: 1px solid #333;
+    height: auto;
+    max-height: 320px;
+    object-fit: cover;
+    image-rendering: auto;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    filter: saturate(1.05) contrast(1.05);
+    transition: transform 0.4s ease, filter 0.4s ease;
+    display: block;
 }
 
-.hero {
-    text-align: center;
-    padding: 4rem 1rem;
-    margin-top: 100px; /* Al empujar el contenido hacia abajo, evitamos que el header fijo lo tape */
-    background: linear-gradient(rgba(0,0,0,0.7), rgba(17,17,17,1)), url('https://images.unsplash.com/photo-1533240332313-0db49b459ad6?auto=format&fit=crop&w=1200&q=80') center/cover;
-    border-bottom: 1px solid #333;
+.imagen-producto:hover {
+    transform: scale(1.01);
+    filter: saturate(1.1) contrast(1.08);
 }
 
