@@ -584,29 +584,36 @@ footer a:hover {
 @media (max-width: 480px) {
     header {
         padding: 0.6rem 0.75rem;
-        justify-content: flex-end;
+        justify-content: flex-start;
         gap: 0.5rem;
         position: relative;
+        align-items: center;
     }
 
     .logo {
-        width: auto;
+        width: 100%;
         gap: 0.35rem;
-        flex: 0 0 auto;
-        justify-content: flex-end;
+        flex: 1 1 100%;
+        justify-content: flex-start;
         padding-right: 0;
-    }
-
-    .imagen-logo {
-        height: 48px;
-        max-width: 140px;
-        margin-left: 0;
-        order: 1;
+        position: relative;
     }
 
     .texto-logo {
         min-width: 0;
         width: auto;
+        flex: 1;
+    }
+
+    .imagen-logo {
+        position: absolute;
+        right: 5.2rem;
+        top: 50%;
+        transform: translateY(-50%);
+        height: 44px;
+        max-width: 120px;
+        margin-left: 0;
+        order: 1;
     }
 
     .logo h1 {
@@ -621,13 +628,13 @@ footer a:hover {
     .boton-carrito {
         padding: 0.45rem 0.75rem;
         font-size: 0.78rem;
-        position: relative;
-        right: auto;
-        top: auto;
-        transform: none;
+        position: absolute;
+        right: 0.75rem;
+        top: 50%;
+        transform: translateY(-50%);
         order: 2;
         white-space: nowrap;
-        margin-left: 0.5rem;
+        margin-left: 0;
     }
 
     .subtitulo-logo {
