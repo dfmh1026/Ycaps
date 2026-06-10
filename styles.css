@@ -325,6 +325,38 @@ header {
     box-shadow: 0 6px 18px rgba(0,0,0,0.45);
 }
 
+/* Navegación compacta para galería: botones prev/next sobre la imagen */
+.gallery-nav {
+    position: absolute;
+    right: 0.6rem;
+    top: 0.6rem;
+    display: flex;
+    gap: 0.35rem;
+    z-index: 2;
+}
+
+.nav-btn {
+    width: 34px;
+    height: 34px;
+    border-radius: 999px;
+    background: rgba(26,26,26,0.8);
+    color: var(--blanco);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid rgba(255,255,255,0.06);
+    cursor: pointer;
+    font-weight: 700;
+    font-size: 0.95rem;
+}
+
+.nav-btn:hover {
+    background: rgba(212,175,55,0.95);
+    color: var(--negro-principal);
+}
+
+.tarjeta-producto { position: relative; }
+
 .tarjeta-producto:hover {
     transform: translateY(-6px);
     border-color: var(--dorado);

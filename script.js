@@ -74,22 +74,48 @@ function initGalerias() {
         });
 
         if (imgs.length > 1) {
-            const thumbs = document.createElement('div');
-            thumbs.className = 'thumbnails';
-            imgs.forEach((img, i) => {
-                const thumb = document.createElement('img');
-                thumb.src = img.src;
-                thumb.alt = img.alt || '';
-                if (i === 0) thumb.classList.add('active-thumb');
-                thumb.addEventListener('click', (e) => {
-                    imgs.forEach((im, idx) => {
-                        im.style.display = (idx === i) ? 'block' : 'none';
-                    });
-                    Array.from(thumbs.querySelectorAll('img')).forEach((t, idx) => t.classList.toggle('active-thumb', idx === i));
-                });
-                thumbs.appendChild(thumb);
+            // crear navegación compacta (prev / next)
+            tarjeta.dataset.currentIndex = 0;
+
+            const nav = document.createElement('div');
+            nav.className = 'gallery-nav';
+
+            const prev = document.createElement('button');
+            prev.type = 'button';
+            prev.className = 'nav-btn prev-btn';
+            prev.setAttribute('aria-label', 'Anterior');
+            prev.textContent = '<';
+
+            const next = document.createElement('button');
+            next.type = 'button';
+            next.className = 'nav-btn next-btn';
+            next.setAttribute('aria-label', 'Siguiente');
+            next.textContent = '>';
+
+            nav.appendChild(prev);
+            nav.appendChild(next);
+            tarjeta.appendChild(nav);
+
+            function showIndex(i) {
+                const idx = (i + imgs.length) % imgs.length;
+                imgs.forEach((im, j) => im.style.display = (j === idx) ? 'block' : 'none');
+                tarjeta.dataset.currentIndex = idx;
+            }
+
+            prev.addEventListener('click', (e) => {
+                e.stopPropagation();
+                const cur = parseInt(tarjeta.dataset.currentIndex, 10) || 0;
+                showIndex(cur - 1);
             });
-            tarjeta.appendChild(thumbs);
+
+            next.addEventListener('click', (e) => {
+                e.stopPropagation();
+                const cur = parseInt(tarjeta.dataset.currentIndex, 10) || 0;
+                showIndex(cur + 1);
+            });
+
+            // iniciar mostrando la primera
+            showIndex(0);
         }
     });
 }
