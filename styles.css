@@ -394,7 +394,8 @@ footer a:hover {
     }
 
     .logo {
-        gap: 0.5rem;
+        gap: 0.4rem;
+        flex: 0;
     }
 
     .texto-logo {
@@ -416,10 +417,11 @@ footer a:hover {
     }
 
     .boton-carrito {
-        padding: 0.45rem 0.7rem;
-        font-size: 0.78rem;
+        padding: 0.35rem 0.55rem;
+        font-size: 0.72rem;
         border-radius: 6px;
-        box-shadow: 0 8px 14px rgba(212, 175, 55, 0.12);
+        box-shadow: 0 6px 12px rgba(212, 175, 55, 0.10);
+        min-width: auto;
     }
 
     .subtitulo-logo {
@@ -490,9 +492,16 @@ footer a:hover {
         height: 48px;
     }
 
+    .logo {
+        gap: 0.35rem;
+        flex: 0;
+    }
+
     .boton-carrito {
-        padding: 0.4rem 0.5rem;
-        font-size: 0.72rem;
+        padding: 0.32rem 0.45rem;
+        font-size: 0.68rem;
+        border-radius: 6px;
+        min-width: 0;
     }
 
     .subtitulo-logo {
