@@ -594,12 +594,14 @@ footer a:hover {
         gap: 0.35rem;
         flex: 1 1 auto;
         justify-content: flex-start;
-        padding-right: 4rem;
+        padding-right: 3.4rem; /* espacio razonable para el botón sin tapar el logo */
     }
 
     .imagen-logo {
         height: 48px;
         max-width: 140px;
+        margin-left: 0; /* evitar que el logo empuje a la derecha y quede detrás del botón */
+        order: 1; /* asegurar que el logo quede a la izquierda del botón absoluto */
     }
 
     .texto-logo {
