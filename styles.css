@@ -416,9 +416,10 @@ footer a:hover {
     }
 
     .boton-carrito {
-        padding: 0.6rem 0.8rem;
-        font-size: 0.85rem;
+        padding: 0.45rem 0.7rem;
+        font-size: 0.78rem;
         border-radius: 6px;
+        box-shadow: 0 8px 14px rgba(212, 175, 55, 0.12);
     }
 
     .subtitulo-logo {
@@ -490,8 +491,8 @@ footer a:hover {
     }
 
     .boton-carrito {
-        padding: 0.5rem 0.6rem;
-        font-size: 0.75rem;
+        padding: 0.4rem 0.5rem;
+        font-size: 0.72rem;
     }
 
     .subtitulo-logo {
