@@ -340,7 +340,7 @@ header {
     background: rgba(17, 17, 17, 0.98);
     box-shadow: -8px 0 30px rgba(0,0,0,0.35);
     transition: right 0.3s ease;
-    z-index: 150;
+    z-index: 1100; /* mayor que el header (1000) para que el botón cerrar quede visible */
     padding: 2rem;
     display: flex;
     flex-direction: column;
