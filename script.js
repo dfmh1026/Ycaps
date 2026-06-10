@@ -116,25 +116,17 @@ function procesarPedido() {
         return;
     }
 
-    // Estructurar el texto del mensaje comercial
-    let textoMensaje = "¡Hola Ycaps! Me interesa comprar las siguientes gorras:\n\n";
-    
+    // Opción 1: Mensaje breve prellenado con los items del carrito
+    let textoMensaje = "Hola, quiero comprar estas gorras:\n\n";
     carrito.forEach(item => {
-        textoMensaje += `- ${item.nombre} (Cantidad: ${item.cantidad})\n`;
+        textoMensaje += `- ${item.nombre} x${item.cantidad}\n`;
     });
-    
-    textoMensaje += `\n*Total estimado:* ${totalTxt.innerText}\n`;
-    textoMensaje += "¿Cómo podemos coordinar el método de pago y el envío?";
+    textoMensaje += "\n¿Tienen stock?";
 
-    // Codificar caracteres especiales para la URL
     const urlTexto = encodeURIComponent(textoMensaje);
-    
-    // REEMPLAZAR AQUÍ: Pon tu número de WhatsApp de Ycaps con el código de país (Ej: Colombia es 57)
-    const numeroTelefono = "573000000000"; 
-    
-    // Redirección directa a la API de WhatsApp
-    // Usar el enlace directo proporcionado por el usuario
-    window.open('https://wa.me/message/FJMYKB6OTYB3M1', '_blank');
+    // Usar el enlace directo proporcionado y añadir el texto prellenado
+    const waLink = `https://wa.me/message/FJMYKB6OTYB3M1?text=${urlTexto}`;
+    window.open(waLink, '_blank');
 }
 
 // Click en logo o H1 recarga la página (mejor experiencia móvil/desktop)
