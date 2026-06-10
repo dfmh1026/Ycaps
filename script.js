@@ -133,7 +133,8 @@ function procesarPedido() {
     const numeroTelefono = "573000000000"; 
     
     // Redirección directa a la API de WhatsApp
-    window.open(`https://wa.me/${numeroTelefono}?text=${urlTexto}`, '_blank');
+    // Usar el enlace directo proporcionado por el usuario
+    window.open('https://wa.me/message/FJMYKB6OTYB3M1', '_blank');
 }
 
 // Click en logo o H1 recarga la página (mejor experiencia móvil/desktop)
