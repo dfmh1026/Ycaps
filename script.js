@@ -23,6 +23,37 @@ document.addEventListener('click', (event) => {
     }
 });
 
+const modalImagen = document.getElementById('modal-imagen');
+const modalImg = document.getElementById('modal-img');
+const modalCaption = document.getElementById('modal-caption');
+const cerrarModal = document.getElementById('cerrar-modal');
+
+function abrirModalImagen(src, alt) {
+    modalImg.src = src;
+    modalImg.alt = alt;
+    modalCaption.textContent = alt || 'Gorra Ycaps';
+    modalImagen.classList.add('activo');
+}
+
+function cerrarModalImagen() {
+    modalImagen.classList.remove('activo');
+    modalImg.src = '';
+}
+
+cerrarModal.addEventListener('click', cerrarModalImagen);
+modalImagen.addEventListener('click', (event) => {
+    if (event.target === modalImagen) {
+        cerrarModalImagen();
+    }
+});
+
+const imagenesProductos = document.querySelectorAll('.imagen-producto');
+imagenesProductos.forEach(imagen => {
+    imagen.addEventListener('click', () => {
+        abrirModalImagen(imagen.src, imagen.alt);
+    });
+});
+
 // --- FUNCIONES DEL CARRITO ---
 
 // Añadir un modelo de gorra al carrito
