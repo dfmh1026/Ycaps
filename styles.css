@@ -53,8 +53,9 @@ header {
 
 /* Controla el tamaño de tu logo para que se adapte perfectamente a la barra */
 .imagen-logo {
-    height: 60px;
+    height: 72px; /* tamaño estándar de logo en escritorio */
     width: auto;
+    max-width: 220px;
     object-fit: contain;
     order: 2;
     margin-left: auto;
@@ -411,7 +412,7 @@ footer a:hover {
     }
 
     .imagen-logo {
-        height: 45px;
+        height: 60px;
     }
 
     .boton-carrito {
@@ -485,7 +486,7 @@ footer a:hover {
     }
 
     .imagen-logo {
-        height: 40px;
+        height: 48px;
     }
 
     .boton-carrito {
