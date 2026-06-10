@@ -53,9 +53,9 @@ header {
 
 /* Controla el tamaño de tu logo para que se adapte perfectamente a la barra */
 .imagen-logo {
-    height: 72px; /* tamaño estándar de logo en escritorio */
+    height: 96px; /* aumentado para mejor visibilidad en desktop */
     width: auto;
-    max-width: 220px;
+    max-width: 260px;
     object-fit: contain;
     order: 2;
     margin-left: auto;
@@ -132,8 +132,8 @@ header {
 /* --- HERO BANNER --- */
 .hero {
     text-align: center;
-    padding: 7rem 1rem 5rem;
-    margin-top: 100px;
+    padding: 7.5rem 1rem 5.5rem;
+    margin-top: 110px;
     min-height: 560px;
     display: flex;
     flex-direction: column;
