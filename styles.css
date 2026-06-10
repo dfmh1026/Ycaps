@@ -1,0 +1,337 @@
+/* --- VARIABLES DE COLOR (Ycaps Palette) --- */
+:root {
+    --negro-principal: #111111;
+    --negro-secundario: #1a1a1a;
+    --dorado: #d4af37;
+    --dorado-hover: #bda032;
+    --blanco: #ffffff;
+    --gris-claro: #cccccc;
+}
+
+/* --- CONFIGURACIÓN BASE --- */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+body {
+    background-color: var(--negro-principal);
+    color: var(--blanco);
+}
+
+/* --- ENCABEZADO (NAVBAR) --- */
+/* Modifica la clase .logo para que use flexbox y alinee la imagen con el texto */
+/* --- ENCABEZADO (NAVBAR) --- */
+header {
+    background-color: var(--negro-secundario);
+    border-bottom: 2px solid var(--dorado);
+    padding: 0.5rem 2rem;
+    
+    /* ESTAS TRES LÍNEAS HACEN QUE SE QUEDE FIJO ARRIBA */
+    position: fixed;   /* Cambiamos sticky por fixed para asegurar que no se mueva */
+    top: 0;
+    left: 0;
+    width: 100%;       /* Ocupa todo el ancho de la pantalla */
+    
+    z-index: 1000;     /* Un número alto para que pase por encima de todas las fotos de las gorras */
+    
+    display: flex;
+   
+    align-items: center;
+}
+
+.logo {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    flex: 1;
+    justify-content: space-between;
+}
+
+/* Controla el tamaño de tu logo para que se adapte perfectamente a la barra */
+.imagen-logo {
+    height: 70px; /* Ajusta la altura a tu gusto (50px o 60px queda ideal) */
+    width: auto;  /* Mantiene la proporción original de la imagen sin deformarla */
+    object-fit: contain;
+    order: 2;
+}
+
+/* Agrupamos el título y subtítulo para que mantengan su orden vertical */
+.texto-logo {
+    display: flex;
+    flex-direction: column;
+    order: 1;
+}
+
+.logo h1 {
+    font-family: 'Bebas Neue', sans-serif;
+    color: goldenrod;
+    font-size: 3.2rem;
+    letter-spacing: 3px;
+}
+
+.logo span {
+    color: var(--dorado);
+}
+
+.subtitulo-logo {
+    font-family: 'Montserrat', sans-serif;
+    font-size: 0.85rem;
+    letter-spacing: 1.5px;
+    color: var(--gris-claro);
+    text-transform: uppercase;
+}
+
+.subtitulo-logo {
+    font-size: 0.8rem;
+    color: var(--gris-claro);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.boton-carrito {
+    background: none;
+    border: 2px solid var(--dorado);
+    color: var(--blanco);
+    padding: 0.1rem 1.0rem;
+    cursor: pointer;
+    font-weight: bold;
+    border-radius: 8px;
+    transition: 0.3s;
+}
+
+.boton-carrito:hover {
+    background-color: var(--dorado);
+    color: var(--negro-principal);
+}
+
+/* --- HERO BANNER --- */
+.hero {
+    text-align: center;
+    padding: 4rem 1rem;
+    background: linear-gradient(rgba(0,0,0,0.7), rgba(17,17,17,1)), url('https://images.unsplash.com/photo-1533240332313-0db49b459ad6?auto=format&fit=crop&w=1200&q=80') center/cover;
+    border-bottom: 1px solid #333;
+}
+
+.hero h2 {
+    font-size: 2.5rem;
+    color: var(--blanco);
+    margin-bottom: 0.5rem;
+}
+
+.hero p {
+    color: var(--dorado);
+    font-size: 1.2rem;
+    font-style: italic;
+}
+
+/* --- CATÁLOGO DE PRODUCTOS (GRID RESPONSIVO) --- */
+.contenedor-productos {
+    max-width: 1200px;
+    margin: 3rem auto;
+    padding: 0 1rem;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 2.5rem;
+}
+
+.tarjeta-producto {
+    background-color: var(--negro-secundario);
+    border: 1px solid #333;
+    border-radius: 8px;
+    overflow: hidden;
+    text-align: center;
+    padding-bottom: 1.5rem;
+    transition: transform 0.3s, border-color 0.3s;
+}
+
+.tarjeta-producto:hover {
+    transform: translateY(-5px);
+    border-color: var(--dorado);
+}
+
+/* Placeholder para fotos con el logo del caballo */
+.imagen-placeholder {
+    width: 100%;
+    height: 250px;
+    background-color: #252525;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    color: var(--gris-claro);
+    border-bottom: 1px solid #333;
+    font-size: 0.9rem;
+}
+
+.imagen-placeholder svg {
+    fill: var(--dorado);
+    width: 60px;
+    height: 60px;
+    margin-bottom: 10px;
+}
+
+.tarjeta-producto h3 {
+    margin: 1rem 0 0.5rem 0;
+    font-size: 1.3rem;
+    color: var(--blanco);
+}
+
+.tarjeta-producto .precio {
+    color: var(--dorado);
+    font-weight: bold;
+    font-size: 1.2rem;
+    margin-bottom: 1rem;
+}
+
+.btn-agregar {
+    background-color: transparent;
+    border: 2px solid var(--dorado);
+    color: var(--dorado);
+    padding: 0.6rem 1.5rem;
+    font-weight: bold;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+.btn-agregar:hover {
+    background-color: var(--dorado);
+    color: var(--negro-principal);
+}
+
+/* --- PANEL LATERAL DEL CARRITO --- */
+.carrito-panel {
+    position: fixed;
+    top: 0;
+    right: -400px;
+    width: 100%;
+    max-width: 400px;
+    height: 100%;
+    background-color: var(--negro-secundario);
+    box-shadow: -5px 0 15px rgba(0,0,0,0.5);
+    transition: right 0.3s ease;
+    z-index: 150;
+    padding: 2rem;
+    display: flex;
+    flex-direction: column;
+    border-left: 2px solid var(--dorado);
+}
+
+.carrito-panel.activo {
+    right: 0;
+}
+
+.cabecera-carrito {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid #333;
+    padding-bottom: 1rem;
+    margin-bottom: 1rem;
+}
+
+.btn-cerrar {
+    background: none;
+    border: none;
+    color: var(--blanco);
+    font-size: 1.5rem;
+    cursor: pointer;
+}
+
+.btn-cerrar:hover {
+    color: var(--dorado);
+}
+
+.items-carrito {
+    flex: 1;
+    overflow-y: auto;
+    margin-bottom: 1rem;
+}
+
+.item-en-carrito {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.8rem 0;
+    border-bottom: 1px solid #222;
+}
+
+.item-detalles h4 {
+    font-size: 1rem;
+    color: var(--blanco);
+}
+
+.item-detalles p {
+    font-size: 0.9rem;
+    color: var(--dorado);
+}
+
+.btn-eliminar {
+    background: none;
+    border: none;
+    color: #ff4d4d;
+    cursor: pointer;
+    font-size: 0.8rem;
+}
+
+.total-seccion {
+    border-top: 1px solid #333;
+    padding-top: 1rem;
+    margin-bottom: 1rem;
+    display: flex;
+    justify-content: space-between;
+    font-size: 1.2rem;
+    font-weight: bold;
+}
+
+.total-seccion span:last-child {
+    color: var(--dorado);
+}
+
+.btn-checkout {
+    background-color: var(--dorado);
+    color: var(--negro-principal);
+    border: none;
+    padding: 1rem;
+    font-weight: bold;
+    font-size: 1rem;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: 0.3s;
+    text-align: center;
+}
+
+.btn-checkout:hover {
+    background-color: var(--dorado-hover);
+}
+
+/* --- FOOTER --- */
+footer {
+    background-color: var(--negro-secundario);
+    text-align: center;
+    padding: 2rem;
+    margin-top: 5rem;
+    border-top: 1px solid #222;
+    color: var(--gris-claro);
+    font-size: 0.9rem;
+}
+
+/* Estilo para las fotos reales de las gorras */
+.imagen-producto {
+    width: 100%;
+    height: 250px;       /* Mantiene la misma altura que tenía el cuadro gris */
+    object-fit: cover;   /* Corta y adapta la foto para que llene el espacio sin estirarse ni verse mal */
+    border-bottom: 1px solid #333;
+}
+
+.hero {
+    text-align: center;
+    padding: 4rem 1rem;
+    margin-top: 100px; /* Al empujar el contenido hacia abajo, evitamos que el header fijo lo tape */
+    background: linear-gradient(rgba(0,0,0,0.7), rgba(17,17,17,1)), url('https://images.unsplash.com/photo-1533240332313-0db49b459ad6?auto=format&fit=crop&w=1200&q=80') center/cover;
+    border-bottom: 1px solid #333;
+}
+

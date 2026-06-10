@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ycaps | Gorras Estilo Agropecuario</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Montserrat:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+  <header>
+    <div class="logo">
+        <!-- Reemplaza "logo-ycaps.png" por la ruta real de tu imagen (puede ser local o un link de internet) -->
+        <img src="./assets/logoycaps.png" alt="Logo Ycaps" class="imagen-logo">
+        <div class="texto-logo">
+            <h1>Y<span>CAPS</span></h1>
+            <div class="subtitulo-logo">Estilo de campo</div>
+        </div>
+    </div>
+    <button class="boton-carrito" id="abrir-carrito">
+        Carrito (<span id="contador-carrito">0</span>)
+    </button>
+</header>
+
+    <section class="hero">
+        <h2>Colección Exclusiva</h2>
+        <p>Gorras Premium con alma ecuestre</p>
+    </section>
+
+    <main class="contenedor-productos">
+        
+            <!-- Producto 1 (Ejemplo con Foto Real) -->
+        <div class="tarjeta-producto">
+            <!-- REEMPLAZAMOS TODO EL PLACEHOLDER GRIS POR ESTA LÍNEA -->
+            <img src="./assets/gorra-negra.png" alt="Gorra Negra Azabache " class="imagen-producto">
+            
+            <h3>Gorra Negra Azabache</h3>
+            <p class="precio">$85.000</p>
+            <button class="btn-agregar" onclick="agregarAlCarrito('Gorra Negra Azabache', 85000)">Agregar al Carrito</button>
+        </div>
+
+      <div class="tarjeta-producto">
+            <!-- REEMPLAZAMOS TODO EL PLACEHOLDER GRIS POR ESTA LÍNEA -->
+            <img src="./assets/gorra-gris.png" alt="Gorra Gris " class="imagen-producto">
+            
+            <h3>Gorra Gris</h3>
+            <p class="precio">$85.000</p>
+            <button class="btn-agregar" onclick="agregarAlCarrito('Gorra Gris', 85000)">Agregar al Carrito</button>
+        </div>
+
+        <div class="tarjeta-producto">
+            <!-- REEMPLAZAMOS TODO EL PLACEHOLDER GRIS POR ESTA LÍNEA -->
+            <img src="./assets/gorra-blancan.png" alt="Gorra Blanca Caballo Negro" class="imagen-producto">
+            
+            <h3>Gorra Blanca Caballo Negro</h3>
+            <p class="precio">$85.000</p>
+            <button class="btn-agregar" onclick="agregarAlCarrito('Gorra Blanca Caballo Negro', 85000)">Agregar al Carrito</button>
+        </div>
+
+        <div class="tarjeta-producto">
+            <!-- REEMPLAZAMOS TODO EL PLACEHOLDER GRIS POR ESTA LÍNEA -->
+            <img src="./assets/gorra-blancat.png" alt="Gorra Blanca " class="imagen-producto">
+            
+            <h3>Gorra Blanca</h3>
+            <p class="precio">$85.000</p>
+            <button class="btn-agregar" onclick="agregarAlCarrito('Gorra Blanca', 85000)">Agregar al Carrito</button>
+        </div>
+
+
+          <div class="tarjeta-producto">
+            <!-- REEMPLAZAMOS TODO EL PLACEHOLDER GRIS POR ESTA LÍNEA -->
+            <img src="./assets/gorra-negrayj.png" alt="Gorra Negra Firma YJ" class="imagen-producto">
+            
+            <h3>Gorra Negra Firma YJ</h3>
+            <p class="precio">$85.000</p>
+            <button class="btn-agregar" onclick="agregarAlCarrito('Gorra Negra Firma YJ', 85000)">Agregar al Carrito</button>
+        </div>
+
+    </main>
+
+    <div class="carrito-panel" id="carrito-panel">
+        <div class="cabecera-carrito">
+            <h3>Tu Pedido</h3>
+            <button class="btn-cerrar" id="cerrar-carrito">&times;</button>
+        </div>
+        
+        <div class="items-carrito" id="items-carrito">
+            </div>
+
+        <div class="total-seccion">
+            <span>Total:</span>
+            <span id="precio-total">$0</span>
+        </div>
+
+        <button class="btn-checkout" onclick="procesarPedido()">Hacer Pedido por WhatsApp</button>
+    </div>
+
+    <footer>
+        <p>&copy; 2026 Ycaps. Síguenos en <a href="https://www.instagram.com/y.caps.gorras?igsh=MWY0d2xyMWc0aDc0MQ%3D%3D&utm_source=qr" target="_blank" rel="noopener noreferrer">Instagram</a>.</p>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+</html>
