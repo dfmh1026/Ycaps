@@ -135,3 +135,18 @@ function procesarPedido() {
     // Redirección directa a la API de WhatsApp
     window.open(`https://wa.me/${numeroTelefono}?text=${urlTexto}`, '_blank');
 }
+
+// Click en logo o H1 recarga la página (mejor experiencia móvil/desktop)
+document.addEventListener('DOMContentLoaded', () => {
+    const logoImg = document.querySelector('.imagen-logo');
+    const logoH1 = document.querySelector('.logo h1');
+
+    function recargarPagina(event) {
+        event.preventDefault();
+        // Usar location.reload para refrescar la página actual
+        window.location.reload();
+    }
+
+    if (logoImg) logoImg.addEventListener('click', recargarPagina);
+    if (logoH1) logoH1.addEventListener('click', recargarPagina);
+});

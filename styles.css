@@ -59,6 +59,7 @@ header {
     object-fit: contain;
     order: 2;
     margin-left: auto;
+    cursor: pointer;
 }
 
 /* Agrupamos el título y subtítulo para que mantengan su orden vertical */
@@ -78,6 +79,7 @@ header {
     display: flex;
     align-items: baseline;
     gap: 0.1em;
+    cursor: pointer;
 }
 
 .logo h1 .y-impacto {
