@@ -69,20 +69,30 @@ header {
 
 .logo h1 {
     font-family: 'Bebas Neue', sans-serif;
-    font-size: 3rem;
-    letter-spacing: 0.3em;
+    font-size: 2.8rem;
+    letter-spacing: 0.2em;
     text-transform: uppercase;
-    font-weight: 800;
-    color: transparent;
-    background: linear-gradient(90deg, rgba(255, 215, 0, 0.95), rgba(212, 175, 55, 0.95), rgba(255, 255, 255, 0.9));
-    -webkit-background-clip: text;
-    background-clip: text;
-    text-shadow: 0 0 18px rgba(212, 175, 55, 0.22);
+    font-weight: 900;
     margin: 0;
+    display: flex;
+    align-items: baseline;
+    gap: 0.1em;
 }
 
-.logo h1 span {
+.logo h1 .y-impacto {
     color: var(--blanco);
+    font-size: 1.55em;
+    text-shadow: 0 6px 16px rgba(212, 175, 55, 0.3), 0 0 24px rgba(212, 175, 55, 0.15);
+    font-weight: 900;
+    letter-spacing: 0.08em;
+}
+
+.logo h1 .caps-dorado {
+    background: linear-gradient(90deg, var(--dorado), rgba(212, 175, 55, 0.85));
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    text-shadow: 0 0 20px rgba(212, 175, 55, 0.2);
 }
 
 .logo span {
