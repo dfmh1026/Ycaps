@@ -48,10 +48,56 @@ modalImagen.addEventListener('click', (event) => {
 });
 
 const tarjetasProductos = document.querySelectorAll('.tarjeta-producto');
+
+function getVisibleImage(tarjeta) {
+    const principales = tarjeta.querySelectorAll('.imagen-principal');
+    for (const img of principales) {
+        const style = window.getComputedStyle(img);
+        if (style.display !== 'none' && style.visibility !== 'hidden' && img.naturalWidth !== 0) {
+            return img;
+        }
+    }
+    // fallback to any imagen-producto
+    return tarjeta.querySelector('.imagen-producto');
+}
+
+// Inicializar galerías: si hay varias imágenes dentro de la tarjeta, crear miniaturas
+function initGalerias() {
+    tarjetasProductos.forEach(tarjeta => {
+        const imgs = Array.from(tarjeta.querySelectorAll('.imagen-producto'));
+        if (imgs.length === 0) return;
+
+        // marcar la primera como imagen principal
+        imgs.forEach((img, i) => {
+            img.classList.add('imagen-principal');
+            if (i !== 0) img.style.display = 'none';
+        });
+
+        if (imgs.length > 1) {
+            const thumbs = document.createElement('div');
+            thumbs.className = 'thumbnails';
+            imgs.forEach((img, i) => {
+                const thumb = document.createElement('img');
+                thumb.src = img.src;
+                thumb.alt = img.alt || '';
+                if (i === 0) thumb.classList.add('active-thumb');
+                thumb.addEventListener('click', (e) => {
+                    imgs.forEach((im, idx) => {
+                        im.style.display = (idx === i) ? 'block' : 'none';
+                    });
+                    Array.from(thumbs.querySelectorAll('img')).forEach((t, idx) => t.classList.toggle('active-thumb', idx === i));
+                });
+                thumbs.appendChild(thumb);
+            });
+            tarjeta.appendChild(thumbs);
+        }
+    });
+}
+
 tarjetasProductos.forEach(tarjeta => {
     tarjeta.addEventListener('click', (event) => {
         if (event.target.closest('.btn-agregar')) return;
-        const imagen = tarjeta.querySelector('.imagen-producto');
+        const imagen = getVisibleImage(tarjeta);
         if (imagen) {
             abrirModalImagen(imagen.src, imagen.alt);
         }
