@@ -607,11 +607,11 @@ footer a:hover {
 
     .imagen-logo {
         position: absolute;
-        right: 5.2rem;
+        right: 10rem;
         top: 50%;
         transform: translateY(-50%);
-        height: 44px;
-        max-width: 120px;
+        height: 40px;
+        max-width: 110px;
         margin-left: 0;
         order: 1;
     }
