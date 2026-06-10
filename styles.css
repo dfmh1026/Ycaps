@@ -129,7 +129,7 @@ header {
 }
 
 .imagen-producto {
-    cursor: zoom-in;
+    cursor: default;
 }
 
 .modal-imagen {

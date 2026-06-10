@@ -47,10 +47,14 @@ modalImagen.addEventListener('click', (event) => {
     }
 });
 
-const imagenesProductos = document.querySelectorAll('.imagen-producto');
-imagenesProductos.forEach(imagen => {
-    imagen.addEventListener('click', () => {
-        abrirModalImagen(imagen.src, imagen.alt);
+const tarjetasProductos = document.querySelectorAll('.tarjeta-producto');
+tarjetasProductos.forEach(tarjeta => {
+    tarjeta.addEventListener('click', (event) => {
+        if (event.target.closest('.btn-agregar')) return;
+        const imagen = tarjeta.querySelector('.imagen-producto');
+        if (imagen) {
+            abrirModalImagen(imagen.src, imagen.alt);
+        }
     });
 });
 
