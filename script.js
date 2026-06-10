@@ -143,3 +143,24 @@ document.addEventListener('DOMContentLoaded', () => {
     if (logoImg) logoImg.addEventListener('click', recargarPagina);
     if (logoH1) logoH1.addEventListener('click', recargarPagina);
 });
+
+// Intentar forzar reproducción del video en móvil: asegurar muted y playsinline
+document.addEventListener('DOMContentLoaded', () => {
+    const video = document.querySelector('.hero-video');
+    if (!video) return;
+    try {
+        video.muted = true;
+        video.setAttribute('playsinline', '');
+        video.setAttribute('webkit-playsinline', '');
+        // algunos navegadores requieren llamar a play() desde código
+        const playPromise = video.play();
+        if (playPromise && typeof playPromise.then === 'function') {
+            playPromise.catch((err) => {
+                // no bloquear; registrar para diagnóstico
+                console.log('hero video play rejected:', err);
+            });
+        }
+    } catch (e) {
+        console.log('error forcing hero video play', e);
+    }
+});
