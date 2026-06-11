@@ -163,6 +163,19 @@ header {
     box-shadow: 0 0 60px rgba(0, 0, 0, 0.55);
     transform: translateY(20px) scale(0.97);
     animation: modalEntrance 0.28s ease forwards;
+    display: flex;
+    flex-direction: column;
+}
+
+.modal-gallery-wrapper {
+    position: relative;
+    width: 100%;
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #111;
+    overflow: hidden;
 }
 
 .modal-contenido img {
@@ -174,6 +187,47 @@ header {
     object-fit: contain;
     background: #111;
     margin: 0 auto;
+}
+
+.modal-gallery-controls {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 1rem;
+    padding: 0.9rem 1.25rem;
+    background: rgba(0, 0, 0, 0.3);
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.modal-nav-btn {
+    background: rgba(212, 175, 55, 0.16);
+    border: 1px solid rgba(212, 175, 55, 0.32);
+    color: var(--blanco);
+    border-radius: 999px;
+    width: 38px;
+    height: 38px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    cursor: pointer;
+    font-weight: 700;
+    font-size: 1rem;
+    transition: transform 0.25s ease, background 0.25s ease, color 0.25s ease;
+}
+
+.modal-nav-btn:hover {
+    background: rgba(212, 175, 55, 0.95);
+    color: var(--negro-principal);
+    transform: translateY(-1px);
+}
+
+.modal-indicator {
+    color: var(--dorado);
+    font-size: 0.9rem;
+    font-weight: 700;
+    min-width: 2.5rem;
+    text-align: center;
 }
 
 .modal-caption {
@@ -487,13 +541,81 @@ footer a:hover {
     image-rendering: auto;
     border-bottom: 1px solid rgba(255, 255, 255, 0.08);
     filter: saturate(1.05) contrast(1.05);
-    transition: transform 0.4s ease, filter 0.4s ease;
+    transition: transform 0.4s ease, filter 0.4s ease, opacity 0.35s ease, visibility 0.35s ease;
     display: block;
+}
+
+.gallery-wrapper {
+    position: relative;
+    width: 100%;
+    min-height: 320px;
+    overflow: hidden;
+}
+
+.gallery-wrapper .imagen-producto {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    opacity: 0;
+    visibility: hidden;
+}
+
+.gallery-wrapper .imagen-producto.activo {
+    opacity: 1;
+    visibility: visible;
+    border: 2px solid rgba(212, 175, 55, 0.5);
+    box-shadow: inset 0 0 8px rgba(212, 175, 55, 0.2);
 }
 
 .imagen-producto:hover {
     transform: scale(1.01);
     filter: saturate(1.1) contrast(1.08);
+}
+
+.gallery-nav {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.8rem 1rem 0;
+}
+
+.gallery-indicator {
+    color: var(--dorado);
+    font-size: 0.95rem;
+    font-weight: 700;
+    min-width: 3rem;
+    text-align: center;
+}
+
+.nav-btn {
+    background: rgba(212, 175, 55, 0.16);
+    border: 1px solid rgba(212, 175, 55, 0.32);
+    color: var(--blanco);
+    border-radius: 999px;
+    width: 42px;
+    height: 42px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    cursor: pointer;
+    font-weight: 700;
+    font-size: 1.1rem;
+    transition: transform 0.25s ease, background 0.25s ease, color 0.25s ease;
+}
+
+.nav-btn:hover {
+    background: rgba(212, 175, 55, 0.95);
+    color: var(--negro-principal);
+    transform: translateY(-1px);
+}
+
+.nav-btn.prev-btn,
+.nav-btn.next-btn {
+    min-width: 42px;
 }
 
 /* --- RESPONSIVE MOBILE --- */

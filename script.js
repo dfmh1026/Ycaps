@@ -27,31 +27,112 @@ const modalImagen = document.getElementById('modal-imagen');
 const modalImg = document.getElementById('modal-img');
 const modalCaption = document.getElementById('modal-caption');
 const cerrarModal = document.getElementById('cerrar-modal');
+const modalControls = document.getElementById('modal-controls');
+const modalPrevBtn = document.getElementById('modal-prev-btn');
+const modalNextBtn = document.getElementById('modal-next-btn');
+const modalIndicator = document.getElementById('modal-indicator');
 
-function abrirModalImagen(src, alt) {
+let modalGaleria = [];
+let modalGaleriaIndex = 0;
+
+function abrirModalImagen(src, alt, galeria = null, index = 0) {
     modalImg.src = src;
     modalImg.alt = alt;
     modalCaption.textContent = alt || 'Gorra Ycaps';
+    
+    if (galeria && galeria.length > 1) {
+        modalGaleria = galeria;
+        modalGaleriaIndex = index;
+        modalControls.style.display = 'flex';
+        modalIndicator.textContent = `${index + 1}/${galeria.length}`;
+    } else {
+        modalGaleria = [];
+        modalControls.style.display = 'none';
+    }
+    
     modalImagen.classList.add('activo');
 }
 
-function cerrarModalImagen() {
-    modalImagen.classList.remove('activo');
-    modalImg.src = '';
+function updateModalImage() {\n    if (modalGaleria.length === 0) return;\n    const img = modalGaleria[modalGaleriaIndex];\n    modalImg.src = img.src;\n    modalImg.alt = img.alt;\n    modalCaption.textContent = img.alt || 'Gorra Ycaps';\n    modalIndicator.textContent = `${modalGaleriaIndex + 1}/${modalGaleria.length}`;\n}\n\nfunction cerrarModalImagen() {\n    modalImagen.classList.remove('activo');\n    modalImg.src = '';\n    modalGaleria = [];\n}\n\nmodalPrevBtn.addEventListener('click', (e) => {\n    e.stopPropagation();\n    if (modalGaleria.length > 1) {\n        modalGaleriaIndex = (modalGaleriaIndex - 1 + modalGaleria.length) % modalGaleria.length;\n        updateModalImage();\n    }\n});\n\nmodalNextBtn.addEventListener('click', (e) => {\n    e.stopPropagation();\n    if (modalGaleria.length > 1) {\n        modalGaleriaIndex = (modalGaleriaIndex + 1) % modalGaleria.length;\n        updateModalImage();\n    }\n});\n
+const tarjetasProductos = document.querySelectorAll('.tarjeta-producto');
+
+function getVisibleImage(tarjeta) {
+    const imagenes = Array.from(tarjeta.querySelectorAll('.imagen-producto'));
+    const visible = imagenes.find(img => img.classList.contains('activo'));
+    return visible || imagenes[0];
 }
 
-cerrarModal.addEventListener('click', cerrarModalImagen);
-modalImagen.addEventListener('click', (event) => {
-    if (event.target === modalImagen) {
-        cerrarModalImagen();
-    }
-});
+function initGalerias() {
+    tarjetasProductos.forEach(tarjeta => {
+        const imagenes = Array.from(tarjeta.querySelectorAll('.imagen-producto'));
+        if (imagenes.length <= 1) return;
 
-const tarjetasProductos = document.querySelectorAll('.tarjeta-producto');
+        const wrapper = document.createElement('div');
+        wrapper.className = 'gallery-wrapper';
+        const firstImg = imagenes[0];
+        tarjeta.insertBefore(wrapper, firstImg);
+        imagenes.forEach(img => wrapper.appendChild(img));
+
+        let currentIndex = 0;
+        imagenes.forEach((img, index) => {
+            img.classList.toggle('activo', index === 0);
+            img.setAttribute('data-gallery-index', index);
+        });
+
+        const nav = document.createElement('div');
+        nav.className = 'gallery-nav';
+
+        const prevBtn = document.createElement('button');
+        prevBtn.type = 'button';
+        prevBtn.className = 'nav-btn prev-btn';
+        prevBtn.textContent = '‹';
+        prevBtn.setAttribute('aria-label', 'Ver la imagen anterior');
+
+        const indicator = document.createElement('span');
+        indicator.className = 'gallery-indicator';
+        indicator.textContent = `${currentIndex + 1}/${imagenes.length}`;
+
+        const nextBtn = document.createElement('button');
+        nextBtn.type = 'button';
+        nextBtn.className = 'nav-btn next-btn';
+        nextBtn.textContent = '›';
+        nextBtn.setAttribute('aria-label', 'Ver la siguiente imagen');
+
+        function updateGaleria() {
+            imagenes.forEach((img, index) => {
+                img.classList.toggle('activo', index === currentIndex);
+            });
+            indicator.textContent = `${currentIndex + 1}/${imagenes.length}`;
+        }
+
+        prevBtn.addEventListener('click', (event) => {
+            event.stopPropagation();
+            currentIndex = (currentIndex - 1 + imagenes.length) % imagenes.length;
+            updateGaleria();
+        });
+
+        nextBtn.addEventListener('click', (event) => {
+            event.stopPropagation();
+            currentIndex = (currentIndex + 1) % imagenes.length;
+            updateGaleria();
+        });
+
+        nav.append(prevBtn, indicator, nextBtn);
+        const titulo = tarjeta.querySelector('h3');
+        tarjeta.insertBefore(nav, titulo);
+    });
+}
+
+if (document.readyState !== 'loading') {
+    initGalerias();
+} else {
+    document.addEventListener('DOMContentLoaded', initGalerias);
+}
+
 tarjetasProductos.forEach(tarjeta => {
     tarjeta.addEventListener('click', (event) => {
-        if (event.target.closest('.btn-agregar')) return;
-        const imagen = tarjeta.querySelector('.imagen-producto');
+        if (event.target.closest('.btn-agregar') || event.target.closest('.nav-btn')) return;
+        const imagen = getVisibleImage(tarjeta);
         if (imagen) {
             abrirModalImagen(imagen.src, imagen.alt);
         }

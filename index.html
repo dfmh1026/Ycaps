@@ -41,8 +41,8 @@
             <!-- Producto 1 (Ejemplo con Foto Real) -->
         <div class="tarjeta-producto">
             <!-- REEMPLAZAMOS TODO EL PLACEHOLDER GRIS POR ESTA LÍNEA -->
-            <img src="./assets/gorra-negra.png" alt="Gorra Negra Azabache " class="imagen-producto">
-            <img src="./assets/gorra-negra2.png" alt="Gorra Negra Azabache " class="imagen-producto">
+            <img src="./assets/gorra-negra.png" alt="Gorra Negra Azabache" class="imagen-producto">
+            <img src="./assets/gorra-negra2.png" alt="Gorra Negra Azabache detalle" class="imagen-producto">
 
             <h3>Gorra Negra Azabache</h3>
             <p class="precio">$85.000</p>
@@ -85,9 +85,6 @@
             <p class="precio">$85.000</p>
             <button class="btn-agregar" onclick="agregarAlCarrito('Gorra Negra Firma YJ', 85000)">Agregar al Carrito</button>
         </div>
-
-           </div>
-
 
         <div class="tarjeta-producto">
             <!-- REEMPLAZAMOS TODO EL PLACEHOLDER GRIS POR ESTA LÍNEA -->
@@ -138,7 +135,14 @@
     <div class="modal-imagen" id="modal-imagen">
         <div class="modal-contenido">
             <button class="modal-cerrar" id="cerrar-modal">&times;</button>
-            <img src="" alt="" id="modal-img">
+            <div class="modal-gallery-wrapper">
+                <img src="" alt="" id="modal-img" class="modal-img-activo">
+            </div>
+            <div class="modal-gallery-controls" id="modal-controls" style="display: none;">
+                <button class="modal-nav-btn modal-prev" id="modal-prev-btn">‹</button>
+                <span class="modal-indicator" id="modal-indicator"></span>
+                <button class="modal-nav-btn modal-next" id="modal-next-btn">›</button>
+            </div>
             <p class="modal-caption" id="modal-caption"></p>
         </div>
     </div>
