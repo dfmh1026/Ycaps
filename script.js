@@ -53,7 +53,37 @@ function abrirModalImagen(src, alt, galeria = null, index = 0) {
     modalImagen.classList.add('activo');
 }
 
-function updateModalImage() {\n    if (modalGaleria.length === 0) return;\n    const img = modalGaleria[modalGaleriaIndex];\n    modalImg.src = img.src;\n    modalImg.alt = img.alt;\n    modalCaption.textContent = img.alt || 'Gorra Ycaps';\n    modalIndicator.textContent = `${modalGaleriaIndex + 1}/${modalGaleria.length}`;\n}\n\nfunction cerrarModalImagen() {\n    modalImagen.classList.remove('activo');\n    modalImg.src = '';\n    modalGaleria = [];\n}\n\nmodalPrevBtn.addEventListener('click', (e) => {\n    e.stopPropagation();\n    if (modalGaleria.length > 1) {\n        modalGaleriaIndex = (modalGaleriaIndex - 1 + modalGaleria.length) % modalGaleria.length;\n        updateModalImage();\n    }\n});\n\nmodalNextBtn.addEventListener('click', (e) => {\n    e.stopPropagation();\n    if (modalGaleria.length > 1) {\n        modalGaleriaIndex = (modalGaleriaIndex + 1) % modalGaleria.length;\n        updateModalImage();\n    }\n});\n
+function updateModalImage() {
+    if (modalGaleria.length === 0) return;
+    const img = modalGaleria[modalGaleriaIndex];
+    modalImg.src = img.src;
+    modalImg.alt = img.alt;
+    modalCaption.textContent = img.alt || 'Gorra Ycaps';
+    modalIndicator.textContent = `${modalGaleriaIndex + 1}/${modalGaleria.length}`;
+}
+
+function cerrarModalImagen() {
+    modalImagen.classList.remove('activo');
+    modalImg.src = '';
+    modalGaleria = [];
+}
+
+modalPrevBtn.addEventListener('click', (e) => {
+    e.stopPropagation();
+    if (modalGaleria.length > 1) {
+        modalGaleriaIndex = (modalGaleriaIndex - 1 + modalGaleria.length) % modalGaleria.length;
+        updateModalImage();
+    }
+});
+
+modalNextBtn.addEventListener('click', (e) => {
+    e.stopPropagation();
+    if (modalGaleria.length > 1) {
+        modalGaleriaIndex = (modalGaleriaIndex + 1) % modalGaleria.length;
+        updateModalImage();
+    }
+});
+
 const tarjetasProductos = document.querySelectorAll('.tarjeta-producto');
 
 function getVisibleImage(tarjeta) {
@@ -129,12 +159,21 @@ if (document.readyState !== 'loading') {
     document.addEventListener('DOMContentLoaded', initGalerias);
 }
 
+cerrarModal.addEventListener('click', cerrarModalImagen);
+modalImagen.addEventListener('click', (event) => {
+    if (event.target === modalImagen) {
+        cerrarModalImagen();
+    }
+});
+
 tarjetasProductos.forEach(tarjeta => {
     tarjeta.addEventListener('click', (event) => {
         if (event.target.closest('.btn-agregar') || event.target.closest('.nav-btn')) return;
         const imagen = getVisibleImage(tarjeta);
         if (imagen) {
-            abrirModalImagen(imagen.src, imagen.alt);
+            const imagenes = Array.from(tarjeta.querySelectorAll('.imagen-producto'));
+            const index = imagenes.indexOf(imagen);
+            abrirModalImagen(imagen.src, imagen.alt, imagenes, index);
         }
     });
 });
