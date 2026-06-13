@@ -191,9 +191,13 @@ function agregarAlCarrito(nombre, precio) {
     }
     
     actualizarInterfaz();
-    
+
     // Abre automáticamente el panel para dar feedback al usuario
     panel.classList.add('activo');
+
+    // Microanimación: pulso en el botón del carrito al agregar un producto
+    abrirBtn.classList.remove('pulso');
+    requestAnimationFrame(() => abrirBtn.classList.add('pulso'));
 }
 
 // Eliminar un producto por completo
@@ -263,6 +267,37 @@ document.addEventListener('DOMContentLoaded', () => {
     if (logoImg) logoImg.addEventListener('click', recargarPagina);
     if (logoH1) logoH1.addEventListener('click', recargarPagina);
 });
+
+// --- ANIMACIONES DE ENTRADA AL HACER SCROLL ---
+const elementosReveal = document.querySelectorAll('.reveal');
+
+if ('IntersectionObserver' in window) {
+    const observadorReveal = new IntersectionObserver((entradas) => {
+        entradas.forEach(entrada => {
+            if (entrada.isIntersecting) {
+                entrada.target.classList.add('visible');
+                observadorReveal.unobserve(entrada.target);
+            }
+        });
+    }, { threshold: 0.15 });
+
+    elementosReveal.forEach(el => observadorReveal.observe(el));
+} else {
+    elementosReveal.forEach(el => el.classList.add('visible'));
+}
+
+// --- BOTÓN VOLVER ARRIBA ---
+const btnArriba = document.getElementById('btn-arriba');
+
+if (btnArriba) {
+    window.addEventListener('scroll', () => {
+        btnArriba.classList.toggle('visible', window.scrollY > 480);
+    });
+
+    btnArriba.addEventListener('click', () => {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    });
+}
 
 // Intentar forzar reproducción del video en móvil: asegurar muted y playsinline
 document.addEventListener('DOMContentLoaded', () => {

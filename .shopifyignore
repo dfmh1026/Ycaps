@@ -1,0 +1,5 @@
+# Archivos del sitio estatico de Ycaps (no forman parte del tema de Shopify)
+/index.html
+/script.js
+/styles.css
+/media/
