@@ -771,6 +771,119 @@ header {
     background: linear-gradient(135deg, var(--dorado-hover), var(--dorado));
 }
 
+/* --- MODAL DE CHECKOUT (DATOS DE ENVÍO) --- */
+.modal-checkout {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.92);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 2600;
+    padding: 1.25rem;
+    opacity: 0;
+    transition: opacity 0.28s ease;
+}
+
+.modal-checkout.activo {
+    display: flex;
+    opacity: 1;
+}
+
+.modal-checkout-contenido {
+    position: relative;
+    width: min(480px, calc(100vw - 2rem));
+    max-height: 92vh;
+    overflow-y: auto;
+    background: rgba(17, 17, 17, 0.98);
+    border: 1px solid rgba(212, 175, 55, 0.18);
+    border-radius: 24px;
+    padding: 2rem;
+    box-shadow: 0 0 60px rgba(0, 0, 0, 0.55);
+    transform: translateY(20px) scale(0.97);
+    animation: modalEntrance 0.28s ease forwards;
+}
+
+.modal-checkout-contenido h3 {
+    color: var(--dorado);
+    margin-bottom: 0.5rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.modal-checkout-subtexto {
+    color: var(--gris-claro);
+    font-size: 0.9rem;
+    margin-bottom: 1.5rem;
+}
+
+.campo-formulario {
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+    margin-bottom: 1rem;
+}
+
+.campo-formulario label {
+    font-size: 0.85rem;
+    color: var(--blanco);
+}
+
+.campo-formulario input {
+    background: rgba(255, 255, 255, 0.06);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    border-radius: 10px;
+    padding: 0.7rem 0.9rem;
+    color: var(--blanco);
+    font-size: 0.95rem;
+    transition: border-color var(--duracion-rapida) var(--ease-premium),
+        background var(--duracion-rapida) var(--ease-premium);
+}
+
+.campo-formulario input:focus {
+    outline: none;
+    border-color: var(--dorado);
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.botones-checkout {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    margin-top: 1.5rem;
+}
+
+.btn-whatsapp {
+    background: rgba(255, 255, 255, 0.05);
+    color: var(--blanco);
+    border: 1px solid rgba(212, 175, 55, 0.32);
+    padding: 1rem 1.25rem;
+    font-weight: 600;
+    font-size: 1rem;
+    border-radius: 999px;
+    cursor: pointer;
+    transition: transform 0.25s ease, background 0.25s ease, border-color 0.25s ease;
+    text-align: center;
+}
+
+.btn-whatsapp:hover {
+    transform: translateY(-1px);
+    background: rgba(212, 175, 55, 0.12);
+    border-color: var(--dorado);
+}
+
+.checkout-mensaje {
+    margin-top: 1rem;
+    font-size: 0.85rem;
+    color: var(--gris-claro);
+    text-align: center;
+    min-height: 1.2em;
+}
+
+.checkout-mensaje.error {
+    color: #ff6b6b;
+}
+
 /* --- FOOTER --- */
 footer {
     background-color: var(--negro-secundario);

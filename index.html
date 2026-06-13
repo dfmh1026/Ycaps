@@ -169,7 +169,43 @@
             <span id="precio-total">$0</span>
         </div>
 
-        <button class="btn-checkout" onclick="procesarPedido()">Hacer Pedido por WhatsApp</button>
+        <button class="btn-checkout" id="btn-abrir-checkout">Finalizar Pedido</button>
+    </div>
+
+    <div class="modal-checkout" id="modal-checkout">
+        <div class="modal-checkout-contenido">
+            <button class="modal-cerrar" id="cerrar-modal-checkout">&times;</button>
+            <h3>Datos de envío</h3>
+            <p class="modal-checkout-subtexto">Completa tus datos para continuar con el pago o el pedido por WhatsApp.</p>
+            <form id="form-checkout">
+                <div class="campo-formulario">
+                    <label for="checkout-nombre">Nombre completo</label>
+                    <input type="text" id="checkout-nombre" name="nombre" required autocomplete="name">
+                </div>
+                <div class="campo-formulario">
+                    <label for="checkout-email">Correo electrónico</label>
+                    <input type="email" id="checkout-email" name="email" required autocomplete="email">
+                </div>
+                <div class="campo-formulario">
+                    <label for="checkout-telefono">Teléfono</label>
+                    <input type="tel" id="checkout-telefono" name="telefono" required autocomplete="tel">
+                </div>
+                <div class="campo-formulario">
+                    <label for="checkout-direccion">Dirección de envío</label>
+                    <input type="text" id="checkout-direccion" name="direccion" required autocomplete="street-address">
+                </div>
+                <div class="campo-formulario">
+                    <label for="checkout-ciudad">Ciudad</label>
+                    <input type="text" id="checkout-ciudad" name="ciudad" required autocomplete="address-level2">
+                </div>
+
+                <div class="botones-checkout">
+                    <button type="submit" class="btn-checkout" id="btn-pagar-mp">Pagar con Mercado Pago</button>
+                    <button type="button" class="btn-whatsapp" id="btn-pedir-whatsapp">Pedir por WhatsApp</button>
+                </div>
+                <p class="checkout-mensaje" id="checkout-mensaje"></p>
+            </form>
+        </div>
     </div>
 
     <div class="modal-imagen" id="modal-imagen">

@@ -1,5 +1,25 @@
 // --- VARIABLES GLOBALES Y SELECTORES ---
-let carrito = [];
+const CARRITO_STORAGE_KEY = 'ycaps-carrito';
+
+function cargarCarrito() {
+    try {
+        const guardado = localStorage.getItem(CARRITO_STORAGE_KEY);
+        return guardado ? JSON.parse(guardado) : [];
+    } catch (e) {
+        console.log('No se pudo leer el carrito guardado:', e);
+        return [];
+    }
+}
+
+function guardarCarrito() {
+    try {
+        localStorage.setItem(CARRITO_STORAGE_KEY, JSON.stringify(carrito));
+    } catch (e) {
+        console.log('No se pudo guardar el carrito:', e);
+    }
+}
+
+let carrito = cargarCarrito();
 
 const panel = document.getElementById('carrito-panel');
 const abrirBtn = document.getElementById('abrir-carrito');
@@ -12,13 +32,17 @@ const totalTxt = document.getElementById('precio-total');
 abrirBtn.addEventListener('click', () => panel.classList.add('activo'));
 cerrarBtn.addEventListener('click', () => panel.classList.remove('activo'));
 
+// Restaurar el carrito guardado al cargar la página
+actualizarInterfaz();
+
 document.addEventListener('click', (event) => {
     if (!panel.classList.contains('activo')) return;
 
     const clickDentroPanel = panel.contains(event.target);
     const clickEnBotonAbrir = abrirBtn.contains(event.target);
+    const clickEnAgregar = event.target.closest('.btn-agregar');
 
-    if (!clickDentroPanel && !clickEnBotonAbrir) {
+    if (!clickDentroPanel && !clickEnBotonAbrir && !clickEnAgregar) {
         panel.classList.remove('activo');
     }
 });
@@ -189,7 +213,8 @@ function agregarAlCarrito(nombre, precio) {
     } else {
         carrito.push({ nombre, precio, cantidad: 1 });
     }
-    
+
+    guardarCarrito();
     actualizarInterfaz();
 
     // Abre automáticamente el panel para dar feedback al usuario
@@ -203,6 +228,7 @@ function agregarAlCarrito(nombre, precio) {
 // Eliminar un producto por completo
 function eliminarDelCarrito(nombre) {
     carrito = carrito.filter(item => item.nombre !== nombre);
+    guardarCarrito();
     actualizarInterfaz();
 }
 
@@ -233,25 +259,109 @@ function actualizarInterfaz() {
     totalTxt.innerText = `$${total.toLocaleString('es-CO')}`;
 }
 
-// --- PROCESAR PEDIDO Y ENVIAR A WHATSAPP ---
-function procesarPedido() {
+// --- MODAL DE CHECKOUT (DATOS DE ENVÍO Y PAGO) ---
+const modalCheckout = document.getElementById('modal-checkout');
+const btnAbrirCheckout = document.getElementById('btn-abrir-checkout');
+const cerrarModalCheckoutBtn = document.getElementById('cerrar-modal-checkout');
+const formCheckout = document.getElementById('form-checkout');
+const btnPedirWhatsapp = document.getElementById('btn-pedir-whatsapp');
+const checkoutMensaje = document.getElementById('checkout-mensaje');
+
+function abrirModalCheckout() {
     if (carrito.length === 0) {
         alert("Tu carrito está vacío. ¡Añade algunas Ycaps primero!");
         return;
     }
+    checkoutMensaje.textContent = '';
+    checkoutMensaje.classList.remove('error');
+    modalCheckout.classList.add('activo');
+}
 
-    // Opción 1: Mensaje breve prellenado con los items del carrito
+function cerrarModalCheckout() {
+    modalCheckout.classList.remove('activo');
+}
+
+btnAbrirCheckout.addEventListener('click', abrirModalCheckout);
+cerrarModalCheckoutBtn.addEventListener('click', cerrarModalCheckout);
+modalCheckout.addEventListener('click', (event) => {
+    if (event.target === modalCheckout) {
+        cerrarModalCheckout();
+    }
+});
+
+function obtenerDatosComprador() {
+    return {
+        nombre: document.getElementById('checkout-nombre').value.trim(),
+        email: document.getElementById('checkout-email').value.trim(),
+        telefono: document.getElementById('checkout-telefono').value.trim(),
+        direccion: document.getElementById('checkout-direccion').value.trim(),
+        ciudad: document.getElementById('checkout-ciudad').value.trim()
+    };
+}
+
+// --- ENVIAR PEDIDO POR WHATSAPP (incluye datos del comprador) ---
+btnPedirWhatsapp.addEventListener('click', () => {
+    if (!formCheckout.checkValidity()) {
+        formCheckout.reportValidity();
+        return;
+    }
+
+    const comprador = obtenerDatosComprador();
+
     let textoMensaje = "Hola, quiero comprar estas gorras:\n\n";
     carrito.forEach(item => {
         textoMensaje += `- ${item.nombre} x${item.cantidad}\n`;
     });
+    textoMensaje += `\nDatos de envío:\n`;
+    textoMensaje += `Nombre: ${comprador.nombre}\n`;
+    textoMensaje += `Email: ${comprador.email}\n`;
+    textoMensaje += `Teléfono: ${comprador.telefono}\n`;
+    textoMensaje += `Dirección: ${comprador.direccion}, ${comprador.ciudad}\n`;
     textoMensaje += "\n¿Tienen stock?";
 
     const urlTexto = encodeURIComponent(textoMensaje);
-    // Usar el enlace directo proporcionado y añadir el texto prellenado
     const waLink = `https://wa.me/message/FJMYKB6OTYB3M1?text=${urlTexto}`;
     window.open(waLink, '_blank');
-}
+});
+
+// --- PAGAR CON MERCADO PAGO (crea una preferencia en el backend PHP) ---
+formCheckout.addEventListener('submit', async (event) => {
+    event.preventDefault();
+
+    if (!formCheckout.checkValidity()) {
+        formCheckout.reportValidity();
+        return;
+    }
+
+    const btnPagarMp = document.getElementById('btn-pagar-mp');
+    const comprador = obtenerDatosComprador();
+
+    checkoutMensaje.textContent = 'Conectando con Mercado Pago...';
+    checkoutMensaje.classList.remove('error');
+    btnPagarMp.disabled = true;
+
+    try {
+        const respuesta = await fetch('mercadopago/crear-preferencia.php', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ items: carrito, comprador })
+        });
+
+        const datos = await respuesta.json();
+
+        if (!respuesta.ok || !datos.init_point) {
+            throw new Error(datos.error || 'No se pudo crear la preferencia de pago.');
+        }
+
+        window.location.href = datos.init_point;
+    } catch (error) {
+        checkoutMensaje.textContent = 'No se pudo iniciar el pago. Intenta de nuevo o usa WhatsApp.';
+        checkoutMensaje.classList.add('error');
+        console.log('Error al crear preferencia de Mercado Pago:', error);
+    } finally {
+        btnPagarMp.disabled = false;
+    }
+});
 
 // Click en logo o H1 recarga la página (mejor experiencia móvil/desktop)
 document.addEventListener('DOMContentLoaded', () => {
