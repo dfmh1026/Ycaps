@@ -11,6 +11,7 @@ if (!file_exists($configFile)) {
     exit;
 }
 require $configFile;
+require __DIR__ . '/db.php';
 
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     http_response_code(405);
@@ -69,6 +70,7 @@ $preferencia = [
         'failure' => MP_BACK_URL_FAILURE,
         'pending' => MP_BACK_URL_PENDING,
     ],
+    'notification_url' => MP_NOTIFICATION_URL,
     'auto_return' => 'approved',
 ];
 
@@ -98,6 +100,19 @@ if ($respuesta === false) {
 $resultado = json_decode($respuesta, true);
 
 if ($codigoHttp >= 200 && $codigoHttp < 300 && !empty($resultado['init_point'])) {
+    $total = 0;
+    foreach ($itemsPreferencia as $item) {
+        $total += $item['unit_price'] * $item['quantity'];
+    }
+
+    try {
+        $db = conectarDb();
+        guardarPedido($db, $comprador, $itemsPreferencia, $total, $resultado['id'] ?? '');
+    } catch (Throwable $e) {
+        // No bloquear el pago si falla el guardado del pedido; solo registrar el error.
+        error_log('Error guardando pedido en la base de datos: ' . $e->getMessage());
+    }
+
     echo json_encode(['init_point' => $resultado['init_point']]);
     exit;
 }
