@@ -301,6 +301,26 @@ modalCheckout.addEventListener('click', (event) => {
     }
 });
 
+// --- MODAL DE POLÍTICA DE PRIVACIDAD ---
+const modalPolitica = document.getElementById('modal-politica');
+const abrirPoliticaBtn = document.getElementById('abrir-politica-privacidad');
+const cerrarModalPoliticaBtn = document.getElementById('cerrar-modal-politica');
+
+abrirPoliticaBtn.addEventListener('click', (event) => {
+    event.preventDefault();
+    modalPolitica.classList.add('activo');
+});
+
+cerrarModalPoliticaBtn.addEventListener('click', () => {
+    modalPolitica.classList.remove('activo');
+});
+
+modalPolitica.addEventListener('click', (event) => {
+    if (event.target === modalPolitica) {
+        modalPolitica.classList.remove('activo');
+    }
+});
+
 function obtenerDatosComprador() {
     return {
         nombre: document.getElementById('checkout-nombre').value.trim(),
