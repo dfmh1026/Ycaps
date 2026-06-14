@@ -193,7 +193,7 @@ modalImagen.addEventListener('click', (event) => {
 
 tarjetasProductos.forEach(tarjeta => {
     tarjeta.addEventListener('click', (event) => {
-        if (event.target.closest('.btn-agregar') || event.target.closest('.nav-btn')) return;
+        if (event.target.closest('.btn-agregar') || event.target.closest('.nav-btn') || event.target.closest('.selector-cantidad')) return;
         const imagen = getVisibleImage(tarjeta);
         if (imagen) {
             const imagenes = Array.from(tarjeta.querySelectorAll('.imagen-producto'));
@@ -203,16 +203,49 @@ tarjetasProductos.forEach(tarjeta => {
     });
 });
 
+// --- SELECTOR DE CANTIDAD POR PRODUCTO ---
+tarjetasProductos.forEach(tarjeta => {
+    const input = tarjeta.querySelector('.input-cantidad');
+    const btnRestar = tarjeta.querySelector('.btn-restar');
+    const btnSumar = tarjeta.querySelector('.btn-sumar');
+    if (!input || !btnRestar || !btnSumar) return;
+
+    const cantidadMin = Number(input.min) || 1;
+    const cantidadMax = Number(input.max) || 99;
+
+    function ajustarCantidad(delta) {
+        const valorActual = parseInt(input.value, 10) || cantidadMin;
+        const nuevoValor = Math.min(cantidadMax, Math.max(cantidadMin, valorActual + delta));
+        input.value = nuevoValor;
+    }
+
+    btnRestar.addEventListener('click', () => ajustarCantidad(-1));
+    btnSumar.addEventListener('click', () => ajustarCantidad(1));
+
+    input.addEventListener('change', () => {
+        const valor = parseInt(input.value, 10) || cantidadMin;
+        input.value = Math.min(cantidadMax, Math.max(cantidadMin, valor));
+    });
+});
+
 // --- FUNCIONES DEL CARRITO ---
 
 // Añadir un modelo de gorra al carrito
-function agregarAlCarrito(nombre, precio) {
+function agregarAlCarrito(nombre, precio, btn) {
+    let cantidad = 1;
+    const tarjeta = btn ? btn.closest('.tarjeta-producto') : null;
+    const inputCantidad = tarjeta ? tarjeta.querySelector('.input-cantidad') : null;
+    if (inputCantidad) {
+        cantidad = Math.max(1, parseInt(inputCantidad.value, 10) || 1);
+        inputCantidad.value = inputCantidad.min || 1;
+    }
+
     const existe = carrito.find(item => item.nombre === nombre);
-    
+
     if (existe) {
-        existe.cantidad++;
+        existe.cantidad += cantidad;
     } else {
-        carrito.push({ nombre, precio, cantidad: 1 });
+        carrito.push({ nombre, precio, cantidad });
     }
 
     guardarCarrito();
