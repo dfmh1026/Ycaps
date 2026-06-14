@@ -4,7 +4,8 @@ const CARRITO_STORAGE_KEY = 'ycaps-carrito';
 function cargarCarrito() {
     try {
         const guardado = localStorage.getItem(CARRITO_STORAGE_KEY);
-        return guardado ? JSON.parse(guardado) : [];
+        const datos = guardado ? JSON.parse(guardado) : [];
+        return Array.isArray(datos) ? datos : [];
     } catch (e) {
         console.log('No se pudo leer el carrito guardado:', e);
         return [];
@@ -244,13 +245,24 @@ function actualizarInterfaz() {
 
         const div = document.createElement('div');
         div.classList.add('item-en-carrito');
-        div.innerHTML = `
-            <div class="item-detalles">
-                <h4>${item.nombre} (x${item.cantidad})</h4>
-                <p>$${(item.precio * item.cantidad).toLocaleString('es-CO')}</p>
-            </div>
-            <button class="btn-eliminar" onclick="eliminarDelCarrito('${item.nombre}')">Eliminar</button>
-        `;
+
+        const detalles = document.createElement('div');
+        detalles.classList.add('item-detalles');
+
+        const titulo = document.createElement('h4');
+        titulo.textContent = `${item.nombre} (x${item.cantidad})`;
+
+        const precio = document.createElement('p');
+        precio.textContent = `$${(item.precio * item.cantidad).toLocaleString('es-CO')}`;
+
+        detalles.append(titulo, precio);
+
+        const btnEliminar = document.createElement('button');
+        btnEliminar.classList.add('btn-eliminar');
+        btnEliminar.textContent = 'Eliminar';
+        btnEliminar.addEventListener('click', () => eliminarDelCarrito(item.nombre));
+
+        div.append(detalles, btnEliminar);
         contenedorItems.appendChild(div);
     });
 
@@ -320,8 +332,8 @@ btnPedirWhatsapp.addEventListener('click', () => {
     textoMensaje += "\n¿Tienen stock?";
 
     const urlTexto = encodeURIComponent(textoMensaje);
-    const waLink = `https://wa.me/message/FJMYKB6OTYB3M1?text=${urlTexto}`;
-    window.open(waLink, '_blank');
+    const waLink = `https://wa.me/573105853626?text=${urlTexto}`;
+    window.location.href = waLink;
 });
 
 // --- PAGAR CON MERCADO PAGO (crea una preferencia en el backend PHP) ---

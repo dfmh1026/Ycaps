@@ -835,7 +835,7 @@ header {
     border-radius: 10px;
     padding: 0.7rem 0.9rem;
     color: var(--blanco);
-    font-size: 0.95rem;
+    font-size: 16px; /* evita el zoom automático al enfocar inputs en iOS Safari */
     transition: border-color var(--duracion-rapida) var(--ease-premium),
         background var(--duracion-rapida) var(--ease-premium);
 }
@@ -903,6 +903,51 @@ footer a {
 
 footer a:hover {
     color: var(--blanco);
+}
+
+.footer-social {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+    margin-bottom: 1.25rem;
+    flex-wrap: wrap;
+}
+
+.social-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.6rem 1.25rem;
+    border: 1px solid rgba(212, 175, 55, 0.32);
+    border-radius: 999px;
+    color: var(--blanco);
+    font-weight: 600;
+    font-size: 0.85rem;
+    letter-spacing: 0.04em;
+    background: rgba(212, 175, 55, 0.06);
+    transition: transform var(--duracion-rapida) var(--ease-premium),
+        background var(--duracion-rapida) var(--ease-premium),
+        border-color var(--duracion-rapida) var(--ease-premium),
+        color var(--duracion-rapida) var(--ease-premium);
+}
+
+.social-link svg {
+    width: 20px;
+    height: 20px;
+    flex-shrink: 0;
+    color: var(--dorado);
+    transition: color var(--duracion-rapida) var(--ease-premium);
+}
+
+.social-link:hover {
+    transform: translateY(-2px);
+    background: rgba(212, 175, 55, 0.95);
+    border-color: var(--dorado);
+    color: var(--negro-principal);
+}
+
+.social-link:hover svg {
+    color: var(--negro-principal);
 }
 
 /* Estilo para las fotos reales de las gorras */
@@ -1254,5 +1299,13 @@ footer a:hover {
     .btn-agregar {
         padding: 0.55rem 1rem;
         font-size: 0.82rem;
+    }
+
+    .modal-checkout-contenido {
+        padding: 1.5rem 1.25rem;
+    }
+
+    .carrito-panel {
+        padding: 1.5rem;
     }
 }

@@ -1,0 +1,20 @@
+# Seguridad básica del sitio Ycaps
+
+# Evitar que se listen los archivos de las carpetas
+Options -Indexes
+
+# Bloquear acceso directo a archivos sensibles
+<FilesMatch "\.(sql|env|log)$">
+    Require all denied
+</FilesMatch>
+
+<Files "config.php">
+    Require all denied
+</Files>
+
+# Cabeceras de seguridad
+<IfModule mod_headers.c>
+    Header set X-Content-Type-Options "nosniff"
+    Header set X-Frame-Options "SAMEORIGIN"
+    Header set Referrer-Policy "strict-origin-when-cross-origin"
+</IfModule>
