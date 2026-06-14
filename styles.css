@@ -916,7 +916,9 @@ footer a:hover {
 .social-link {
     display: inline-flex;
     align-items: center;
+    justify-content: center;
     gap: 0.5rem;
+    width: 148px;
     padding: 0.6rem 1.25rem;
     border: 1px solid rgba(212, 175, 55, 0.32);
     border-radius: 999px;
