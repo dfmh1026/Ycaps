@@ -321,6 +321,16 @@ modalPolitica.addEventListener('click', (event) => {
     }
 });
 
+// Acordeón: "Tratamiento de Datos Personales" oculto hasta que el usuario hace clic
+const toggleTratamientoDatos = document.getElementById('toggle-tratamiento-datos');
+const contenidoTratamientoDatos = document.getElementById('contenido-tratamiento-datos');
+
+toggleTratamientoDatos.addEventListener('click', () => {
+    const expandido = toggleTratamientoDatos.getAttribute('aria-expanded') === 'true';
+    toggleTratamientoDatos.setAttribute('aria-expanded', String(!expandido));
+    contenidoTratamientoDatos.hidden = expandido;
+});
+
 function obtenerDatosComprador() {
     return {
         nombre: document.getElementById('checkout-nombre').value.trim(),

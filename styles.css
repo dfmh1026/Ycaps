@@ -947,6 +947,50 @@ header {
     margin-bottom: 0.4rem;
 }
 
+.acordeon-toggle {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    width: 100%;
+    margin-top: 1.5rem;
+    padding: 0.9rem 1.1rem;
+    background: rgba(212, 175, 55, 0.06);
+    border: 1px solid rgba(212, 175, 55, 0.32);
+    border-radius: 12px;
+    color: var(--dorado-claro);
+    font-weight: 600;
+    font-size: 0.95rem;
+    letter-spacing: 0.02em;
+    text-align: left;
+    cursor: pointer;
+    transition: background var(--duracion-rapida) var(--ease-premium),
+        border-color var(--duracion-rapida) var(--ease-premium);
+}
+
+.acordeon-toggle:hover {
+    background: rgba(212, 175, 55, 0.12);
+    border-color: var(--dorado);
+}
+
+.acordeon-icono {
+    flex-shrink: 0;
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: var(--dorado);
+    transition: transform var(--duracion-rapida) var(--ease-premium);
+}
+
+.acordeon-toggle[aria-expanded="true"] .acordeon-icono {
+    transform: rotate(45deg);
+}
+
+.acordeon-contenido {
+    margin-top: 1rem;
+    padding-top: 0.25rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+}
+
 /* --- FOOTER --- */
 footer {
     background-color: var(--negro-secundario);
