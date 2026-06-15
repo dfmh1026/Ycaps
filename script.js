@@ -334,34 +334,73 @@ modalCheckout.addEventListener('click', (event) => {
     }
 });
 
-// --- MODAL DE POLÍTICA DE PRIVACIDAD ---
-const modalPolitica = document.getElementById('modal-politica');
-const abrirPoliticaBtn = document.getElementById('abrir-politica-privacidad');
-const cerrarModalPoliticaBtn = document.getElementById('cerrar-modal-politica');
+// --- MODALES LEGALES (Política de Privacidad y Términos y Condiciones) ---
+function inicializarModalLegal(modalId, abrirId, cerrarId) {
+    const modal = document.getElementById(modalId);
+    const abrirBtnLegal = document.getElementById(abrirId);
+    const cerrarBtnLegal = document.getElementById(cerrarId);
 
-abrirPoliticaBtn.addEventListener('click', (event) => {
+    abrirBtnLegal.addEventListener('click', (event) => {
+        event.preventDefault();
+        modal.classList.add('activo');
+    });
+
+    cerrarBtnLegal.addEventListener('click', () => {
+        modal.classList.remove('activo');
+    });
+
+    modal.addEventListener('click', (event) => {
+        if (event.target === modal) {
+            modal.classList.remove('activo');
+        }
+    });
+
+    return modal;
+}
+
+const modalPolitica = inicializarModalLegal('modal-politica', 'abrir-politica-privacidad', 'cerrar-modal-politica');
+inicializarModalLegal('modal-terminos', 'abrir-terminos-condiciones', 'cerrar-modal-terminos');
+
+// Acordeones de la política de privacidad, ocultos hasta que el usuario hace clic
+function inicializarAcordeon(toggleId, contenidoId) {
+    const toggle = document.getElementById(toggleId);
+    const contenido = document.getElementById(contenidoId);
+
+    toggle.addEventListener('click', () => {
+        const expandido = toggle.getAttribute('aria-expanded') === 'true';
+        toggle.setAttribute('aria-expanded', String(!expandido));
+        contenido.hidden = expandido;
+    });
+
+    return { toggle, contenido };
+}
+
+inicializarAcordeon('toggle-tratamiento-datos', 'contenido-tratamiento-datos');
+const acordeonCookies = inicializarAcordeon('toggle-cookies', 'contenido-cookies');
+
+// --- AVISO DE COOKIES ---
+const COOKIES_STORAGE_KEY = 'ycaps-cookies-aceptadas';
+const bannerCookies = document.getElementById('banner-cookies');
+const btnCookiesAceptar = document.getElementById('btn-cookies-aceptar');
+const bannerCookiesEnlace = document.getElementById('banner-cookies-enlace');
+
+if (!localStorage.getItem(COOKIES_STORAGE_KEY)) {
+    bannerCookies.hidden = false;
+    document.body.style.paddingBottom = `${bannerCookies.offsetHeight}px`;
+}
+
+btnCookiesAceptar.addEventListener('click', () => {
+    localStorage.setItem(COOKIES_STORAGE_KEY, 'true');
+    bannerCookies.hidden = true;
+    document.body.style.paddingBottom = '';
+});
+
+bannerCookiesEnlace.addEventListener('click', (event) => {
     event.preventDefault();
     modalPolitica.classList.add('activo');
-});
-
-cerrarModalPoliticaBtn.addEventListener('click', () => {
-    modalPolitica.classList.remove('activo');
-});
-
-modalPolitica.addEventListener('click', (event) => {
-    if (event.target === modalPolitica) {
-        modalPolitica.classList.remove('activo');
-    }
-});
-
-// Acordeón: "Tratamiento de Datos Personales" oculto hasta que el usuario hace clic
-const toggleTratamientoDatos = document.getElementById('toggle-tratamiento-datos');
-const contenidoTratamientoDatos = document.getElementById('contenido-tratamiento-datos');
-
-toggleTratamientoDatos.addEventListener('click', () => {
-    const expandido = toggleTratamientoDatos.getAttribute('aria-expanded') === 'true';
-    toggleTratamientoDatos.setAttribute('aria-expanded', String(!expandido));
-    contenidoTratamientoDatos.hidden = expandido;
+    acordeonCookies.toggle.setAttribute('aria-expanded', 'true');
+    acordeonCookies.contenido.hidden = false;
+    acordeonCookies.toggle.scrollIntoView({ behavior: 'smooth', block: 'center' });
 });
 
 function obtenerDatosComprador() {

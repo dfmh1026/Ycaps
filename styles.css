@@ -597,6 +597,29 @@ header {
     transform: translateY(0) scale(0.97);
 }
 
+/* --- BOTÓN "COTIZA POR WHATSAPP" (Gorras Personalizadas) --- */
+.boton-cotizawhatsapp {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 0.9rem;
+}
+
+.btn-whatsapp-cotiza {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    text-decoration: none;
+    background: linear-gradient(135deg, #25d366, #1da851);
+    box-shadow: 0 12px 22px rgba(37, 211, 102, 0.22);
+    color: #ffffff;
+}
+
+.btn-whatsapp-cotiza:hover {
+    box-shadow: 0 16px 28px rgba(37, 211, 102, 0.3);
+    color: #ffffff;
+}
+
 /* --- SELECTOR DE CANTIDAD --- */
 .selector-cantidad {
     display: flex;
@@ -1128,6 +1151,77 @@ header {
     border-top: 1px solid rgba(255, 255, 255, 0.08);
 }
 
+/* --- AVISO DE COOKIES --- */
+.banner-cookies {
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 1000;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+    gap: 1rem;
+    padding: 1rem 1.5rem;
+    background: rgba(17, 17, 17, 0.97);
+    border-top: 1px solid rgba(212, 175, 55, 0.3);
+    backdrop-filter: blur(8px);
+    box-shadow: 0 -8px 24px rgba(0, 0, 0, 0.35);
+    animation: cookies-aparecer 0.4s var(--ease-premium);
+}
+
+.banner-cookies[hidden] {
+    display: none;
+}
+
+.banner-cookies p {
+    margin: 0;
+    color: var(--gris-claro);
+    font-size: 0.9rem;
+    max-width: 60ch;
+    text-align: center;
+}
+
+.banner-cookies a {
+    color: var(--dorado);
+    text-decoration: underline;
+}
+
+.btn-cookies-aceptar {
+    background: linear-gradient(135deg, var(--dorado), var(--dorado-hover));
+    border: none;
+    color: var(--negro-principal);
+    padding: 0.65rem 1.6rem;
+    font-weight: 700;
+    border-radius: 999px;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: transform var(--duracion-rapida) var(--ease-premium), box-shadow var(--duracion-rapida) var(--ease-premium);
+    box-shadow: 0 12px 22px rgba(212, 175, 55, 0.18);
+}
+
+.btn-cookies-aceptar:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 16px 28px rgba(212, 175, 55, 0.24);
+}
+
+@keyframes cookies-aparecer {
+    from { transform: translateY(100%); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
+}
+
+@media (max-width: 600px) {
+    .banner-cookies {
+        flex-direction: column;
+        padding: 1rem;
+    }
+
+    .banner-cookies p {
+        font-size: 0.85rem;
+    }
+}
+
 /* --- FOOTER --- */
 footer {
     background-color: var(--negro-secundario);
@@ -1567,3 +1661,6 @@ footer a:hover {
         padding: 1.5rem;
     }
 }
+
+
+
