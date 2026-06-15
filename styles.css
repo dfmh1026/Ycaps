@@ -542,6 +542,7 @@ header {
 .tarjeta-producto .precio {
     display: inline-flex;
     align-items: center;
+    gap: 0.5rem;
     color: var(--negro-principal);
     background: linear-gradient(120deg, var(--dorado-claro), var(--dorado));
     font-weight: 700;
@@ -551,6 +552,18 @@ header {
     margin-bottom: 1.1rem;
     box-shadow: 0 6px 16px rgba(212, 175, 55, 0.22);
     transition: transform var(--duracion-rapida) var(--ease-premium);
+}
+
+.precio-original {
+    text-decoration: line-through;
+    font-weight: 500;
+    font-size: 0.8em;
+    color: rgba(17, 17, 17, 0.55);
+}
+
+.precio-descuento {
+    color: var(--negro-principal);
+    font-weight: 700;
 }
 
 .tarjeta-producto:hover .precio {
