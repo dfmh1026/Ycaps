@@ -36,7 +36,7 @@ $titulo = 'Pedidos';
 $pag    = 'pedidos';
 require __DIR__ . '/_head.php';
 ?>
-<div class="card" style="display:block!important;background:#fff!important;border:3px solid blue!important;min-height:100px">
+<div class="card">
     <div class="card-header">
         <h2>Todos los pedidos (<?= $total ?>)</h2>
         <div class="card-header-actions">

@@ -43,8 +43,6 @@ body { font-family: 'Segoe UI', system-ui, sans-serif; font-size: 14px; color: v
 
 /* ── Admin layout ── */
 .admin-body {
-    display: grid;
-    grid-template-columns: var(--sidebar-w) 1fr;
     min-height: 100vh;
     background: var(--bg);
 }
