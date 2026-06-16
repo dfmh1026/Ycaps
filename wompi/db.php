@@ -1,0 +1,62 @@
+<?php
+// Conexión PDO a la base de datos MySQL.
+// Requiere las constantes DB_HOST, DB_NAME, DB_USER, DB_PASS definidas en config.php.
+
+function conectarDb(): PDO
+{
+    $dsn = 'mysql:host=' . DB_HOST . ';dbname=' . DB_NAME . ';charset=utf8mb4';
+
+    return new PDO($dsn, DB_USER, DB_PASS, [
+        PDO::ATTR_ERRMODE            => PDO::ERRMODE_EXCEPTION,
+        PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
+    ]);
+}
+
+// Guarda un pedido con sus ítems en una transacción atómica.
+// Devuelve el id del pedido creado.
+function guardarPedido(PDO $db, array $comprador, array $items, float $total, string $wompiReferencia): int
+{
+    $db->beginTransaction();
+
+    try {
+        $stmt = $db->prepare(
+            'INSERT INTO pedidos
+                (nombre, email, telefono, direccion, ciudad, total, metodo_pago, estado, wompi_referencia)
+             VALUES
+                (:nombre, :email, :telefono, :direccion, :ciudad, :total, :metodo_pago, :estado, :wompi_referencia)'
+        );
+        $stmt->execute([
+            ':nombre'           => $comprador['nombre']    ?? '',
+            ':email'            => $comprador['email']     ?? '',
+            ':telefono'         => $comprador['telefono']  ?? '',
+            ':direccion'        => $comprador['direccion'] ?? '',
+            ':ciudad'           => $comprador['ciudad']    ?? '',
+            ':total'            => $total,
+            ':metodo_pago'      => 'wompi',
+            ':estado'           => 'pendiente',
+            ':wompi_referencia' => $wompiReferencia,
+        ]);
+
+        $pedidoId = (int) $db->lastInsertId();
+
+        $stmtItem = $db->prepare(
+            'INSERT INTO pedido_items (pedido_id, nombre_producto, precio, cantidad)
+             VALUES (:pedido_id, :nombre_producto, :precio, :cantidad)'
+        );
+
+        foreach ($items as $item) {
+            $stmtItem->execute([
+                ':pedido_id'       => $pedidoId,
+                ':nombre_producto' => $item['title'],
+                ':precio'          => $item['unit_price'],
+                ':cantidad'        => $item['quantity'],
+            ]);
+        }
+
+        $db->commit();
+        return $pedidoId;
+    } catch (Throwable $e) {
+        $db->rollBack();
+        throw $e;
+    }
+}

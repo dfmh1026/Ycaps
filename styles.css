@@ -1681,3 +1681,42 @@ footer a:hover {
 
 
 
+
+/* ===== BANNER DE RESULTADO DE PAGO (post-Wompi) ===== */
+.banner-resultado-pago {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 9999;
+    padding: 1rem 1.5rem;
+    text-align: center;
+    font-family: 'Poppins', sans-serif;
+    font-size: 1rem;
+    font-weight: 500;
+    line-height: 1.4;
+    animation: slideDown 0.4s ease;
+}
+
+.banner-resultado-pago[data-tipo="exito"] {
+    background-color: #1a7a3c;
+    color: #fff;
+    border-bottom: 3px solid #2ecc71;
+}
+
+.banner-resultado-pago[data-tipo="pendiente"] {
+    background-color: #7a5a00;
+    color: #fff;
+    border-bottom: 3px solid #f1c40f;
+}
+
+.banner-resultado-pago[data-tipo="fallo"] {
+    background-color: #7a1a1a;
+    color: #fff;
+    border-bottom: 3px solid #e74c3c;
+}
+
+@keyframes slideDown {
+    from { transform: translateY(-100%); opacity: 0; }
+    to   { transform: translateY(0);    opacity: 1; }
+}

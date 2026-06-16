@@ -438,7 +438,7 @@ btnPedirWhatsapp.addEventListener('click', () => {
     window.location.href = waLink;
 });
 
-// --- PAGAR CON MERCADO PAGO (crea una preferencia en el backend PHP) ---
+// --- PAGAR CON WOMPI (genera la URL firmada del checkout y redirige) ---
 formCheckout.addEventListener('submit', async (event) => {
     event.preventDefault();
 
@@ -447,15 +447,15 @@ formCheckout.addEventListener('submit', async (event) => {
         return;
     }
 
-    const btnPagarMp = document.getElementById('btn-pagar-mp');
+    const btnPagarWompi = document.getElementById('btn-pagar-wompi');
     const comprador = obtenerDatosComprador();
 
-    checkoutMensaje.textContent = 'Conectando con Mercado Pago...';
+    checkoutMensaje.textContent = 'Conectando con Wompi...';
     checkoutMensaje.classList.remove('error');
-    btnPagarMp.disabled = true;
+    btnPagarWompi.disabled = true;
 
     try {
-        const respuesta = await fetch('mercadopago/crear-preferencia.php', {
+        const respuesta = await fetch('wompi/crear-transaccion.php', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ items: carrito, comprador })
@@ -463,19 +463,43 @@ formCheckout.addEventListener('submit', async (event) => {
 
         const datos = await respuesta.json();
 
-        if (!respuesta.ok || !datos.init_point) {
-            throw new Error(datos.error || 'No se pudo crear la preferencia de pago.');
+        if (!respuesta.ok || !datos.checkout_url) {
+            throw new Error(datos.error || 'No se pudo iniciar el pago con Wompi.');
         }
 
-        window.location.href = datos.init_point;
+        window.location.href = datos.checkout_url;
     } catch (error) {
         checkoutMensaje.textContent = 'No se pudo iniciar el pago. Intenta de nuevo o usa WhatsApp.';
         checkoutMensaje.classList.add('error');
-        console.log('Error al crear preferencia de Mercado Pago:', error);
+        console.log('Error al crear transacción Wompi:', error);
     } finally {
-        btnPagarMp.disabled = false;
+        btnPagarWompi.disabled = false;
     }
 });
+
+// --- MOSTRAR RESULTADO DEL PAGO AL VOLVER DE WOMPI ---
+(function mostrarResultadoPago() {
+    const params = new URLSearchParams(window.location.search);
+    const estadoPago = params.get('pago');
+    if (!estadoPago) return;
+
+    const banner = document.getElementById('banner-resultado-pago');
+    if (!banner) return;
+
+    const mensajes = {
+        exito:     '¡Pago exitoso! Gracias por tu compra. Te contactaremos pronto para coordinar el envío.',
+        pendiente: 'Tu pago está siendo procesado. Te notificaremos cuando se confirme.',
+        fallo:     'El pago no se completó. Inténtalo de nuevo o pide tu pedido por WhatsApp.',
+    };
+
+    banner.textContent = mensajes[estadoPago] || mensajes.fallo;
+    banner.dataset.tipo = estadoPago;
+    banner.hidden = false;
+    banner.scrollIntoView({ behavior: 'smooth', block: 'center' });
+
+    // Limpiar el parámetro de la URL sin recargar la página
+    window.history.replaceState({}, document.title, window.location.pathname);
+}());
 
 // Click en logo o H1 recarga la página (mejor experiencia móvil/desktop)
 document.addEventListener('DOMContentLoaded', () => {

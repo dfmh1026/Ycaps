@@ -8,7 +8,13 @@ Options -Indexes
     Require all denied
 </FilesMatch>
 
+# Bloquear acceso directo a config.php en cualquier subdirectorio
 <Files "config.php">
+    Require all denied
+</Files>
+
+# Bloquear acceso directo a db.php (función interna, no es un endpoint público)
+<Files "db.php">
     Require all denied
 </Files>
 
