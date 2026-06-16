@@ -15,31 +15,26 @@ $porPag   = 20;
 
 $where  = '1=1';
 $params = [];
-if ($estado)   { $where .= ' AND estado = :estado';   $params[':estado']   = $estado; }
-if ($busqueda) {
+if ($estado !== '')  { $where .= ' AND estado = :estado';  $params[':estado'] = $estado; }
+if ($busqueda !== '') {
     $where .= ' AND (wompi_referencia LIKE :q OR nombre LIKE :q OR email LIKE :q)';
-    $params[':q'] = "%$busqueda%";
+    $params[':q'] = '%' . $busqueda . '%';
 }
 
-$stTotal = $pdo->prepare("SELECT COUNT(*) FROM pedidos WHERE $where");
+$stTotal = $pdo->prepare("SELECT COUNT(*) FROM pedidos WHERE " . $where);
 $stTotal->execute($params);
 $total     = (int) $stTotal->fetchColumn();
 $totalPags = max(1, (int) ceil($total / $porPag));
 $offset    = ($pagina - 1) * $porPag;
 
-$st = $pdo->prepare("SELECT * FROM pedidos WHERE $where ORDER BY creado_en DESC LIMIT $porPag OFFSET $offset");
-$st->execute($params);
-$pedidos = $st->fetchAll(PDO::FETCH_ASSOC);
+$sql     = "SELECT * FROM pedidos WHERE " . $where . " ORDER BY creado_en DESC LIMIT " . (int)$porPag . " OFFSET " . (int)$offset;
+$stPed   = $pdo->prepare($sql);
+$stPed->execute($params);
+$pedidos = $stPed->fetchAll(PDO::FETCH_ASSOC);
 
 $titulo = 'Pedidos';
 $pag    = 'pedidos';
 require __DIR__ . '/_head.php';
-?>
-<div style="background:#fef9c3;padding:1rem;margin-bottom:1rem;border-radius:8px">
-    DEBUG — total=<?= $total ?> | pedidos=<?= count($pedidos) ?> | offset=<?= $offset ?>
-</div>
-<?php
-try {
 ?>
 
 <div class="card">
@@ -50,12 +45,12 @@ try {
                 <input type="text" name="q" placeholder="Referencia, nombre o email..." value="<?= htmlspecialchars($busqueda) ?>" style="width:220px">
                 <select name="estado">
                     <option value="">Todos los estados</option>
-                    <?php foreach(['pendiente'=>'Pendiente','aprobado'=>'Aprobado','rechazado'=>'Rechazado','anulado'=>'Anulado','error'=>'Error'] as $v=>$l): ?>
-                    <option value="<?= $v ?>" <?= $estado===$v ? 'selected' : '' ?>><?= $l ?></option>
+                    <?php foreach (['pendiente' => 'Pendiente', 'aprobado' => 'Aprobado', 'rechazado' => 'Rechazado', 'anulado' => 'Anulado', 'error' => 'Error'] as $v => $l): ?>
+                    <option value="<?= $v ?>" <?= $estado === $v ? 'selected' : '' ?>><?= $l ?></option>
                     <?php endforeach; ?>
                 </select>
                 <button type="submit" class="btn-primary btn-sm">Filtrar</button>
-                <?php if ($busqueda || $estado): ?>
+                <?php if ($busqueda !== '' || $estado !== ''): ?>
                 <a href="/admin/pedidos.php" class="btn-secondary btn-sm">Limpiar</a>
                 <?php endif; ?>
             </form>
@@ -87,18 +82,18 @@ try {
             <?php foreach ($pedidos as $p):
                 $stItems = $pdo->prepare("SELECT nombre_producto, cantidad, precio FROM pedido_items WHERE pedido_id = :id");
                 $stItems->execute([':id' => $p['id']]);
-                $items = $stItems->fetchAll(PDO::FETCH_ASSOC);
-                $e     = strtolower($p['estado']);
-                $cls   = in_array($e, ['aprobado','pendiente','rechazado','anulado','error']) ? $e : 'pendiente';
+                $items    = $stItems->fetchAll(PDO::FETCH_ASSOC);
+                $estado_p = strtolower($p['estado']);
+                $cls      = in_array($estado_p, ['aprobado', 'pendiente', 'rechazado', 'anulado', 'error']) ? $estado_p : 'pendiente';
             ?>
                 <tr>
-                    <td><?= $p['id'] ?></td>
+                    <td><?= (int)$p['id'] ?></td>
                     <td><code style="font-size:.78rem"><?= htmlspecialchars($p['wompi_referencia'] ?? '—') ?></code></td>
                     <td><?= htmlspecialchars($p['nombre']) ?></td>
                     <td><?= htmlspecialchars($p['email']) ?></td>
                     <td><?= htmlspecialchars($p['telefono'] ?? '—') ?></td>
                     <td><?= htmlspecialchars($p['ciudad'] ?? '—') ?></td>
-                    <td><strong>$<?= number_format($p['total'], 0, ',', '.') ?></strong></td>
+                    <td><strong>$<?= number_format((float)$p['total'], 0, ',', '.') ?></strong></td>
                     <td><span class="badge badge-<?= $cls ?>"><?= ucfirst($p['estado']) ?></span></td>
                     <td><?= date('d/m/Y H:i', strtotime($p['creado_en'])) ?></td>
                     <td>
@@ -106,7 +101,7 @@ try {
                             <summary style="cursor:pointer;color:var(--info);font-size:.8rem"><?= count($items) ?> item(s)</summary>
                             <ul style="margin:.5rem 0 0 1rem;font-size:.8rem">
                             <?php foreach ($items as $it): ?>
-                                <li><?= htmlspecialchars($it['nombre_producto']) ?> ×<?= $it['cantidad'] ?> — $<?= number_format($it['precio'],0,',','.') ?></li>
+                                <li><?= htmlspecialchars($it['nombre_producto']) ?> &times;<?= (int)$it['cantidad'] ?> &mdash; $<?= number_format((float)$it['precio'], 0, ',', '.') ?></li>
                             <?php endforeach; ?>
                             </ul>
                         </details>
@@ -120,14 +115,11 @@ try {
     <?php if ($totalPags > 1): ?>
     <div class="pagination">
         <?php for ($i = 1; $i <= $totalPags; $i++): ?>
-            <?php $q = http_build_query(array_merge($_GET, ['pag' => $i])); ?>
-            <a href="?<?= $q ?>" class="<?= $i === $pagina ? 'activo-pag' : '' ?>"><?= $i ?></a>
+            <?php $qs = http_build_query(array_merge($_GET, ['pag' => $i])); ?>
+            <a href="?<?= $qs ?>" class="<?= $i === $pagina ? 'activo-pag' : '' ?>"><?= $i ?></a>
         <?php endfor; ?>
     </div>
     <?php endif; ?>
 </div>
 
-} catch (Throwable $e) {
-    echo '<div style="background:#fee2e2;padding:1rem;border-radius:8px"><strong>ERROR:</strong> ' . htmlspecialchars($e->getMessage()) . '</div>';
-}
 <?php require __DIR__ . '/_foot.php'; ?>
