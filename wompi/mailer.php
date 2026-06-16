@@ -123,6 +123,29 @@ function enviarEmailNuevoPedido(array $comprador, array $items, float $total, st
     _smtpEnviar(TIENDA_EMAIL, 'Nuevo pedido — ' . $asunto, $cuerpoTienda);
 }
 
+function enviarEmailGuiaEnvio(string $emailCliente, string $nombreCliente, string $referencia, string $guia): void
+{
+    $asunto = "Tu pedido está en camino — Ycaps #{$referencia}";
+
+    $cuerpo =
+        "Hola {$nombreCliente},\n\n"
+        . "¡Tu pedido ya fue despachado! Aquí tienes el número de guía para rastrearlo:\n\n"
+        . "  Número de guía: {$guia}\n\n"
+        . "Puedes rastrear tu paquete en el sitio web de la transportadora con ese número.\n\n"
+        . "Si tienes alguna duda, escríbenos por WhatsApp:\n"
+        . "  https://wa.me/573105453049\n\n"
+        . "Gracias por tu compra.\n"
+        . "— El equipo de Ycaps | www.ycapsgorras.com";
+
+    _smtpEnviar($emailCliente, $asunto, $cuerpo);
+
+    _smtpEnviar(
+        TIENDA_EMAIL,
+        "Guía enviada al cliente — Pedido #{$referencia}",
+        "Guía {$guia} notificada a {$nombreCliente} ({$emailCliente})."
+    );
+}
+
 function enviarEmailPagoConfirmado(string $emailCliente, string $nombreCliente, string $referencia, float $total): void
 {
     $asunto   = "¡Pago confirmado! — Ycaps #{$referencia}";

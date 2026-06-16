@@ -16,6 +16,7 @@ CREATE TABLE IF NOT EXISTS pedidos (
     estado               VARCHAR(30)  NOT NULL DEFAULT 'pendiente',
     wompi_referencia     VARCHAR(100) DEFAULT NULL,
     wompi_transaction_id VARCHAR(100) DEFAULT NULL,
+    guia_envio           VARCHAR(150) DEFAULT NULL,
     creado_en            DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     actualizado_en       DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 );
@@ -63,9 +64,13 @@ INSERT IGNORE INTO productos (nombre, precio, precio_original, stock, categoria,
 ('Gorras Personalizadas',         0,     0,  0, 'personalizada', 'personalizada1.png');
 
 -- ============================================================
--- MIGRACIÓN — ejecuta SOLO si ya tenías las tablas con columnas
--- antiguas (mp_preference_id, mp_payment_id). Ignora si es nueva.
+-- MIGRACIONES — ejecuta solo las que apliquen a tu instalación.
 -- ============================================================
+
+-- Guía de envío (agregar si ya tenías la tabla pedidos sin esta columna):
+-- ALTER TABLE pedidos ADD COLUMN guia_envio VARCHAR(150) DEFAULT NULL;
+
+-- Columnas Wompi (solo si venías de MercadoPago):
 -- ALTER TABLE pedidos
 --     CHANGE COLUMN mp_preference_id wompi_referencia     VARCHAR(100) DEFAULT NULL,
 --     CHANGE COLUMN mp_payment_id    wompi_transaction_id VARCHAR(100) DEFAULT NULL;
