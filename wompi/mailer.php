@@ -23,10 +23,22 @@ function _listadoItems(array $items): string
 
 function _headers(): string
 {
-    return "From: " . TIENDA_NOMBRE . " <" . TIENDA_EMAIL . ">\r\n"
-         . "Reply-To: " . TIENDA_EMAIL . "\r\n"
+    $email = TIENDA_EMAIL;
+    $nombre = TIENDA_NOMBRE;
+    return "From: {$nombre} <{$email}>\r\n"
+         . "Reply-To: {$email}\r\n"
+         . "Return-Path: {$email}\r\n"
+         . "X-Mailer: PHP/" . phpversion() . "\r\n"
          . "MIME-Version: 1.0\r\n"
-         . "Content-Type: text/plain; charset=UTF-8\r\n";
+         . "Content-Type: text/plain; charset=UTF-8\r\n"
+         . "Content-Transfer-Encoding: 8bit\r\n";
+}
+
+function _enviar(string $para, string $asunto, string $cuerpo): void
+{
+    $headers = _headers();
+    $params  = '-f' . TIENDA_EMAIL;
+    @mail($para, '=?UTF-8?B?' . base64_encode($asunto) . '?=', $cuerpo, $headers, $params);
 }
 
 // Envía emails cuando se crea un pedido (antes de confirmación de pago).
@@ -66,11 +78,10 @@ function enviarEmailNuevoPedido(array $comprador, array $items, float $total, st
         . "Estado: Pendiente de pago\n\n"
         . "Ingresa al panel de base de datos para ver el detalle completo.";
 
-    $headers = _headers();
     if ($email !== '') {
-        @mail($email, $asunto, $cuerpoCliente, $headers);
+        _enviar($email, $asunto, $cuerpoCliente);
     }
-    @mail(TIENDA_EMAIL, 'Nuevo pedido — ' . $asunto, $cuerpoTienda, $headers);
+    _enviar(TIENDA_EMAIL, 'Nuevo pedido — ' . $asunto, $cuerpoTienda);
 }
 
 // Envía emails cuando Wompi confirma el pago (desde webhook).
@@ -96,9 +107,8 @@ function enviarEmailPagoConfirmado(string $emailCliente, string $nombreCliente, 
         . "Email:      {$emailCliente}\n"
         . "Total:      {$totalFmt}";
 
-    $headers = _headers();
     if ($emailCliente !== '') {
-        @mail($emailCliente, $asunto, $cuerpoCliente, $headers);
+        _enviar($emailCliente, $asunto, $cuerpoCliente);
     }
-    @mail(TIENDA_EMAIL, 'Pago confirmado — ' . $asunto, $cuerpoTienda, $headers);
+    _enviar(TIENDA_EMAIL, 'Pago confirmado — ' . $asunto, $cuerpoTienda);
 }
