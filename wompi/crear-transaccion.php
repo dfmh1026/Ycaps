@@ -4,13 +4,7 @@
 
 header('Content-Type: application/json; charset=utf-8');
 
-$configFile = __DIR__ . '/config.php';
-if (!file_exists($configFile)) {
-    http_response_code(500);
-    echo json_encode(['error' => 'Falta configurar wompi/config.php con las credenciales de Wompi.']);
-    exit;
-}
-require $configFile;
+require __DIR__ . '/load_config.php';
 require __DIR__ . '/db.php';
 
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {

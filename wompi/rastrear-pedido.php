@@ -4,7 +4,7 @@
 
 header('Content-Type: application/json; charset=utf-8');
 
-require __DIR__ . '/config.php';
+require __DIR__ . '/load_config.php';
 require __DIR__ . '/db.php';
 
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {

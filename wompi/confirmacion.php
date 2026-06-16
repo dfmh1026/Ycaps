@@ -3,7 +3,7 @@
 // Verifica el estado real de la transacción llamando a la API de Wompi y
 // redirige al inicio con el parámetro ?pago=exito|pendiente|fallo.
 
-require __DIR__ . '/config.php';
+require __DIR__ . '/load_config.php';
 
 // Wompi envía el id de la transacción como query param "id"
 $transaccionId = isset($_GET['id']) ? preg_replace('/[^a-zA-Z0-9\-_]/', '', $_GET['id']) : '';
