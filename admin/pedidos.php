@@ -36,7 +36,7 @@ $titulo = 'Pedidos';
 $pag    = 'pedidos';
 require __DIR__ . '/_head.php';
 ?>
-
+<p style="color:red;font-size:2rem;font-weight:bold">PRUEBA PHP OK — total=<?= $total ?></p>
 <div class="card">
     <div class="card-header">
         <h2>Todos los pedidos (<?= $total ?>)</h2>
