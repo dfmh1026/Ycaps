@@ -40,3 +40,12 @@ define('DB_HOST', 'localhost');
 define('DB_NAME', 'TU_BASE_DE_DATOS');
 define('DB_USER', 'TU_USUARIO_DB');
 define('DB_PASS', 'TU_CONTRASENA_DB');
+
+// ── Correo SMTP (Hostinger) ─────────────────────────────────────────────────
+// Para enviar correos via SMTP autenticado y evitar la carpeta de spam.
+// En Hostinger usa el correo creado en hPanel > Correos electrónicos.
+// El servidor SMTP de Hostinger firma con DKIM, los correos llegan a la bandeja de entrada.
+define('SMTP_HOST', 'smtp.hostinger.com');
+define('SMTP_PORT', 465);                          // 465 = SSL directo
+define('SMTP_USER', 'ventas@ycapsgorras.com');     // usuario = dirección de correo completa
+define('SMTP_PASS', 'TU_CONTRASENA_DEL_CORREO');   // contraseña de la cuenta de correo

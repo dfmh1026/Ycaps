@@ -1,6 +1,69 @@
 <?php
-// Funciones de correo para Ycaps.
-// Requiere TIENDA_EMAIL y TIENDA_NOMBRE definidas en config.php.
+// Envío de correos via SMTP autenticado — evita spam vs mail() sin autenticación.
+// Requiere SMTP_HOST, SMTP_PORT, SMTP_USER, SMTP_PASS, TIENDA_EMAIL, TIENDA_NOMBRE.
+
+function _smtpEnviar(string $para, string $asunto, string $cuerpo): void
+{
+    $host = defined('SMTP_HOST') ? SMTP_HOST : 'smtp.hostinger.com';
+    $port = defined('SMTP_PORT') ? (int) SMTP_PORT : 465;
+    $user = defined('SMTP_USER') ? SMTP_USER : TIENDA_EMAIL;
+    $pass = defined('SMTP_PASS') ? SMTP_PASS : '';
+    $from = TIENDA_EMAIL;
+    $nombre = TIENDA_NOMBRE;
+
+    // Conexión SSL directa (puerto 465)
+    $ctx    = stream_context_create(['ssl' => ['verify_peer' => false, 'verify_peer_name' => false]]);
+    $socket = @stream_socket_client("ssl://{$host}:{$port}", $errno, $errstr, 15, STREAM_CLIENT_CONNECT, $ctx);
+
+    if (!$socket) {
+        // Fallback a mail() si SMTP no conecta
+        $headers = "From: {$nombre} <{$from}>\r\nReply-To: {$from}\r\nMIME-Version: 1.0\r\nContent-Type: text/plain; charset=UTF-8\r\n";
+        @mail($para, '=?UTF-8?B?' . base64_encode($asunto) . '?=', $cuerpo, $headers, '-f' . $from);
+        return;
+    }
+
+    $leer = function() use ($socket) { return fgets($socket, 512); };
+    $cmd  = function(string $c) use ($socket) { fputs($socket, $c . "\r\n"); };
+
+    $leer(); // greeting
+
+    $cmd("EHLO {$host}");
+    while ($l = $leer()) { if (substr($l, 3, 1) === ' ') break; }
+
+    $cmd("AUTH LOGIN");
+    $leer();
+    $cmd(base64_encode($user));
+    $leer();
+    $cmd(base64_encode($pass));
+    $leer();
+
+    $cmd("MAIL FROM:<{$from}>");
+    $leer();
+
+    $cmd("RCPT TO:<{$para}>");
+    $leer();
+
+    $cmd("DATA");
+    $leer();
+
+    $subjectB64 = '=?UTF-8?B?' . base64_encode($asunto) . '?=';
+    $cuerpoB64  = chunk_split(base64_encode($cuerpo));
+
+    $mensaje = "From: {$nombre} <{$from}>\r\n"
+             . "To: {$para}\r\n"
+             . "Subject: {$subjectB64}\r\n"
+             . "MIME-Version: 1.0\r\n"
+             . "Content-Type: text/plain; charset=UTF-8\r\n"
+             . "Content-Transfer-Encoding: base64\r\n"
+             . "\r\n"
+             . $cuerpoB64;
+
+    $cmd($mensaje . "\r\n.");
+    $leer();
+
+    $cmd("QUIT");
+    fclose($socket);
+}
 
 function _formatearPrecio(float $precio): string
 {
@@ -11,7 +74,6 @@ function _listadoItems(array $items): string
 {
     $lineas = [];
     foreach ($items as $item) {
-        // Acepta tanto el formato de crear-transaccion.php como el de la BD
         $nombre   = $item['title']          ?? $item['nombre_producto'] ?? 'Producto';
         $precio   = (float) ($item['unit_price'] ?? $item['precio']    ?? 0);
         $cantidad = (int)   ($item['quantity']   ?? $item['cantidad']   ?? 1);
@@ -21,39 +83,17 @@ function _listadoItems(array $items): string
     return implode("\n", $lineas);
 }
 
-function _headers(): string
-{
-    $email = TIENDA_EMAIL;
-    $nombre = TIENDA_NOMBRE;
-    return "From: {$nombre} <{$email}>\r\n"
-         . "Reply-To: {$email}\r\n"
-         . "Return-Path: {$email}\r\n"
-         . "X-Mailer: PHP/" . phpversion() . "\r\n"
-         . "MIME-Version: 1.0\r\n"
-         . "Content-Type: text/plain; charset=UTF-8\r\n"
-         . "Content-Transfer-Encoding: 8bit\r\n";
-}
-
-function _enviar(string $para, string $asunto, string $cuerpo): void
-{
-    $headers = _headers();
-    $params  = '-f' . TIENDA_EMAIL;
-    @mail($para, '=?UTF-8?B?' . base64_encode($asunto) . '?=', $cuerpo, $headers, $params);
-}
-
-// Envía emails cuando se crea un pedido (antes de confirmación de pago).
 function enviarEmailNuevoPedido(array $comprador, array $items, float $total, string $referencia): void
 {
-    $asunto      = "Pedido recibido — Ycaps #{$referencia}";
-    $itemsTxt    = _listadoItems($items);
-    $totalFmt    = _formatearPrecio($total);
-    $nombre      = $comprador['nombre']    ?? '';
-    $email       = $comprador['email']     ?? '';
-    $telefono    = $comprador['telefono']  ?? '';
-    $direccion   = $comprador['direccion'] ?? '';
-    $ciudad      = $comprador['ciudad']    ?? '';
+    $asunto    = "Pedido recibido — Ycaps #{$referencia}";
+    $itemsTxt  = _listadoItems($items);
+    $totalFmt  = _formatearPrecio($total);
+    $nombre    = $comprador['nombre']    ?? '';
+    $email     = $comprador['email']     ?? '';
+    $telefono  = $comprador['telefono']  ?? '';
+    $direccion = $comprador['direccion'] ?? '';
+    $ciudad    = $comprador['ciudad']    ?? '';
 
-    // Email para el cliente
     $cuerpoCliente =
         "Hola {$nombre},\n\n"
         . "Hemos recibido tu pedido en Ycaps. Aquí están los detalles:\n\n"
@@ -61,13 +101,12 @@ function enviarEmailNuevoPedido(array $comprador, array $items, float $total, st
         . "Productos:\n{$itemsTxt}\n"
         . "Total: {$totalFmt}\n"
         . "Estado: Pendiente de pago\n\n"
-        . "Guarda tu número de referencia — lo necesitarás para rastrear tu pedido en www.ycapsgorras.com\n\n"
+        . "Guarda tu número de referencia para rastrear tu pedido en www.ycapsgorras.com\n\n"
         . "Gracias por confiar en Ycaps.\n"
         . "— El equipo de Ycaps | www.ycapsgorras.com";
 
-    // Email para la tienda
     $cuerpoTienda =
-        "Nuevo pedido recibido en Ycaps:\n\n"
+        "¡Nuevo pedido recibido!\n\n"
         . "Referencia:  {$referencia}\n"
         . "Cliente:     {$nombre}\n"
         . "Email:       {$email}\n"
@@ -76,15 +115,14 @@ function enviarEmailNuevoPedido(array $comprador, array $items, float $total, st
         . "Productos:\n{$itemsTxt}\n"
         . "Total: {$totalFmt}\n"
         . "Estado: Pendiente de pago\n\n"
-        . "Ingresa al panel de base de datos para ver el detalle completo.";
+        . "Ingresa al panel admin para ver el detalle: https://www.ycapsgorras.com/admin/";
 
     if ($email !== '') {
-        _enviar($email, $asunto, $cuerpoCliente);
+        _smtpEnviar($email, $asunto, $cuerpoCliente);
     }
-    _enviar(TIENDA_EMAIL, 'Nuevo pedido — ' . $asunto, $cuerpoTienda);
+    _smtpEnviar(TIENDA_EMAIL, 'Nuevo pedido — ' . $asunto, $cuerpoTienda);
 }
 
-// Envía emails cuando Wompi confirma el pago (desde webhook).
 function enviarEmailPagoConfirmado(string $emailCliente, string $nombreCliente, string $referencia, float $total): void
 {
     $asunto   = "¡Pago confirmado! — Ycaps #{$referencia}";
@@ -95,20 +133,22 @@ function enviarEmailPagoConfirmado(string $emailCliente, string $nombreCliente, 
         . "¡Tu pago ha sido confirmado! Pronto te contactaremos por WhatsApp para coordinar el envío.\n\n"
         . "Referencia: {$referencia}\n"
         . "Total pagado: {$totalFmt}\n\n"
-        . "Puedes rastrear tu pedido en cualquier momento en:\n"
+        . "Puedes rastrear tu pedido en:\n"
         . "www.ycapsgorras.com — sección \"Rastrear pedido\"\n\n"
         . "Gracias por tu compra.\n"
         . "— El equipo de Ycaps | www.ycapsgorras.com";
 
     $cuerpoTienda =
-        "Pago confirmado por Wompi:\n\n"
+        "¡Pago confirmado por Wompi!\n\n"
         . "Referencia: {$referencia}\n"
         . "Cliente:    {$nombreCliente}\n"
         . "Email:      {$emailCliente}\n"
-        . "Total:      {$totalFmt}";
+        . "Total:      {$totalFmt}\n\n"
+        . "Alista el pedido para envío.\n"
+        . "Panel admin: https://www.ycapsgorras.com/admin/";
 
     if ($emailCliente !== '') {
-        _enviar($emailCliente, $asunto, $cuerpoCliente);
+        _smtpEnviar($emailCliente, $asunto, $cuerpoCliente);
     }
-    _enviar(TIENDA_EMAIL, 'Pago confirmado — ' . $asunto, $cuerpoTienda);
+    _smtpEnviar(TIENDA_EMAIL, 'Pago confirmado — ' . $asunto, $cuerpoTienda);
 }
