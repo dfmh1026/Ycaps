@@ -72,6 +72,14 @@ try {
     // No bloquear el pago si falla el guardado; el webhook puede actualizar después
 }
 
+// Enviar email de confirmación de pedido recibido
+try {
+    require_once __DIR__ . '/mailer.php';
+    enviarEmailNuevoPedido($comprador, $items, $total, $referencia);
+} catch (Throwable $e) {
+    error_log('Error enviando email de pedido: ' . $e->getMessage());
+}
+
 // Solo los parámetros requeridos por Wompi — los opcionales (customer-data,
 // shipping-address) causan conflictos de parseo en el JS de Wompi cuando
 // el navegador re-codifica los dos puntos del nombre de parámetro.

@@ -77,6 +77,29 @@ try {
         ':referencia'     => $referencia,
     ]);
 
+    // Enviar email de pago confirmado solo cuando el pago fue aprobado
+    if ($estado === 'APPROVED') {
+        $stmtPedido = $db->prepare(
+            'SELECT nombre, email, total FROM pedidos WHERE wompi_referencia = :ref LIMIT 1'
+        );
+        $stmtPedido->execute([':ref' => $referencia]);
+        $pedido = $stmtPedido->fetch();
+
+        if ($pedido) {
+            try {
+                require_once __DIR__ . '/mailer.php';
+                enviarEmailPagoConfirmado(
+                    $pedido['email'],
+                    $pedido['nombre'],
+                    $referencia,
+                    (float) $pedido['total']
+                );
+            } catch (Throwable $e) {
+                error_log('Error enviando email de pago confirmado: ' . $e->getMessage());
+            }
+        }
+    }
+
     echo json_encode(['ok' => true]);
 } catch (Throwable $e) {
     error_log('Error actualizando pedido desde webhook Wompi: ' . $e->getMessage());

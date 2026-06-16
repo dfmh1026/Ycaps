@@ -27,18 +27,22 @@ $respuesta  = curl_exec($ch);
 $codigoHttp = curl_getinfo($ch, CURLINFO_HTTP_CODE);
 curl_close($ch);
 
-$estado = '';
+$estado     = '';
+$referencia = '';
 if ($respuesta !== false && $codigoHttp >= 200 && $codigoHttp < 300) {
-    $data   = json_decode($respuesta, true);
-    $estado = $data['data']['status'] ?? '';
+    $data       = json_decode($respuesta, true);
+    $estado     = $data['data']['status']    ?? '';
+    $referencia = $data['data']['reference'] ?? '';
 }
+
+$refParam = $referencia !== '' ? '&ref=' . urlencode($referencia) : '';
 
 switch ($estado) {
     case 'APPROVED':
-        header('Location: ../index.html?pago=exito');
+        header('Location: ../index.html?pago=exito'     . $refParam);
         break;
     case 'PENDING':
-        header('Location: ../index.html?pago=pendiente');
+        header('Location: ../index.html?pago=pendiente' . $refParam);
         break;
     default:
         header('Location: ../index.html?pago=fallo');

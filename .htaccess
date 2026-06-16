@@ -13,8 +13,12 @@ Options -Indexes
     Require all denied
 </Files>
 
-# Bloquear acceso directo a db.php (función interna, no es un endpoint público)
+# Bloquear acceso directo a archivos internos (no son endpoints públicos)
 <Files "db.php">
+    Require all denied
+</Files>
+
+<Files "mailer.php">
     Require all denied
 </Files>
 

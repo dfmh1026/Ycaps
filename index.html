@@ -20,10 +20,45 @@
             <div class="subtitulo-logo">Estilo de campo</div>
         </div>
     </div>
-    <button class="boton-carrito" id="abrir-carrito">
-        Carrito (<span id="contador-carrito">0</span>)
-    </button>
+    <div class="header-acciones">
+        <button class="btn-rastrear" id="btn-abrir-rastreo">Rastrear pedido</button>
+        <button class="boton-carrito" id="abrir-carrito">
+            Carrito (<span id="contador-carrito">0</span>)
+        </button>
+    </div>
 </header>
+
+<div class="modal-checkout" id="modal-rastreo">
+    <div class="modal-checkout-contenido">
+        <button class="modal-cerrar" id="cerrar-modal-rastreo">&times;</button>
+        <h3>Rastrear pedido</h3>
+        <p class="modal-checkout-subtexto">Ingresa el número de referencia que recibiste en tu correo.</p>
+        <form id="form-rastreo">
+            <div class="campo-formulario">
+                <label for="rastreo-referencia">Número de referencia</label>
+                <input type="text" id="rastreo-referencia" placeholder="Ej: YCAPS-20260616-5B55BDF6" required autocomplete="off">
+            </div>
+            <div class="botones-checkout">
+                <button type="submit" class="btn-checkout" id="btn-buscar-pedido">Buscar pedido</button>
+            </div>
+            <p class="checkout-mensaje" id="rastreo-mensaje"></p>
+        </form>
+        <div id="rastreo-resultado" class="rastreo-resultado" hidden>
+            <div class="rastreo-estado-badge">
+                <span id="rastreo-estado"></span>
+            </div>
+            <table class="rastreo-tabla">
+                <tr><td>Referencia</td><td><strong id="rastreo-ref"></strong></td></tr>
+                <tr><td>Nombre</td><td id="rastreo-nombre"></td></tr>
+                <tr><td>Ciudad</td><td id="rastreo-ciudad"></td></tr>
+                <tr><td>Total</td><td id="rastreo-total"></td></tr>
+                <tr><td>Fecha</td><td id="rastreo-fecha"></td></tr>
+            </table>
+            <p class="rastreo-subtitulo">Productos:</p>
+            <ul id="rastreo-items" class="rastreo-items"></ul>
+        </div>
+    </div>
+</div>
 
     <div id="banner-resultado-pago" class="banner-resultado-pago" hidden></div>
 

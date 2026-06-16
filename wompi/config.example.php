@@ -29,6 +29,12 @@ define('WOMPI_EVENTS_SECRET', 'TU_SECRETO_DE_EVENTOS_AQUI');
 // Debe ser una URL pública y accesible (HTTPS obligatorio en producción).
 define('WOMPI_REDIRECT_URL', 'https://www.ycapsgorras.com/wompi/confirmacion.php');
 
+// Email del propietario de la tienda — debe ser un correo que exista en tu hosting
+// (ej: info@ycapsgorras.com creado en hPanel > Correos electrónicos).
+// Se usa como remitente de todos los correos y para recibir notificaciones de pedidos.
+define('TIENDA_EMAIL', 'info@ycapsgorras.com');
+define('TIENDA_NOMBRE', 'Ycaps');
+
 // Credenciales de la base de datos MySQL (hPanel de Hostinger > Bases de datos).
 define('DB_HOST', 'localhost');
 define('DB_NAME', 'TU_BASE_DE_DATOS');

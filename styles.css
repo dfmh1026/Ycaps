@@ -1720,3 +1720,106 @@ footer a:hover {
     from { transform: translateY(-100%); opacity: 0; }
     to   { transform: translateY(0);    opacity: 1; }
 }
+
+/* ===== BOTONES DEL HEADER ===== */
+.header-acciones {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    flex-shrink: 0;
+}
+
+/* ===== BOTÓN RASTREAR PEDIDO (header) ===== */
+.btn-rastrear {
+    background: transparent;
+    border: 1px solid var(--dorado, #c9a84c);
+    color: var(--dorado, #c9a84c);
+    padding: 0.4rem 0.9rem;
+    border-radius: 6px;
+    font-family: 'Poppins', sans-serif;
+    font-size: 0.78rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background 0.2s, color 0.2s;
+    white-space: nowrap;
+}
+
+.btn-rastrear:hover {
+    background: var(--dorado, #c9a84c);
+    color: #000;
+}
+
+/* ===== RESULTADO DE RASTREO ===== */
+.rastreo-resultado {
+    margin-top: 1.2rem;
+    border-top: 1px solid rgba(255,255,255,0.1);
+    padding-top: 1rem;
+}
+
+.rastreo-estado-badge {
+    text-align: center;
+    margin-bottom: 1rem;
+}
+
+.rastreo-estado-badge span {
+    display: inline-block;
+    padding: 0.4rem 1rem;
+    border-radius: 20px;
+    font-weight: 600;
+    font-size: 0.9rem;
+    background: rgba(201,168,76,0.15);
+    color: var(--dorado, #c9a84c);
+    border: 1px solid var(--dorado, #c9a84c);
+}
+
+.rastreo-estado-badge span[data-estado="aprobado"] {
+    background: rgba(46,204,113,0.15);
+    color: #2ecc71;
+    border-color: #2ecc71;
+}
+
+.rastreo-estado-badge span[data-estado="rechazado"],
+.rastreo-estado-badge span[data-estado="error"] {
+    background: rgba(231,76,60,0.15);
+    color: #e74c3c;
+    border-color: #e74c3c;
+}
+
+.rastreo-tabla {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.88rem;
+    margin-bottom: 0.8rem;
+}
+
+.rastreo-tabla td {
+    padding: 0.4rem 0.3rem;
+    border-bottom: 1px solid rgba(255,255,255,0.06);
+}
+
+.rastreo-tabla td:first-child {
+    color: rgba(255,255,255,0.55);
+    width: 40%;
+}
+
+.rastreo-subtitulo {
+    font-size: 0.85rem;
+    color: rgba(255,255,255,0.55);
+    margin: 0.5rem 0 0.3rem;
+}
+
+.rastreo-items {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    font-size: 0.88rem;
+}
+
+.rastreo-items li {
+    padding: 0.25rem 0;
+    border-bottom: 1px solid rgba(255,255,255,0.06);
+}
+
+.rastreo-items li:last-child {
+    border-bottom: none;
+}

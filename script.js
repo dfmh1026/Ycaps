@@ -479,27 +479,123 @@ formCheckout.addEventListener('submit', async (event) => {
 
 // --- MOSTRAR RESULTADO DEL PAGO AL VOLVER DE WOMPI ---
 (function mostrarResultadoPago() {
-    const params = new URLSearchParams(window.location.search);
+    const params     = new URLSearchParams(window.location.search);
     const estadoPago = params.get('pago');
     if (!estadoPago) return;
 
     const banner = document.getElementById('banner-resultado-pago');
     if (!banner) return;
 
-    const mensajes = {
-        exito:     '¡Pago exitoso! Gracias por tu compra. Te contactaremos pronto para coordinar el envío.',
-        pendiente: 'Tu pago está siendo procesado. Te notificaremos cuando se confirme.',
-        fallo:     'El pago no se completó. Inténtalo de nuevo o pide tu pedido por WhatsApp.',
-    };
+    const ref = params.get('ref') || '';
 
-    banner.textContent = mensajes[estadoPago] || mensajes.fallo;
+    if (estadoPago === 'exito') {
+        // Vaciar carrito al confirmar pago exitoso
+        carrito = [];
+        guardarCarrito();
+        actualizarInterfaz();
+
+        banner.innerHTML = '¡Pago exitoso! Gracias por tu compra. Te contactaremos pronto para coordinar el envío.'
+            + (ref ? ` — Referencia: <strong>${ref}</strong>` : '');
+    } else if (estadoPago === 'pendiente') {
+        banner.innerHTML = 'Tu pago está siendo procesado. Te notificaremos cuando se confirme.'
+            + (ref ? ` — Referencia: <strong>${ref}</strong>` : '');
+    } else {
+        banner.textContent = 'El pago no se completó. Inténtalo de nuevo o pide tu pedido por WhatsApp.';
+    }
+
     banner.dataset.tipo = estadoPago;
     banner.hidden = false;
     banner.scrollIntoView({ behavior: 'smooth', block: 'center' });
 
-    // Limpiar el parámetro de la URL sin recargar la página
+    // Auto-cerrar el banner después de 10 segundos con fade-out
+    setTimeout(() => {
+        banner.style.transition = 'opacity 0.6s ease';
+        banner.style.opacity    = '0';
+        setTimeout(() => {
+            banner.hidden        = true;
+            banner.style.opacity = '';
+        }, 650);
+    }, 10000);
+
+    // Limpiar los parámetros de la URL sin recargar la página
     window.history.replaceState({}, document.title, window.location.pathname);
 }());
+
+// --- MODAL DE RASTREO DE PEDIDO ---
+const modalRastreo        = document.getElementById('modal-rastreo');
+const btnAbrirRastreo     = document.getElementById('btn-abrir-rastreo');
+const cerrarRastreoBtn    = document.getElementById('cerrar-modal-rastreo');
+const formRastreo         = document.getElementById('form-rastreo');
+const rastreoResultado    = document.getElementById('rastreo-resultado');
+const rastreoMensaje      = document.getElementById('rastreo-mensaje');
+
+if (btnAbrirRastreo) {
+    btnAbrirRastreo.addEventListener('click', () => {
+        rastreoResultado.hidden = true;
+        rastreoMensaje.textContent = '';
+        formRastreo.reset();
+        modalRastreo.classList.add('activo');
+    });
+}
+
+if (cerrarRastreoBtn) {
+    cerrarRastreoBtn.addEventListener('click', () => modalRastreo.classList.remove('activo'));
+}
+
+if (modalRastreo) {
+    modalRastreo.addEventListener('click', (e) => {
+        if (e.target === modalRastreo) modalRastreo.classList.remove('activo');
+    });
+}
+
+if (formRastreo) {
+    formRastreo.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const referencia  = document.getElementById('rastreo-referencia').value.trim();
+        const btnBuscar   = document.getElementById('btn-buscar-pedido');
+
+        rastreoMensaje.textContent = 'Buscando pedido...';
+        rastreoResultado.hidden    = true;
+        btnBuscar.disabled         = true;
+
+        try {
+            const resp  = await fetch('wompi/rastrear-pedido.php', {
+                method:  'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body:    JSON.stringify({ referencia }),
+            });
+            const datos = await resp.json();
+
+            if (!resp.ok || datos.error) {
+                rastreoMensaje.textContent = datos.error || 'No se encontró el pedido.';
+                return;
+            }
+
+            rastreoMensaje.textContent = '';
+            document.getElementById('rastreo-ref').textContent    = datos.referencia;
+            document.getElementById('rastreo-nombre').textContent  = datos.nombre;
+            document.getElementById('rastreo-ciudad').textContent  = datos.ciudad;
+            document.getElementById('rastreo-total').textContent   = '$' + datos.total.toLocaleString('es-CO');
+            document.getElementById('rastreo-estado').textContent  = datos.estadoTexto;
+            document.getElementById('rastreo-estado').dataset.estado = datos.estado;
+            document.getElementById('rastreo-fecha').textContent   = new Date(datos.fecha).toLocaleDateString('es-CO', { year:'numeric', month:'long', day:'numeric' });
+
+            const listaEl = document.getElementById('rastreo-items');
+            listaEl.innerHTML = '';
+            datos.items.forEach(item => {
+                const li = document.createElement('li');
+                li.textContent = item;
+                listaEl.appendChild(li);
+            });
+
+            rastreoResultado.hidden = false;
+        } catch (err) {
+            rastreoMensaje.textContent = 'Error al consultar. Intenta de nuevo.';
+        } finally {
+            btnBuscar.disabled = false;
+        }
+    });
+}
 
 // Click en logo o H1 recarga la página (mejor experiencia móvil/desktop)
 document.addEventListener('DOMContentLoaded', () => {
