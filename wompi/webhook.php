@@ -77,15 +77,35 @@ try {
         ':referencia'     => $referencia,
     ]);
 
-    // Enviar email de pago confirmado solo cuando el pago fue aprobado
+    // Acciones al aprobar el pago
     if ($estado === 'APPROVED') {
+        // Obtener datos del pedido
         $stmtPedido = $db->prepare(
-            'SELECT nombre, email, total FROM pedidos WHERE wompi_referencia = :ref LIMIT 1'
+            'SELECT id, nombre, email, total FROM pedidos WHERE wompi_referencia = :ref LIMIT 1'
         );
         $stmtPedido->execute([':ref' => $referencia]);
         $pedido = $stmtPedido->fetch();
 
         if ($pedido) {
+            // Decrementar stock de cada producto comprado
+            $stmtItems = $db->prepare(
+                'SELECT nombre_producto, cantidad FROM pedido_items WHERE pedido_id = :id'
+            );
+            $stmtItems->execute([':id' => $pedido['id']]);
+            $items = $stmtItems->fetchAll();
+
+            $stmtStock = $db->prepare(
+                'UPDATE productos SET stock = GREATEST(0, stock - :cantidad)
+                 WHERE nombre = :nombre AND activo = 1'
+            );
+            foreach ($items as $item) {
+                $stmtStock->execute([
+                    ':cantidad' => (int) $item['cantidad'],
+                    ':nombre'   => $item['nombre_producto'],
+                ]);
+            }
+
+            // Email de confirmación al cliente
             try {
                 require_once __DIR__ . '/mailer.php';
                 enviarEmailPagoConfirmado(

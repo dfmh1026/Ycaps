@@ -7,7 +7,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="styles.css?v=2">
+    <link rel="stylesheet" href="styles.css?v=3">
 </head>
 <body>
 
@@ -27,6 +27,12 @@
         </button>
     </div>
 </header>
+
+<nav class="nav-secciones" id="nav-secciones">
+    <a href="#catalogo"      class="nav-link-sec">Catálogo</a>
+    <a href="#quienes-somos" class="nav-link-sec">Quiénes Somos</a>
+    <a href="https://wa.me/573105853626" class="nav-link-sec nav-link-wa" target="_blank" rel="noopener noreferrer">WhatsApp</a>
+</nav>
 
 <div class="modal-checkout" id="modal-rastreo">
     <div class="modal-checkout-contenido">
@@ -89,16 +95,27 @@
         </div>
     </section>
 
+    <section id="catalogo">
+
     <div class="encabezado-seccion reveal">
         <span class="eyebrow">Colección Ycaps</span>
         <h2>Nuestras Gorras</h2>
         <p>Cada gorra está hecha para resistir el campo y dominar la ciudad, con materiales de primera y acabados artesanales.</p>
     </div>
 
+    <div class="filtros-catalogo">
+        <button class="btn-filtro activo-filtro" data-filtro="todos">Todos</button>
+        <button class="btn-filtro" data-filtro="negra">Negras</button>
+        <button class="btn-filtro" data-filtro="blanca">Blancas</button>
+        <button class="btn-filtro" data-filtro="caqui">Caqui</button>
+        <button class="btn-filtro" data-filtro="gris">Gris</button>
+        <button class="btn-filtro" data-filtro="personalizada">Personalizadas</button>
+    </div>
+
     <main class="contenedor-productos">
 
-            <!-- Producto 1 (Ejemplo con Foto Real) -->
-        <div class="tarjeta-producto reveal">
+            <!-- Producto 1 -->
+        <div class="tarjeta-producto reveal" data-categoria="negra">
             <!-- REEMPLAZAMOS TODO EL PLACEHOLDER GRIS POR ESTA LÍNEA -->
             <img src="./media/gorra-negra.png" alt="Gorra Negra Azabache" class="imagen-producto">
             <img src="./media/gorra-negra2.png" alt="Gorra Negra Azabache detalle" class="imagen-producto">
@@ -114,7 +131,7 @@
             <button class="btn-agregar" onclick="agregarAlCarrito('Gorra Negra Azabache', 85000, this)">Agregar al Carrito</button>
         </div>
 
-        <div class="tarjeta-producto reveal">
+        <div class="tarjeta-producto reveal" data-categoria="gris">
         <img src="./media/gorra-gris.png" alt="Gorra Gris" class="imagen-producto">
         <img src="./media/gorra-gris2.png" alt="Gorra Gris - alternativa" class="imagen-producto">
 
@@ -128,7 +145,7 @@
         <button class="btn-agregar" onclick="agregarAlCarrito('Gorra Gris', 85000, this)">Agregar al Carrito</button>
       </div>
 
-        <div class="tarjeta-producto reveal">
+        <div class="tarjeta-producto reveal" data-categoria="blanca">
             <img src="./media/gorra-blancan.png" alt="Gorra Blanca Caballo Negro" class="imagen-producto">
             
             <h3>Gorra Blanca Caballo Negro</h3>
@@ -141,7 +158,7 @@
             <button class="btn-agregar" onclick="agregarAlCarrito('Gorra Blanca Caballo Negro', 85000, this)">Agregar al Carrito</button>
         </div>
 
-        <div class="tarjeta-producto reveal">
+        <div class="tarjeta-producto reveal" data-categoria="blanca">
             <img src="./media/gorra-blancat.png" alt="Gorra Blanca" class="imagen-producto">
             
             <h3>Gorra Blanca</h3>
@@ -155,7 +172,7 @@
         </div>
 
 
-        <div class="tarjeta-producto reveal">
+        <div class="tarjeta-producto reveal" data-categoria="negra">
             <img src="./media/gorra-negrayj.png" alt="Gorra Negra Firma YJ" class="imagen-producto">
            
             <h3>Gorra Negra Firma YJ</h3>
@@ -169,7 +186,7 @@
         </div>
 
 
-        <div   class="tarjeta-producto reveal">
+        <div class="tarjeta-producto reveal" data-categoria="caqui">
                 <img src="./media/gorra-caqui.png" alt="Gorra Caqui" class="imagen-producto">
                  <img src="./media/gorra-caqui2.png" alt="Gorra Caqui detalle" class="imagen-producto">     
 
@@ -184,7 +201,7 @@
         </div>
 
 
-        <div class="tarjeta-producto reveal">
+        <div class="tarjeta-producto reveal" data-categoria="negra">
             <img src="./media/gorra-negrad.png" alt="Gorra Negra Caballo Dorado" class="imagen-producto">
             <img src="./media/gorra-negrad2.png" alt="Gorra Negra Caballo Dorado detalle" class="imagen-producto">
 
@@ -198,7 +215,7 @@
             <button class="btn-agregar" onclick="agregarAlCarrito('Gorra Negra Caballo Dorado', 85000, this)">Agregar al Carrito</button>
         </div>
 
-        <div class="tarjeta-producto reveal">
+        <div class="tarjeta-producto reveal" data-categoria="blanca">
             <img src="./media/gorra-blancad.png" alt="Gorra Blanca Dorado" class="imagen-producto">
             
 
@@ -212,7 +229,7 @@
             <button class="btn-agregar" onclick="agregarAlCarrito('Gorra Blanca Dorado', 85000, this)">Agregar al Carrito</button>
         </div>
 
-          <div class="tarjeta-producto reveal">
+          <div class="tarjeta-producto reveal" data-categoria="negra">
             <img src="./media/gorra-negramallad2.png" alt="Gorra Negra Malla Dorado" class="imagen-producto">
             <img src="./media/gorra-negramallad.png" alt="Gorra Negra Malla Dorado detalle" class="imagen-producto">
 
@@ -227,7 +244,7 @@
         </div>
 
 
-        <div class="tarjeta-producto reveal">
+        <div class="tarjeta-producto reveal" data-categoria="blanca">
             <img src="./media/gorra-blancayj.png" alt="Gorra Blanca Edición YJ" class="imagen-producto">
             
             <h3>Gorra Blanca Edición YJ</h3>
@@ -242,7 +259,7 @@
 
              
 
-        <div class="tarjeta-producto reveal">
+        <div class="tarjeta-producto reveal" data-categoria="caqui">
              <img src="./media/gorra-caquiyj.png" alt="Gorra Caqui Edición YJ" class="imagen-producto">
                         
             <h3>Gorra Caqui Edición YJ</h3>
@@ -255,21 +272,60 @@
              <button class="btn-agregar" onclick="agregarAlCarrito('Gorra Caqui Edición YJ', 85000, this)">Agregar al Carrito</button>
         </div>
 
-           <div class="tarjeta-producto reveal">
-             <img src="./media/personalizada1.png" alt="Gorra Caqui Edición YJ" class="imagen-producto">
-             <img src="./media/personalizada2.png" alt="Gorra Caqui Edición YJ" class="imagen-producto">
-             <img src="./media/personalizada3.png" alt="Gorra Caqui Edición YJ" class="imagen-producto">
+           <div class="tarjeta-producto reveal" data-categoria="personalizada">
+             <img src="./media/personalizada1.png" alt="Gorras Personalizadas" class="imagen-producto">
+             <img src="./media/personalizada2.png" alt="Gorras Personalizadas detalle" class="imagen-producto">
+             <img src="./media/personalizada3.png" alt="Gorras Personalizadas detalle" class="imagen-producto">
 
             <h3>Gorras Personalizadas</h3>
-            
 
             <div class="boton-cotizawhatsapp">
                 <a href="https://wa.me/573105853626" class="btn-agregar btn-whatsapp-cotiza" target="_blank" rel="noopener noreferrer">Cotiza por WhatsApp</a>
             </div>
 
-            
+        </div>
 
     </main>
+    </section><!-- /#catalogo -->
+
+    <section id="quienes-somos" class="seccion-quienes-somos">
+        <div class="quienes-contenedor">
+            <div class="quienes-texto reveal">
+                <span class="eyebrow">Nuestra historia</span>
+                <h2>Quiénes Somos</h2>
+                <p>Somos <strong>Ycaps</strong>, una marca nacida en Cali, Colombia, con el alma puesta en el campo y la mirada en la ciudad. Creemos que el estilo agropecuario no es solo una moda: es una forma de vida, un orgullo que se lleva en la cabeza y en el corazón.</p>
+                <p>Cada gorra que diseñamos es un homenaje a las raíces rurales colombianas, elaborada con materiales de alta calidad y detalles artesanales que la hacen única. Desde la primera puntada hasta el empaque, cuidamos cada detalle para que lo que recibes sea más que un accesorio — es una declaración.</p>
+                <p>Trabajamos directamente con nuestros clientes para crear piezas que cuenten su historia. Si buscas una gorra que te represente, llegaste al lugar correcto.</p>
+                <a href="https://wa.me/573105853626" class="btn-quienes-wa" target="_blank" rel="noopener noreferrer">
+                    <svg viewBox="0 0 32 32" fill="currentColor" width="20" height="20" aria-hidden="true"><path d="M16.001 2.667C8.64 2.667 2.667 8.64 2.667 16c0 2.59.733 5.01 2.003 7.067L2.667 29.333l6.453-1.96A13.27 13.27 0 0 0 16.001 29.333C23.36 29.333 29.333 23.36 29.333 16S23.36 2.667 16.001 2.667Zm6.158 15.835c-.337-.169-1.99-.982-2.298-1.094-.308-.113-.532-.169-.755.169-.224.337-.866 1.094-1.06 1.318-.196.225-.392.253-.728.084-1.967-.982-3.255-1.752-4.55-3.973-.343-.59.343-.548.982-1.824.108-.225.054-.42-.054-.589-.108-.169-.728-1.752-.997-2.401-.263-.633-.532-.547-.728-.557-.196-.011-.42-.011-.643-.011-.224 0-.586.084-.894.42-.308.337-1.18 1.156-1.18 2.82 0 1.663 1.21 3.272 1.378 3.498.169.225 2.32 3.54 5.62 4.823 2.785 1.08 3.354.866 3.96.81.605-.056 1.99-.81 2.27-1.596.28-.785.28-1.458.196-1.596-.084-.14-.337-.225-.674-.394Z"/></svg>
+                    Contáctanos por WhatsApp
+                </a>
+            </div>
+            <div class="quienes-valores reveal">
+                <div class="valor-card">
+                    <div class="valor-icono">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 2 4 5v6c0 5 3.5 8.5 8 9 4.5-.5 8-4 8-9V5l-8-3Z" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                    </div>
+                    <h4>Calidad</h4>
+                    <p>Materiales seleccionados y acabados que duran.</p>
+                </div>
+                <div class="valor-card">
+                    <div class="valor-icono">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                    </div>
+                    <h4>Pasión</h4>
+                    <p>Cada diseño refleja el orgullo de nuestra tierra.</p>
+                </div>
+                <div class="valor-card">
+                    <div class="valor-icono">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="10" stroke-linecap="round" stroke-linejoin="round"/><path d="M12 8v4l3 3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                    </div>
+                    <h4>Entrega rápida</h4>
+                    <p>Envíos sin costo a todo Colombia.</p>
+                </div>
+            </div>
+        </div>
+    </section>
 
     <div class="carrito-panel" id="carrito-panel">
         <div class="cabecera-carrito">
@@ -504,6 +560,6 @@
         <button type="button" class="btn-cookies-aceptar" id="btn-cookies-aceptar">Aceptar</button>
     </div>
 
-    <script src="script.js?v=2"></script>
+    <script src="script.js?v=3"></script>
 </body>
 </html>

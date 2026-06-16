@@ -1823,3 +1823,191 @@ footer a:hover {
 .rastreo-items li:last-child {
     border-bottom: none;
 }
+
+/* ── Nav de secciones ── */
+.nav-secciones {
+    position: sticky;
+    top: 0;
+    z-index: 90;
+    background: rgba(10, 10, 10, 0.92);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border-bottom: 1px solid rgba(212, 175, 55, 0.15);
+    display: flex;
+    justify-content: center;
+    gap: 0.25rem;
+    padding: 0 1rem;
+}
+
+.nav-link-sec {
+    color: rgba(255, 255, 255, 0.65);
+    text-decoration: none;
+    font-size: 0.85rem;
+    font-weight: 500;
+    letter-spacing: 0.5px;
+    padding: 0.8rem 1.25rem;
+    border-bottom: 2px solid transparent;
+    transition: color 0.2s, border-color 0.2s;
+}
+
+.nav-link-sec:hover,
+.nav-link-sec.activo-nav {
+    color: var(--dorado);
+    border-bottom-color: var(--dorado);
+}
+
+.nav-link-wa {
+    color: #4ade80;
+}
+
+.nav-link-wa:hover {
+    color: #86efac;
+    border-bottom-color: #4ade80;
+}
+
+/* ── Filtros del catálogo ── */
+.filtros-catalogo {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    padding: 1.25rem 1rem 0.5rem;
+}
+
+.btn-filtro {
+    background: transparent;
+    border: 1.5px solid rgba(212, 175, 55, 0.3);
+    color: rgba(255, 255, 255, 0.6);
+    padding: 0.4rem 1.1rem;
+    border-radius: 30px;
+    font-size: 0.82rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s var(--ease-premium);
+    letter-spacing: 0.3px;
+}
+
+.btn-filtro:hover {
+    border-color: var(--dorado);
+    color: var(--dorado);
+}
+
+.btn-filtro.activo-filtro {
+    background: var(--dorado);
+    border-color: var(--dorado);
+    color: #111;
+    font-weight: 700;
+}
+
+.tarjeta-producto.oculta-filtro {
+    display: none;
+}
+
+/* ── Sección Quiénes Somos ── */
+.seccion-quienes-somos {
+    background: linear-gradient(180deg, #0d0d0d 0%, #111 100%);
+    padding: 5rem 2rem;
+    border-top: 1px solid rgba(212, 175, 55, 0.12);
+}
+
+.quienes-contenedor {
+    max-width: 1100px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 4rem;
+    align-items: start;
+}
+
+.quienes-texto .eyebrow { display: block; margin-bottom: 0.5rem; }
+
+.quienes-texto h2 {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(2.2rem, 4vw, 3rem);
+    color: var(--dorado);
+    letter-spacing: 2px;
+    margin-bottom: 1.25rem;
+}
+
+.quienes-texto p {
+    color: rgba(255, 255, 255, 0.7);
+    font-size: 0.95rem;
+    line-height: 1.8;
+    margin-bottom: 1rem;
+}
+
+.btn-quienes-wa {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: #25d366;
+    color: #fff;
+    font-weight: 700;
+    font-size: 0.9rem;
+    padding: 0.75rem 1.5rem;
+    border-radius: 8px;
+    text-decoration: none;
+    margin-top: 0.5rem;
+    transition: background 0.2s;
+}
+
+.btn-quienes-wa:hover { background: #1ebe5a; }
+
+.quienes-valores {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 1.25rem;
+}
+
+.valor-card {
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(212, 175, 55, 0.12);
+    border-radius: 12px;
+    padding: 1.25rem 1.5rem;
+    display: flex;
+    align-items: flex-start;
+    gap: 1rem;
+    transition: border-color 0.2s, background 0.2s;
+}
+
+.valor-card:hover {
+    border-color: rgba(212, 175, 55, 0.3);
+    background: rgba(212, 175, 55, 0.04);
+}
+
+.valor-icono {
+    width: 44px;
+    height: 44px;
+    border-radius: 10px;
+    background: rgba(212, 175, 55, 0.1);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.valor-icono svg {
+    width: 22px;
+    height: 22px;
+    stroke: var(--dorado);
+}
+
+.valor-card h4 {
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: var(--dorado);
+    margin-bottom: 0.2rem;
+}
+
+.valor-card p {
+    font-size: 0.83rem;
+    color: rgba(255, 255, 255, 0.55);
+    line-height: 1.5;
+}
+
+@media (max-width: 768px) {
+    .nav-secciones { gap: 0; }
+    .nav-link-sec  { padding: 0.7rem 0.9rem; font-size: 0.8rem; }
+    .quienes-contenedor { grid-template-columns: 1fr; gap: 2.5rem; }
+    .seccion-quienes-somos { padding: 3.5rem 1.25rem; }
+}

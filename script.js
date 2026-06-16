@@ -643,6 +643,51 @@ if (btnArriba) {
     });
 }
 
+// ── Filtros del catálogo ──
+(function () {
+    const botones   = document.querySelectorAll('.btn-filtro');
+    const tarjetas  = document.querySelectorAll('.tarjeta-producto[data-categoria]');
+    if (!botones.length || !tarjetas.length) return;
+
+    function filtrar(categoria) {
+        tarjetas.forEach(t => {
+            const cat = t.dataset.categoria;
+            if (categoria === 'todos' || cat === categoria) {
+                t.classList.remove('oculta-filtro');
+            } else {
+                t.classList.add('oculta-filtro');
+            }
+        });
+    }
+
+    botones.forEach(btn => {
+        btn.addEventListener('click', () => {
+            botones.forEach(b => b.classList.remove('activo-filtro'));
+            btn.classList.add('activo-filtro');
+            filtrar(btn.dataset.filtro);
+        });
+    });
+})();
+
+// ── Nav activo al hacer scroll ──
+(function () {
+    const secciones = document.querySelectorAll('section[id]');
+    const links     = document.querySelectorAll('.nav-link-sec[href^="#"]');
+    if (!secciones.length || !links.length) return;
+
+    const observer = new IntersectionObserver(entries => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                links.forEach(l => l.classList.remove('activo-nav'));
+                const link = document.querySelector(`.nav-link-sec[href="#${entry.target.id}"]`);
+                if (link) link.classList.add('activo-nav');
+            }
+        });
+    }, { rootMargin: '-40% 0px -55% 0px' });
+
+    secciones.forEach(s => observer.observe(s));
+})();
+
 // Intentar forzar reproducción del video en móvil: asegurar muted y playsinline
 document.addEventListener('DOMContentLoaded', () => {
     const video = document.querySelector('.hero-video');

@@ -1,6 +1,9 @@
--- Esquema de base de datos para los pedidos de Ycaps.
--- Ejecuta este script en la base de datos MySQL creada en Hostinger (hPanel > Bases de datos).
+-- ============================================================
+-- ESQUEMA COMPLETO DE BASE DE DATOS — YCAPS
+-- Ejecuta este script completo en phpMyAdmin (hPanel > Bases de datos)
+-- ============================================================
 
+-- Tabla de pedidos
 CREATE TABLE IF NOT EXISTS pedidos (
     id                   INT AUTO_INCREMENT PRIMARY KEY,
     nombre               VARCHAR(150) NOT NULL,
@@ -17,6 +20,7 @@ CREATE TABLE IF NOT EXISTS pedidos (
     actualizado_en       DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 );
 
+-- Tabla de ítems por pedido
 CREATE TABLE IF NOT EXISTS pedido_items (
     id               INT AUTO_INCREMENT PRIMARY KEY,
     pedido_id        INT NOT NULL,
@@ -26,13 +30,42 @@ CREATE TABLE IF NOT EXISTS pedido_items (
     FOREIGN KEY (pedido_id) REFERENCES pedidos(id) ON DELETE CASCADE
 );
 
+-- Tabla de productos e inventario
+CREATE TABLE IF NOT EXISTS productos (
+    id               INT AUTO_INCREMENT PRIMARY KEY,
+    nombre           VARCHAR(150) NOT NULL UNIQUE,
+    descripcion      TEXT DEFAULT NULL,
+    precio           DECIMAL(12,2) NOT NULL DEFAULT 85000,
+    precio_original  DECIMAL(12,2) DEFAULT 95000,
+    stock            INT NOT NULL DEFAULT 10,
+    categoria        VARCHAR(50)  NOT NULL DEFAULT 'gorras',
+    imagen           VARCHAR(255) DEFAULT NULL,
+    activo           TINYINT(1)  NOT NULL DEFAULT 1,
+    creado_en        DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    actualizado_en   DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+);
+
 -- ============================================================
--- MIGRACIÓN — ejecuta esto SOLO si ya tenías la tabla creada
--- con las columnas antiguas de Mercado Pago.
--- Si estás creando la tabla por primera vez, ignora esta sección.
+-- DATOS SEMILLA — productos actuales del catálogo
 -- ============================================================
---
+INSERT IGNORE INTO productos (nombre, precio, precio_original, stock, categoria, imagen) VALUES
+('Gorra Negra Azabache',      85000, 95000, 10, 'negra',         'gorra-negra.png'),
+('Gorra Gris',                85000, 95000, 10, 'gris',          'gorra-gris.png'),
+('Gorra Blanca Caballo Negro',85000, 95000, 10, 'blanca',        'gorra-blancan.png'),
+('Gorra Blanca',              85000, 95000, 10, 'blanca',        'gorra-blancat.png'),
+('Gorra Negra Firma YJ',      85000, 95000, 10, 'negra',         'gorra-negrayj.png'),
+('Gorra Caqui',               85000, 95000, 10, 'caqui',         'gorra-caqui.png'),
+('Gorra Negra Caballo Dorado',85000, 95000, 10, 'negra',         'gorra-negrad.png'),
+('Gorra Blanca Dorado',       85000, 95000, 10, 'blanca',        'gorra-blancad.png'),
+('Gorra Negra Malla Dorado',  85000, 95000, 10, 'negra',         'gorra-negramallad.png'),
+('Gorra Blanca Edición YJ',   85000, 95000, 10, 'blanca',        'gorra-blancayj.png'),
+('Gorra Caqui Edición YJ',    85000, 95000, 10, 'caqui',         'gorra-caquiyj.png'),
+('Gorras Personalizadas',         0,     0,  0, 'personalizada', 'personalizada1.png');
+
+-- ============================================================
+-- MIGRACIÓN — ejecuta SOLO si ya tenías las tablas con columnas
+-- antiguas (mp_preference_id, mp_payment_id). Ignora si es nueva.
+-- ============================================================
 -- ALTER TABLE pedidos
 --     CHANGE COLUMN mp_preference_id wompi_referencia     VARCHAR(100) DEFAULT NULL,
---     CHANGE COLUMN mp_payment_id    wompi_transaction_id VARCHAR(100) DEFAULT NULL,
---     MODIFY COLUMN metodo_pago      VARCHAR(30) NOT NULL DEFAULT 'wompi';
+--     CHANGE COLUMN mp_payment_id    wompi_transaction_id VARCHAR(100) DEFAULT NULL;
