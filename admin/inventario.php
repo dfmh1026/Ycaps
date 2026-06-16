@@ -1,11 +1,6 @@
 <?php
-ini_set('display_errors', 1);
-error_reporting(E_ALL);
-echo 'PASO 1: iniciando<br>';
 require __DIR__ . '/auth.php';
-echo 'PASO 2: auth ok<br>';
 require __DIR__ . '/load_config.php';
-echo 'PASO 3: config ok<br>';
 
 $pdo = new PDO(
     "mysql:host=" . DB_HOST . ";dbname=" . DB_NAME . ";charset=utf8mb4",
