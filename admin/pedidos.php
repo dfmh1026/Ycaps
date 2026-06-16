@@ -35,6 +35,12 @@ $titulo = 'Pedidos';
 $pag    = 'pedidos';
 require __DIR__ . '/_head.php';
 ?>
+<div style="background:#fef9c3;padding:1rem;margin-bottom:1rem;border-radius:8px">
+    DEBUG — total=<?= $total ?> | pedidos=<?= count($pedidos) ?> | offset=<?= $offset ?>
+</div>
+<?php
+try {
+?>
 
 <div class="card">
     <div class="card-header">
@@ -121,4 +127,7 @@ require __DIR__ . '/_head.php';
     <?php endif; ?>
 </div>
 
+} catch (Throwable $e) {
+    echo '<div style="background:#fee2e2;padding:1rem;border-radius:8px"><strong>ERROR:</strong> ' . htmlspecialchars($e->getMessage()) . '</div>';
+}
 <?php require __DIR__ . '/_foot.php'; ?>
