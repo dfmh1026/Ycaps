@@ -1,11 +1,12 @@
 <?php
 // Página de destino a la que Wompi redirige al comprador después del pago.
-// Verifica el estado real de la transacción llamando a la API de Wompi y
-// redirige al inicio con el parámetro ?pago=exito|pendiente|fallo.
+// Verifica el estado real de la transacción llamando a la API de Wompi,
+// actualiza el pedido en la DB (si aún no lo hizo el webhook) y envía
+// el correo de confirmación si el pedido acaba de aprobarse aquí.
 
 require __DIR__ . '/load_config.php';
+require __DIR__ . '/db.php';
 
-// Wompi envía el id de la transacción como query param "id"
 $transaccionId = isset($_GET['id']) ? preg_replace('/[^a-zA-Z0-9\-_]/', '', $_GET['id']) : '';
 
 if ($transaccionId === '') {
@@ -35,11 +36,69 @@ if ($respuesta !== false && $codigoHttp >= 200 && $codigoHttp < 300) {
     $referencia = $data['data']['reference'] ?? '';
 }
 
+// Si el pago fue aprobado, intentar actualizar el pedido en la DB.
+// Solo actualizamos si el estado actual es 'pendiente' — así no pisamos
+// un estado que el webhook ya haya establecido, y evitamos enviar el
+// correo de confirmación dos veces.
+if ($estado === 'APPROVED' && $referencia !== '') {
+    try {
+        $db = conectarDb();
+
+        $upd = $db->prepare(
+            "UPDATE pedidos
+             SET estado = 'aprobado', wompi_transaction_id = :tid
+             WHERE wompi_referencia = :ref AND estado = 'pendiente'"
+        );
+        $upd->execute([':tid' => $transaccionId, ':ref' => $referencia]);
+
+        // rowCount() > 0 significa que fuimos los primeros en marcar el pedido
+        // como aprobado (el webhook aún no había llegado) → enviamos el correo.
+        if ($upd->rowCount() > 0) {
+            $stmtPedido = $db->prepare(
+                'SELECT id, nombre, email, total FROM pedidos WHERE wompi_referencia = :ref LIMIT 1'
+            );
+            $stmtPedido->execute([':ref' => $referencia]);
+            $pedido = $stmtPedido->fetch();
+
+            if ($pedido) {
+                // Decrementar stock (también lo hace el webhook si llega después,
+                // pero GREATEST(0, stock - n) lo hace idempotente).
+                $stmtItems = $db->prepare(
+                    'SELECT nombre_producto, cantidad FROM pedido_items WHERE pedido_id = :id'
+                );
+                $stmtItems->execute([':id' => $pedido['id']]);
+                $items = $stmtItems->fetchAll();
+
+                $stmtStock = $db->prepare(
+                    'UPDATE productos SET stock = GREATEST(0, stock - :cantidad)
+                     WHERE nombre = :nombre AND activo = 1'
+                );
+                foreach ($items as $item) {
+                    $stmtStock->execute([
+                        ':cantidad' => (int) $item['cantidad'],
+                        ':nombre'   => $item['nombre_producto'],
+                    ]);
+                }
+
+                require_once __DIR__ . '/mailer.php';
+                enviarEmailPagoConfirmado(
+                    $pedido['email'],
+                    $pedido['nombre'],
+                    $referencia,
+                    (float) $pedido['total']
+                );
+            }
+        }
+    } catch (Throwable $e) {
+        error_log('Error en confirmacion.php al aprobar pedido: ' . $e->getMessage());
+    }
+}
+
 $refParam = $referencia !== '' ? '&ref=' . urlencode($referencia) : '';
 
 switch ($estado) {
     case 'APPROVED':
-        header('Location: ../index.html?pago=exito'     . $refParam);
+        header('Location: ../index.html?pago=exito' . $refParam);
         break;
     case 'PENDING':
         header('Location: ../index.html?pago=pendiente' . $refParam);
