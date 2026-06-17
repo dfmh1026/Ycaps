@@ -120,19 +120,22 @@ function getVisibleImage(tarjeta) {
 function initGalerias() {
     tarjetasProductos.forEach(tarjeta => {
         const imagenes = Array.from(tarjeta.querySelectorAll('.imagen-producto'));
-        if (imagenes.length <= 1) return;
+        if (imagenes.length === 0) return;
 
+        // Wrap all images (even single) in gallery-wrapper for consistent layout
         const wrapper = document.createElement('div');
         wrapper.className = 'gallery-wrapper';
-        const firstImg = imagenes[0];
-        tarjeta.insertBefore(wrapper, firstImg);
-        imagenes.forEach(img => wrapper.appendChild(img));
-
-        let currentIndex = 0;
+        tarjeta.insertBefore(wrapper, imagenes[0]);
         imagenes.forEach((img, index) => {
+            wrapper.appendChild(img);
             img.classList.toggle('activo', index === 0);
             img.setAttribute('data-gallery-index', index);
         });
+
+        // Only add navigation buttons when there are multiple images
+        if (imagenes.length <= 1) return;
+
+        let currentIndex = 0;
 
         const nav = document.createElement('div');
         nav.className = 'gallery-nav';
