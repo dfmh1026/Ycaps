@@ -516,8 +516,8 @@ header {
     margin: 4.5rem auto 3rem;
     padding: 0 1rem;
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-    gap: 2.5rem;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 1.5rem;
 }
 
 .tarjeta-producto {
@@ -544,8 +544,8 @@ header {
 }
 
 .tarjeta-producto h3 {
-    margin: 1rem 0 0.5rem 0;
-    font-size: 1.3rem;
+    margin: 0.7rem 0 0.35rem 0;
+    font-size: 1.05rem;
     font-weight: 600;
     letter-spacing: 0.02em;
     color: var(--blanco);
@@ -555,14 +555,14 @@ header {
 .tarjeta-producto .precio {
     display: inline-flex;
     align-items: center;
-    gap: 0.5rem;
+    gap: 0.4rem;
     color: var(--negro-principal);
     background: linear-gradient(120deg, var(--dorado-claro), var(--dorado));
     font-weight: 700;
-    font-size: 1.05rem;
-    padding: 0.3rem 0.95rem;
+    font-size: 0.88rem;
+    padding: 0.22rem 0.7rem;
     border-radius: 999px;
-    margin-bottom: 1.1rem;
+    margin-bottom: 0.7rem;
     box-shadow: 0 6px 16px rgba(212, 175, 55, 0.22);
     transition: transform var(--duracion-rapida) var(--ease-premium);
 }
@@ -589,7 +589,8 @@ header {
     background: linear-gradient(135deg, var(--dorado), var(--dorado-hover));
     border: none;
     color: var(--negro-principal);
-    padding: 0.85rem 1.6rem;
+    padding: 0.55rem 1.2rem;
+    font-size: 0.85rem;
     font-weight: 700;
     border-radius: 999px;
     cursor: pointer;
@@ -651,19 +652,19 @@ header {
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 0.6rem;
-    margin: 0 auto 0.9rem;
+    gap: 0.4rem;
+    margin: 0 auto 0.65rem;
 }
 
 .btn-cantidad {
-    width: 32px;
-    height: 32px;
+    width: 28px;
+    height: 28px;
     flex-shrink: 0;
     border-radius: 50%;
     border: 1px solid rgba(212, 175, 55, 0.35);
     background: rgba(255, 255, 255, 0.04);
     color: var(--dorado);
-    font-size: 1.1rem;
+    font-size: 1rem;
     font-weight: 700;
     line-height: 1;
     cursor: pointer;
@@ -686,14 +687,14 @@ header {
 }
 
 .input-cantidad {
-    width: 48px;
+    width: 40px;
     text-align: center;
-    padding: 0.4rem 0.2rem;
+    padding: 0.3rem 0.2rem;
     border-radius: 8px;
     border: 1px solid rgba(212, 175, 55, 0.25);
     background: rgba(255, 255, 255, 0.04);
     color: var(--blanco);
-    font-size: 0.95rem;
+    font-size: 0.85rem;
     font-weight: 600;
     font-family: inherit;
     appearance: textfield;
@@ -1319,7 +1320,7 @@ footer a:hover {
 /* Estilo para las fotos reales de las gorras */
 .imagen-producto {
     width: 100%;
-    height: 210px;
+    height: 155px;
     object-fit: cover;
     object-position: center top;
     flex-shrink: 0;
@@ -1335,7 +1336,7 @@ footer a:hover {
 .gallery-wrapper {
     position: relative;
     width: 100%;
-    height: 210px;
+    height: 155px;
     flex-shrink: 0;
     overflow: hidden;
 }
