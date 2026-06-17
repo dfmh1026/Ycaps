@@ -1454,7 +1454,7 @@ footer a:hover {
         max-width: 180px;
     }
 
-    .boton-carrito {
+    .boton-carrito {          /*(max-width: 768px)*/
         padding: 0.55rem 0.9rem;
         font-size: 0.82rem;
         border-radius: 999px;
@@ -1629,8 +1629,8 @@ footer a:hover {
     .logo h1 .y-impacto {
         font-size: 1.25em;
     }
-
-    .boton-carrito {
+    
+    .boton-carrito {        /*(max-width: 480px)*/
         padding: 0.45rem 0.75rem;
         font-size: 0.78rem;
         position: static;
@@ -1639,7 +1639,7 @@ footer a:hover {
         transform: none;
         order: 1;
         white-space: nowrap;
-        margin-left: 1rem;
+        margin-left: 8.5rem;
     }
 
     .subtitulo-logo {
