@@ -524,6 +524,9 @@ header {
     transition: transform var(--duracion-media) var(--ease-premium),
                 border-color var(--duracion-media) var(--ease-premium),
                 box-shadow var(--duracion-media) var(--ease-premium);
+    /* Flexbox para igualar altura interna entre tarjetas */
+    display: flex;
+    flex-direction: column;
 }
 
 .tarjeta-producto:hover {
@@ -538,6 +541,7 @@ header {
     font-weight: 600;
     letter-spacing: 0.02em;
     color: var(--blanco);
+    flex: 1; /* empuja precio + cantidad + botón siempre al mismo nivel */
 }
 
 .tarjeta-producto .precio {
@@ -1307,12 +1311,12 @@ footer a:hover {
 /* Estilo para las fotos reales de las gorras */
 .imagen-producto {
     width: 100%;
-    height: auto;
-    max-height: 320px;
+    height: 280px;
     object-fit: cover;
+    object-position: center top;
+    flex-shrink: 0;
     image-rendering: auto;
     border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-    /*border: 2px solid rgba(212, 175, 55, 0.5);*/
     filter: saturate(1.05) contrast(1.05);
     transition: transform var(--duracion-media) var(--ease-premium),
                 filter var(--duracion-media) var(--ease-premium),
@@ -1323,7 +1327,8 @@ footer a:hover {
 .gallery-wrapper {
     position: relative;
     width: 100%;
-    min-height: 320px;
+    height: 280px;
+    flex-shrink: 0;
     overflow: hidden;
 }
 
@@ -1529,6 +1534,11 @@ footer a:hover {
     .btn-agregar {
         padding: 0.65rem 1.2rem;
         font-size: 0.9rem;
+    }
+
+    .gallery-wrapper,
+    .imagen-producto {
+        height: 220px;
     }
 
     .carrito-panel {
