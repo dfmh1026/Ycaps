@@ -1,6 +1,26 @@
 <?php
 // Envío de correos via SMTP autenticado — evita spam vs mail() sin autenticación.
 // Requiere SMTP_HOST, SMTP_PORT, SMTP_USER, SMTP_PASS, TIENDA_EMAIL, TIENDA_NOMBRE.
+// WhatsApp via CallMeBot: requiere WHATSAPP_APIKEY en ycaps_config.php.
+
+function _telegramNotificar(string $mensaje): void
+{
+    if (!defined('TELEGRAM_BOT_TOKEN') || !defined('TELEGRAM_CHAT_ID')) return;
+    if (TELEGRAM_BOT_TOKEN === '' || TELEGRAM_CHAT_ID === '') return;
+    if (!function_exists('curl_init')) return;
+
+    $ch = curl_init('https://api.telegram.org/bot' . TELEGRAM_BOT_TOKEN . '/sendMessage');
+    curl_setopt_array($ch, [
+        CURLOPT_POST           => true,
+        CURLOPT_POSTFIELDS     => json_encode(['chat_id' => TELEGRAM_CHAT_ID, 'text' => $mensaje]),
+        CURLOPT_HTTPHEADER     => ['Content-Type: application/json'],
+        CURLOPT_RETURNTRANSFER => true,
+        CURLOPT_TIMEOUT        => 10,
+        CURLOPT_SSL_VERIFYPEER => false,
+    ]);
+    curl_exec($ch);
+    curl_close($ch);
+}
 
 function _smtpEnviar(string $para, string $asunto, string $cuerpo): void
 {
@@ -174,4 +194,12 @@ function enviarEmailPagoConfirmado(string $emailCliente, string $nombreCliente, 
         _smtpEnviar($emailCliente, $asunto, $cuerpoCliente);
     }
     _smtpEnviar(TIENDA_EMAIL, 'Pago confirmado — ' . $asunto, $cuerpoTienda);
+
+    _telegramNotificar(
+        "✅ NUEVO PEDIDO PAGADO\n"
+        . "Cliente: {$nombreCliente}\n"
+        . "Ref: {$referencia}\n"
+        . "Total: {$totalFmt}\n"
+        . "Panel: https://www.ycapsgorras.com/admin/"
+    );
 }
