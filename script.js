@@ -580,6 +580,14 @@ if (formRastreo) {
             document.getElementById('rastreo-estado').dataset.estado = datos.estado;
             document.getElementById('rastreo-fecha').textContent   = new Date(datos.fecha).toLocaleDateString('es-CO', { year:'numeric', month:'long', day:'numeric' });
 
+            const guiaFila = document.getElementById('rastreo-guia-fila');
+            if (datos.guia) {
+                document.getElementById('rastreo-guia').textContent = datos.guia;
+                guiaFila.hidden = false;
+            } else {
+                guiaFila.hidden = true;
+            }
+
             const listaEl = document.getElementById('rastreo-items');
             listaEl.innerHTML = '';
             datos.items.forEach(item => {

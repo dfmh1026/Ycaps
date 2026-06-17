@@ -32,7 +32,7 @@ if (!preg_match('/^YCAPS-/i', $referencia)) {
 try {
     $db   = conectarDb();
     $stmt = $db->prepare(
-        'SELECT p.nombre, p.ciudad, p.total, p.estado, p.creado_en
+        'SELECT p.nombre, p.ciudad, p.total, p.estado, p.guia_envio, p.creado_en
          FROM pedidos p
          WHERE p.wompi_referencia = :ref
          LIMIT 1'
@@ -59,9 +59,10 @@ try {
         return $i['nombre_producto'] . ' x' . $i['cantidad'];
     }, $itemsRaw);
 
+    $guia        = $pedido['guia_envio'] ?? '';
     $estadoTexto = [
         'pendiente'  => 'Pendiente de pago',
-        'aprobado'   => 'Pago confirmado — en preparación',
+        'aprobado'   => $guia !== '' ? 'En camino — paquete despachado' : 'Pago confirmado — en preparación',
         'rechazado'  => 'Pago rechazado',
         'anulado'    => 'Anulado',
         'error'      => 'Error en el pago',
@@ -76,6 +77,7 @@ try {
         'estadoTexto' => $estadoTexto[$pedido['estado']] ?? ucfirst($pedido['estado']),
         'fecha'       => $pedido['creado_en'],
         'items'       => $items,
+        'guia'        => $guia,
     ]);
 
 } catch (Throwable $e) {
