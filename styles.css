@@ -1319,7 +1319,7 @@ footer a:hover {
 /* Estilo para las fotos reales de las gorras */
 .imagen-producto {
     width: 100%;
-    height: 280px;
+    height: 210px;
     object-fit: cover;
     object-position: center top;
     flex-shrink: 0;
@@ -1335,7 +1335,7 @@ footer a:hover {
 .gallery-wrapper {
     position: relative;
     width: 100%;
-    height: 280px;
+    height: 210px;
     flex-shrink: 0;
     overflow: hidden;
 }
@@ -1549,7 +1549,7 @@ footer a:hover {
 
     .gallery-wrapper,
     .imagen-producto {
-        height: 220px;
+        height: 200px;
     }
 
     .carrito-panel {
