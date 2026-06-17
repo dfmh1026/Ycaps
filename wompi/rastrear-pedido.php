@@ -13,38 +13,55 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     exit;
 }
 
-$entrada    = json_decode(file_get_contents('php://input'), true);
-$referencia = isset($entrada['referencia']) ? trim((string) $entrada['referencia']) : '';
+$entrada  = json_decode(file_get_contents('php://input'), true);
+$termino  = isset($entrada['referencia']) ? trim((string) $entrada['referencia']) : '';
 
-if ($referencia === '') {
+if ($termino === '') {
     http_response_code(400);
-    echo json_encode(['error' => 'Ingresa tu número de referencia.']);
+    echo json_encode(['error' => 'Ingresa tu número de guía o referencia.']);
     exit;
 }
 
-// Normalizar: aceptar con o sin prefijo "YCAPS-"
-if (!preg_match('/^YCAPS-/i', $referencia)) {
-    $referencia = 'YCAPS-' . strtoupper($referencia);
-} else {
-    $referencia = strtoupper($referencia);
-}
-
 try {
-    $db   = conectarDb();
+    $db = conectarDb();
+
+    // Buscar primero por número de guía, luego por referencia Wompi.
+    // La referencia Wompi se normaliza aceptando con o sin prefijo "YCAPS-".
+    $referenciaNorm = preg_match('/^YCAPS-/i', $termino)
+        ? strtoupper($termino)
+        : 'YCAPS-' . strtoupper($termino);
+
     $stmt = $db->prepare(
-        'SELECT p.nombre, p.ciudad, p.total, p.estado, p.guia_envio, p.creado_en
+        'SELECT p.nombre, p.ciudad, p.total, p.estado, p.guia_envio,
+                p.wompi_referencia, p.creado_en
          FROM pedidos p
-         WHERE p.wompi_referencia = :ref
+         WHERE p.guia_envio = :guia
+            OR p.wompi_referencia = :ref
          LIMIT 1'
     );
-    $stmt->execute([':ref' => $referencia]);
+    $stmt->execute([':guia' => $termino, ':ref' => $referenciaNorm]);
     $pedido = $stmt->fetch();
+
+    // Si no encontró por referencia normalizada, intenta con el término exacto
+    if (!$pedido) {
+        $stmt2 = $db->prepare(
+            'SELECT p.nombre, p.ciudad, p.total, p.estado, p.guia_envio,
+                    p.wompi_referencia, p.creado_en
+             FROM pedidos p
+             WHERE p.wompi_referencia = :ref
+             LIMIT 1'
+        );
+        $stmt2->execute([':ref' => $termino]);
+        $pedido = $stmt2->fetch();
+    }
 
     if (!$pedido) {
         http_response_code(404);
-        echo json_encode(['error' => 'No encontramos ningún pedido con esa referencia. Verifica que sea correcta.']);
+        echo json_encode(['error' => 'No encontramos ningún pedido con ese número. Verifica que sea correcto.']);
         exit;
     }
+
+    $referencia = $pedido['wompi_referencia'];
 
     // Obtener los ítems del pedido
     $stmtItems = $db->prepare(
