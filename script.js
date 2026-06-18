@@ -490,6 +490,8 @@ formCheckout.addEventListener('submit', async (event) => {
     if (!banner) return;
 
     const ref = params.get('ref') || '';
+    let mensajeHtml = '';
+    let autoCerrar  = true;
 
     if (estadoPago === 'exito') {
         // Vaciar carrito al confirmar pago exitoso
@@ -497,29 +499,48 @@ formCheckout.addEventListener('submit', async (event) => {
         guardarCarrito();
         actualizarInterfaz();
 
-        banner.innerHTML = '¡Pago exitoso! Gracias por tu compra. Te contactaremos pronto para coordinar el envío.'
+        // No cerrar automáticamente: dejamos que el cliente descargue su recibo primero
+        autoCerrar = false;
+
+        mensajeHtml = '¡Pago exitoso! Gracias por tu compra. Te contactaremos pronto para coordinar el envío.'
             + (ref ? ` — Referencia: <strong>${ref}</strong>` : '')
-            + (ref ? ` <a href="wompi/recibo-pdf.php?ref=${encodeURIComponent(ref)}" target="_blank" style="color:#fff;text-decoration:underline;margin-left:8px;white-space:nowrap">Descargar recibo PDF</a>` : '');
+            + (ref ? ` <a id="banner-descarga-recibo" href="wompi/recibo-pdf.php?ref=${encodeURIComponent(ref)}" target="_blank" style="color:#fff;text-decoration:underline;margin-left:8px;white-space:nowrap;font-weight:700">Descargar recibo PDF</a>` : '');
     } else if (estadoPago === 'pendiente') {
-        banner.innerHTML = 'Tu pago está siendo procesado. Te notificaremos cuando se confirme.'
+        mensajeHtml = 'Tu pago está siendo procesado. Te notificaremos cuando se confirme.'
             + (ref ? ` — Referencia: <strong>${ref}</strong>` : '');
     } else {
-        banner.textContent = 'El pago no se completó. Inténtalo de nuevo o pide tu pedido por WhatsApp.';
+        mensajeHtml = 'El pago no se completó. Inténtalo de nuevo o pide tu pedido por WhatsApp.';
     }
+
+    banner.innerHTML = `<span>${mensajeHtml}</span>`
+        + `<button type="button" id="banner-cerrar-btn" aria-label="Cerrar aviso" style="background:none;border:none;color:inherit;font-size:1.3rem;line-height:1;cursor:pointer;margin-left:14px;vertical-align:middle">&times;</button>`;
 
     banner.dataset.tipo = estadoPago;
     banner.hidden = false;
     banner.scrollIntoView({ behavior: 'smooth', block: 'center' });
 
-    // Auto-cerrar el banner después de 10 segundos con fade-out
-    setTimeout(() => {
+    const cerrarBanner = () => {
         banner.style.transition = 'opacity 0.6s ease';
         banner.style.opacity    = '0';
         setTimeout(() => {
             banner.hidden        = true;
             banner.style.opacity = '';
         }, 650);
-    }, 10000);
+    };
+
+    const btnCerrar = document.getElementById('banner-cerrar-btn');
+    if (btnCerrar) btnCerrar.addEventListener('click', cerrarBanner);
+
+    // Si hay enlace de descarga, cerrar el banner poco después de que el cliente descargue
+    const linkDescarga = document.getElementById('banner-descarga-recibo');
+    if (linkDescarga) {
+        linkDescarga.addEventListener('click', () => setTimeout(cerrarBanner, 800));
+    }
+
+    // Solo los avisos de pendiente/fallo se cierran solos; el de éxito espera la descarga
+    if (autoCerrar) {
+        setTimeout(cerrarBanner, 10000);
+    }
 
     // Limpiar los parámetros de la URL sin recargar la página
     window.history.replaceState({}, document.title, window.location.pathname);
