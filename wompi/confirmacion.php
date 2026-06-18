@@ -95,14 +95,7 @@ if ($estado === 'APPROVED' && $referencia !== '') {
                 $pdfDatos     = generarReciboPdf($pedido, $items, $numeroRecibo);
                 $pdfNombre    = 'recibo-' . preg_replace('/[^A-Za-z0-9\-]/', '', $referencia) . '.pdf';
 
-                enviarEmailPagoConfirmado(
-                    $pedido['email'],
-                    $pedido['nombre'],
-                    $referencia,
-                    (float) $pedido['total'],
-                    $pdfDatos,
-                    $pdfNombre
-                );
+                enviarEmailPagoConfirmado($pedido, $referencia, $pdfDatos, $pdfNombre);
             }
         }
     } catch (Throwable $e) {

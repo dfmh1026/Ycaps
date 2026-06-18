@@ -1016,21 +1016,45 @@ header {
     color: var(--blanco);
 }
 
-.campo-formulario input {
+.campo-formulario input,
+.campo-formulario select {
     background: rgba(255, 255, 255, 0.06);
     border: 1px solid rgba(255, 255, 255, 0.12);
     border-radius: 10px;
     padding: 0.7rem 0.9rem;
     color: var(--blanco);
     font-size: 16px; /* evita el zoom automático al enfocar inputs en iOS Safari */
+    font-family: inherit;
     transition: border-color var(--duracion-rapida) var(--ease-premium),
         background var(--duracion-rapida) var(--ease-premium);
 }
 
-.campo-formulario input:focus {
+.campo-formulario input:focus,
+.campo-formulario select:focus {
     outline: none;
     border-color: var(--dorado);
     background: rgba(255, 255, 255, 0.1);
+}
+
+.campo-formulario select {
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    cursor: pointer;
+    padding-right: 2.5rem;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' fill='none' stroke='%23d4af37' stroke-width='2'%3E%3Cpath d='M5 7l5 5 5-5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 0.9rem center;
+    background-size: 14px;
+}
+
+.campo-formulario select:hover {
+    border-color: rgba(212, 175, 55, 0.45);
+}
+
+.campo-formulario select option {
+    background: var(--negro-secundario);
+    color: var(--blanco);
 }
 
 .botones-checkout {

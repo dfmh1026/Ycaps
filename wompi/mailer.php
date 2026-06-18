@@ -194,14 +194,22 @@ function enviarEmailGuiaEnvio(string $emailCliente, string $nombreCliente, strin
     );
 }
 
+// $pedido debe incluir: nombre, cedula, email, telefono, direccion, ciudad, departamento, total
 function enviarEmailPagoConfirmado(
-    string $emailCliente,
-    string $nombreCliente,
+    array $pedido,
     string $referencia,
-    float $total,
     ?string $pdfDatos = null,
     ?string $pdfNombre = null
 ): void {
+    $emailCliente  = $pedido['email']        ?? '';
+    $nombreCliente = $pedido['nombre']        ?? '';
+    $cedula        = $pedido['cedula']        ?? '';
+    $telefono      = $pedido['telefono']      ?? '';
+    $direccion     = $pedido['direccion']     ?? '';
+    $ciudad        = $pedido['ciudad']        ?? '';
+    $departamento  = $pedido['departamento']  ?? '';
+    $total         = (float) ($pedido['total'] ?? 0);
+
     $asunto   = "¡Pago confirmado! — Ycaps #{$referencia}";
     $totalFmt = _formatearPrecio($total);
 
@@ -217,10 +225,13 @@ function enviarEmailPagoConfirmado(
 
     $cuerpoTienda =
         "¡Pago confirmado por Wompi!\n\n"
-        . "Referencia: {$referencia}\n"
-        . "Cliente:    {$nombreCliente}\n"
-        . "Email:      {$emailCliente}\n"
-        . "Total:      {$totalFmt}\n\n"
+        . "Referencia:   {$referencia}\n"
+        . "Cliente:      {$nombreCliente}\n"
+        . "Cédula:       {$cedula}\n"
+        . "Email:        {$emailCliente}\n"
+        . "Teléfono:     {$telefono}\n"
+        . "Dirección:    {$direccion}, {$ciudad}, {$departamento}\n"
+        . "Total:        {$totalFmt}\n\n"
         . "Alista el pedido para envío.\n"
         . "Panel admin: https://www.ycapsgorras.com/admin/"
         . ($pdfDatos !== null ? "\n\nSe adjunta el recibo en PDF de esta compra." : '');
@@ -238,6 +249,7 @@ function enviarEmailPagoConfirmado(
     _telegramNotificar(
         "✅ NUEVO PEDIDO PAGADO\n"
         . "Cliente: {$nombreCliente}\n"
+        . "Dirección: {$direccion}, {$ciudad}, {$departamento}\n"
         . "Ref: {$referencia}\n"
         . "Total: {$totalFmt}\n"
         . "Panel: https://www.ycapsgorras.com/admin/"
