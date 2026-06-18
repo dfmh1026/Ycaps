@@ -1610,13 +1610,13 @@ footer a:hover {
 
 @media (max-width: 480px) {
     html { scroll-padding-top: 130px; }
-    body { padding-top: 75px; }
+    body { padding-top: 0px; }
 
     header {
         padding: 0.6rem 0.75rem;
         justify-content: space-between;
         gap: 0.5rem;
-        position: relative;
+        position: sticky;
         align-items: center;
     }
 
@@ -1748,7 +1748,7 @@ footer a:hover {
     }
 
     .nav-secciones {
-        top: 75px;
+        top: 63px; /* coincide con la altura real del header sticky (logo 44px + padding) */
     }
 
     .modal-checkout-contenido {
@@ -2110,4 +2110,12 @@ footer a:hover {
     .nav-link-sec  { padding: 0.7rem 0.9rem; font-size: 0.8rem; white-space: nowrap; flex-shrink: 0; }
     .quienes-contenedor { grid-template-columns: 1fr; gap: 2.5rem; }
     .seccion-quienes-somos { padding: 3.5rem 1.25rem; }
+}
+
+/* Este bloque debe ir al final: hay otro @media (max-width: 768px) arriba que
+   también aplica a pantallas ≤480px y pisaría el "top" del nav si no se repite aquí. */
+@media (max-width: 480px) {
+    .nav-secciones {
+        top: 63px; /* altura real del header sticky en este breakpoint */
+    }
 }
