@@ -31,6 +31,7 @@ $st = $pdo->prepare(
         MAX(nombre)   AS nombre,
         MAX(telefono) AS telefono,
         MAX(ciudad)   AS ciudad,
+        MAX(departamento) AS departamento,
         COUNT(*)      AS total_pedidos,
         SUM(CASE WHEN estado='aprobado' THEN total ELSE 0 END) AS total_gastado,
         MAX(creado_en) AS ultimo_pedido
@@ -86,7 +87,7 @@ require __DIR__ . '/_head.php';
                     <td><?= htmlspecialchars($c['nombre']) ?></td>
                     <td><?= htmlspecialchars($c['email']) ?></td>
                     <td><?= htmlspecialchars($c['telefono'] ?? '—') ?></td>
-                    <td><?= htmlspecialchars($c['ciudad'] ?? '—') ?></td>
+                    <td><?= htmlspecialchars($c['ciudad'] ?? '—') ?><?php if ($c['departamento'] ?? ''): ?><br><small style="color:var(--muted)"><?= htmlspecialchars($c['departamento']) ?></small><?php endif; ?></td>
                     <td><strong><?= $c['total_pedidos'] ?></strong></td>
                     <td>$<?= number_format($c['total_gastado'], 0, ',', '.') ?></td>
                     <td><?= date('d/m/Y', strtotime($c['ultimo_pedido'])) ?></td>

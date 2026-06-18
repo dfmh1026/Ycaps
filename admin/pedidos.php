@@ -160,7 +160,7 @@ require __DIR__ . '/_head.php';
                         <?php endif; ?>
                     </td>
                     <td><?= htmlspecialchars($p['email']) ?></td>
-                    <td><?= htmlspecialchars($p['ciudad'] ?? '—') ?></td>
+                    <td><?= htmlspecialchars($p['ciudad'] ?? '—') ?><?php if ($p['departamento'] ?? ''): ?><br><small style="color:var(--muted)"><?= htmlspecialchars($p['departamento']) ?></small><?php endif; ?></td>
                     <td><strong>$<?= number_format((float)$p['total'], 0, ',', '.') ?></strong></td>
                     <td><span class="badge badge-<?= $cls ?>"><?= ucfirst($p['estado']) ?></span></td>
                     <td style="white-space:nowrap"><?= date('d/m/Y H:i', strtotime($p['creado_en'])) ?></td>
@@ -185,7 +185,7 @@ require __DIR__ . '/_head.php';
 
                             <?php if ($p['direccion'] ?? ''): ?>
                             <p style="font-size:.78rem;color:var(--muted);margin-bottom:.75rem">
-                                📍 <?= htmlspecialchars($p['direccion']) ?>, <?= htmlspecialchars($p['ciudad'] ?? '') ?>
+                                📍 <?= htmlspecialchars($p['direccion']) ?>, <?= htmlspecialchars($p['ciudad'] ?? '') ?><?= ($p['departamento'] ?? '') !== '' ? ', ' . htmlspecialchars($p['departamento']) : '' ?>
                             </p>
                             <?php endif; ?>
 

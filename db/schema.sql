@@ -11,6 +11,7 @@ CREATE TABLE IF NOT EXISTS pedidos (
     telefono             VARCHAR(50)  NOT NULL,
     direccion            VARCHAR(255) NOT NULL,
     ciudad               VARCHAR(100) NOT NULL,
+    departamento         VARCHAR(100) DEFAULT NULL,
     total                DECIMAL(12,2) NOT NULL,
     metodo_pago          VARCHAR(30)  NOT NULL DEFAULT 'wompi',
     estado               VARCHAR(30)  NOT NULL DEFAULT 'pendiente',
@@ -98,6 +99,9 @@ INSERT IGNORE INTO productos (nombre, precio, precio_original, stock, categoria,
 
 -- Guía de envío (agregar si ya tenías la tabla pedidos sin esta columna):
 -- ALTER TABLE pedidos ADD COLUMN guia_envio VARCHAR(150) DEFAULT NULL;
+
+-- Departamento (agregar si ya tenías la tabla pedidos sin esta columna):
+-- ALTER TABLE pedidos ADD COLUMN departamento VARCHAR(100) DEFAULT NULL;
 
 -- Historial de estados (agregar si ya tenías la base de datos creada):
 -- CREATE TABLE IF NOT EXISTS pedido_estado_historial (

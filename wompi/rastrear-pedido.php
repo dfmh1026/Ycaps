@@ -32,7 +32,7 @@ try {
         : 'YCAPS-' . strtoupper($termino);
 
     $stmt = $db->prepare(
-        'SELECT p.nombre, p.ciudad, p.total, p.estado, p.guia_envio,
+        'SELECT p.nombre, p.ciudad, p.departamento, p.total, p.estado, p.guia_envio,
                 p.wompi_referencia, p.creado_en
          FROM pedidos p
          WHERE p.guia_envio = :guia
@@ -45,7 +45,7 @@ try {
     // Si no encontró por referencia normalizada, intenta con el término exacto
     if (!$pedido) {
         $stmt2 = $db->prepare(
-            'SELECT p.nombre, p.ciudad, p.total, p.estado, p.guia_envio,
+            'SELECT p.nombre, p.ciudad, p.departamento, p.total, p.estado, p.guia_envio,
                     p.wompi_referencia, p.creado_en
              FROM pedidos p
              WHERE p.wompi_referencia = :ref
@@ -86,9 +86,10 @@ try {
     ];
 
     echo json_encode([
-        'referencia'  => $referencia,
-        'nombre'      => $pedido['nombre'],
-        'ciudad'      => $pedido['ciudad'],
+        'referencia'   => $referencia,
+        'nombre'       => $pedido['nombre'],
+        'ciudad'       => $pedido['ciudad'],
+        'departamento' => $pedido['departamento'] ?? '',
         'total'       => (float) $pedido['total'],
         'estado'      => $pedido['estado'],
         'estadoTexto' => $estadoTexto[$pedido['estado']] ?? ucfirst($pedido['estado']),

@@ -133,11 +133,12 @@ function enviarEmailNuevoPedido(array $comprador, array $items, float $total, st
     $asunto    = "Pedido recibido — Ycaps #{$referencia}";
     $itemsTxt  = _listadoItems($items);
     $totalFmt  = _formatearPrecio($total);
-    $nombre    = $comprador['nombre']    ?? '';
-    $email     = $comprador['email']     ?? '';
-    $telefono  = $comprador['telefono']  ?? '';
-    $direccion = $comprador['direccion'] ?? '';
-    $ciudad    = $comprador['ciudad']    ?? '';
+    $nombre       = $comprador['nombre']       ?? '';
+    $email        = $comprador['email']        ?? '';
+    $telefono     = $comprador['telefono']     ?? '';
+    $direccion    = $comprador['direccion']    ?? '';
+    $ciudad       = $comprador['ciudad']       ?? '';
+    $departamento = $comprador['departamento'] ?? '';
 
     $cuerpoCliente =
         "Hola {$nombre},\n\n"
@@ -156,7 +157,7 @@ function enviarEmailNuevoPedido(array $comprador, array $items, float $total, st
         . "Cliente:     {$nombre}\n"
         . "Email:       {$email}\n"
         . "Teléfono:    {$telefono}\n"
-        . "Dirección:   {$direccion}, {$ciudad}\n\n"
+        . "Dirección:   {$direccion}, {$ciudad}, {$departamento}\n\n"
         . "Productos:\n{$itemsTxt}\n"
         . "Total: {$totalFmt}\n"
         . "Estado: Pendiente de pago\n\n"

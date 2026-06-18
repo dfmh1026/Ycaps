@@ -412,7 +412,8 @@ function obtenerDatosComprador() {
         email: document.getElementById('checkout-email').value.trim(),
         telefono: document.getElementById('checkout-telefono').value.trim(),
         direccion: document.getElementById('checkout-direccion').value.trim(),
-        ciudad: document.getElementById('checkout-ciudad').value.trim()
+        ciudad: document.getElementById('checkout-ciudad').value.trim(),
+        departamento: document.getElementById('checkout-departamento').value.trim()
     };
 }
 
@@ -433,7 +434,7 @@ btnPedirWhatsapp.addEventListener('click', () => {
     textoMensaje += `Nombre: ${comprador.nombre}\n`;
     textoMensaje += `Email: ${comprador.email}\n`;
     textoMensaje += `Teléfono: ${comprador.telefono}\n`;
-    textoMensaje += `Dirección: ${comprador.direccion}, ${comprador.ciudad}\n`;
+    textoMensaje += `Dirección: ${comprador.direccion}, ${comprador.ciudad}, ${comprador.departamento}\n`;
     textoMensaje += "\n¿Tienen stock?";
 
     const urlTexto = encodeURIComponent(textoMensaje);
@@ -599,7 +600,7 @@ if (formRastreo) {
             rastreoMensaje.textContent = '';
             document.getElementById('rastreo-ref').textContent    = datos.referencia;
             document.getElementById('rastreo-nombre').textContent  = datos.nombre;
-            document.getElementById('rastreo-ciudad').textContent  = datos.ciudad;
+            document.getElementById('rastreo-ciudad').textContent  = datos.ciudad + (datos.departamento ? ', ' + datos.departamento : '');
             document.getElementById('rastreo-total').textContent   = '$' + datos.total.toLocaleString('es-CO');
             document.getElementById('rastreo-estado').textContent  = datos.estadoTexto;
             document.getElementById('rastreo-estado').dataset.estado = datos.estado;

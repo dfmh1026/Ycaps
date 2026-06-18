@@ -124,7 +124,8 @@ function generarReciboPdf(array $pedido, array $items, string $numeroRecibo): st
     $lineas[] = 'Cliente: ' . $pedido['nombre'];
     $lineas[] = 'Email: ' . $pedido['email'];
     $lineas[] = 'Telefono: ' . $pedido['telefono'];
-    $lineas[] = 'Direccion: ' . $pedido['direccion'] . ', ' . $pedido['ciudad'];
+    $lineas[] = 'Direccion: ' . $pedido['direccion'] . ', ' . $pedido['ciudad']
+        . (!empty($pedido['departamento']) ? ', ' . $pedido['departamento'] : '');
     $lineas[] = '';
     $lineas[] = 'PRODUCTOS';
     $lineas[] = '------------------------------------------------';

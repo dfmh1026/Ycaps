@@ -21,16 +21,17 @@ function guardarPedido(PDO $db, array $comprador, array $items, float $total, st
     try {
         $stmt = $db->prepare(
             'INSERT INTO pedidos
-                (nombre, email, telefono, direccion, ciudad, total, metodo_pago, estado, wompi_referencia)
+                (nombre, email, telefono, direccion, ciudad, departamento, total, metodo_pago, estado, wompi_referencia)
              VALUES
-                (:nombre, :email, :telefono, :direccion, :ciudad, :total, :metodo_pago, :estado, :wompi_referencia)'
+                (:nombre, :email, :telefono, :direccion, :ciudad, :departamento, :total, :metodo_pago, :estado, :wompi_referencia)'
         );
         $stmt->execute([
-            ':nombre'           => $comprador['nombre']    ?? '',
-            ':email'            => $comprador['email']     ?? '',
-            ':telefono'         => $comprador['telefono']  ?? '',
-            ':direccion'        => $comprador['direccion'] ?? '',
-            ':ciudad'           => $comprador['ciudad']    ?? '',
+            ':nombre'           => $comprador['nombre']       ?? '',
+            ':email'            => $comprador['email']        ?? '',
+            ':telefono'         => $comprador['telefono']     ?? '',
+            ':direccion'        => $comprador['direccion']    ?? '',
+            ':ciudad'           => $comprador['ciudad']       ?? '',
+            ':departamento'     => $comprador['departamento'] ?? '',
             ':total'            => $total,
             ':metodo_pago'      => 'wompi',
             ':estado'           => 'pendiente',
