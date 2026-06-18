@@ -31,6 +31,27 @@ CREATE TABLE IF NOT EXISTS pedido_items (
     FOREIGN KEY (pedido_id) REFERENCES pedidos(id) ON DELETE CASCADE
 );
 
+-- Historial de cambios de estado por pedido (trazabilidad)
+CREATE TABLE IF NOT EXISTS pedido_estado_historial (
+    id              INT AUTO_INCREMENT PRIMARY KEY,
+    pedido_id       INT NOT NULL,
+    estado_anterior VARCHAR(30) DEFAULT NULL,
+    estado_nuevo    VARCHAR(30) NOT NULL,
+    origen          VARCHAR(50) NOT NULL,
+    detalle         VARCHAR(255) DEFAULT NULL,
+    creado_en       DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (pedido_id) REFERENCES pedidos(id) ON DELETE CASCADE
+);
+
+-- Historial de números de guía por pedido (trazabilidad de envíos)
+CREATE TABLE IF NOT EXISTS pedido_guia_historial (
+    id          INT AUTO_INCREMENT PRIMARY KEY,
+    pedido_id   INT NOT NULL,
+    guia_envio  VARCHAR(150) NOT NULL,
+    creado_en   DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (pedido_id) REFERENCES pedidos(id) ON DELETE CASCADE
+);
+
 -- Tabla de productos e inventario
 CREATE TABLE IF NOT EXISTS productos (
     id               INT AUTO_INCREMENT PRIMARY KEY,
@@ -69,6 +90,27 @@ INSERT IGNORE INTO productos (nombre, precio, precio_original, stock, categoria,
 
 -- Guía de envío (agregar si ya tenías la tabla pedidos sin esta columna):
 -- ALTER TABLE pedidos ADD COLUMN guia_envio VARCHAR(150) DEFAULT NULL;
+
+-- Historial de estados (agregar si ya tenías la base de datos creada):
+-- CREATE TABLE IF NOT EXISTS pedido_estado_historial (
+--     id              INT AUTO_INCREMENT PRIMARY KEY,
+--     pedido_id       INT NOT NULL,
+--     estado_anterior VARCHAR(30) DEFAULT NULL,
+--     estado_nuevo    VARCHAR(30) NOT NULL,
+--     origen          VARCHAR(50) NOT NULL,
+--     detalle         VARCHAR(255) DEFAULT NULL,
+--     creado_en       DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+--     FOREIGN KEY (pedido_id) REFERENCES pedidos(id) ON DELETE CASCADE
+-- );
+
+-- Historial de guías de envío (agregar si ya tenías la base de datos creada):
+-- CREATE TABLE IF NOT EXISTS pedido_guia_historial (
+--     id          INT AUTO_INCREMENT PRIMARY KEY,
+--     pedido_id   INT NOT NULL,
+--     guia_envio  VARCHAR(150) NOT NULL,
+--     creado_en   DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+--     FOREIGN KEY (pedido_id) REFERENCES pedidos(id) ON DELETE CASCADE
+-- );
 
 -- Columnas Wompi (solo si venías de MercadoPago):
 -- ALTER TABLE pedidos

@@ -53,10 +53,36 @@ function guardarPedido(PDO $db, array $comprador, array $items, float $total, st
             ]);
         }
 
+        registrarCambioEstado($db, $pedidoId, null, 'pendiente', 'creacion', $wompiReferencia);
+
         $db->commit();
         return $pedidoId;
     } catch (Throwable $e) {
         $db->rollBack();
         throw $e;
     }
+}
+
+// Registra una transición de estado en el historial del pedido (trazabilidad).
+function registrarCambioEstado(
+    PDO $db,
+    int $pedidoId,
+    ?string $estadoAnterior,
+    string $estadoNuevo,
+    string $origen,
+    ?string $detalle = null
+): void {
+    $stmt = $db->prepare(
+        'INSERT INTO pedido_estado_historial
+            (pedido_id, estado_anterior, estado_nuevo, origen, detalle)
+         VALUES
+            (:pedido_id, :estado_anterior, :estado_nuevo, :origen, :detalle)'
+    );
+    $stmt->execute([
+        ':pedido_id'       => $pedidoId,
+        ':estado_anterior' => $estadoAnterior,
+        ':estado_nuevo'    => $estadoNuevo,
+        ':origen'          => $origen,
+        ':detalle'         => $detalle,
+    ]);
 }

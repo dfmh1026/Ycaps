@@ -17,8 +17,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['accion'] ?? '') === 'guia'
     $guia     = trim($_POST['guia_envio'] ?? '');
 
     if ($pedidoId > 0 && $guia !== '') {
+        $stmtActual = $pdo->prepare("SELECT guia_envio FROM pedidos WHERE id = :id LIMIT 1");
+        $stmtActual->execute([':id' => $pedidoId]);
+        $guiaAnterior = $stmtActual->fetchColumn();
+
         $pdo->prepare("UPDATE pedidos SET guia_envio = :g WHERE id = :id")
             ->execute([':g' => $guia, ':id' => $pedidoId]);
+
+        if ($guiaAnterior !== $guia) {
+            $pdo->prepare("INSERT INTO pedido_guia_historial (pedido_id, guia_envio) VALUES (:id, :g)")
+                ->execute([':id' => $pedidoId, ':g' => $guia]);
+        }
 
         // Enviar correo al cliente con el número de guía
         $stmtP = $pdo->prepare("SELECT nombre, email, wompi_referencia FROM pedidos WHERE id = :id LIMIT 1");
@@ -127,6 +136,15 @@ require __DIR__ . '/_head.php';
                 $stItems = $pdo->prepare("SELECT nombre_producto, cantidad, precio FROM pedido_items WHERE pedido_id = :id");
                 $stItems->execute([':id' => $p['id']]);
                 $items    = $stItems->fetchAll(PDO::FETCH_ASSOC);
+
+                $stHist = $pdo->prepare("SELECT estado_anterior, estado_nuevo, origen, detalle, creado_en FROM pedido_estado_historial WHERE pedido_id = :id ORDER BY creado_en ASC");
+                $stHist->execute([':id' => $p['id']]);
+                $historial = $stHist->fetchAll(PDO::FETCH_ASSOC);
+
+                $stHistGuia = $pdo->prepare("SELECT guia_envio, creado_en FROM pedido_guia_historial WHERE pedido_id = :id ORDER BY creado_en ASC");
+                $stHistGuia->execute([':id' => $p['id']]);
+                $historialGuia = $stHistGuia->fetchAll(PDO::FETCH_ASSOC);
+
                 $estado_p = strtolower($p['estado']);
                 $cls      = in_array($estado_p, ['aprobado','pendiente','rechazado','anulado','error'])
                             ? $estado_p : 'pendiente';
@@ -169,6 +187,33 @@ require __DIR__ . '/_head.php';
                             <p style="font-size:.78rem;color:var(--muted);margin-bottom:.75rem">
                                 📍 <?= htmlspecialchars($p['direccion']) ?>, <?= htmlspecialchars($p['ciudad'] ?? '') ?>
                             </p>
+                            <?php endif; ?>
+
+                            <!-- Historial de estados -->
+                            <?php if (!empty($historial)): ?>
+                            <p class="rastreo-subtitulo" style="font-size:.78rem;color:var(--muted);margin-bottom:.3rem">Historial de estado:</p>
+                            <ul style="margin:0 0 .75rem 1rem;font-size:.75rem;color:var(--muted)">
+                                <?php foreach ($historial as $h): ?>
+                                <li>
+                                    <?= date('d/m/Y H:i', strtotime($h['creado_en'])) ?> —
+                                    <?= $h['estado_anterior'] ? htmlspecialchars($h['estado_anterior']) . ' → ' : '' ?><strong><?= htmlspecialchars($h['estado_nuevo']) ?></strong>
+                                    <span style="opacity:.7">(<?= htmlspecialchars($h['origen']) ?><?= $h['detalle'] ? ': ' . htmlspecialchars($h['detalle']) : '' ?>)</span>
+                                </li>
+                                <?php endforeach; ?>
+                            </ul>
+                            <?php endif; ?>
+
+                            <!-- Historial de guías -->
+                            <?php if (!empty($historialGuia)): ?>
+                            <p class="rastreo-subtitulo" style="font-size:.78rem;color:var(--muted);margin-bottom:.3rem">Historial de guías:</p>
+                            <ul style="margin:0 0 .75rem 1rem;font-size:.75rem;color:var(--muted)">
+                                <?php foreach ($historialGuia as $hg): ?>
+                                <li>
+                                    <?= date('d/m/Y H:i', strtotime($hg['creado_en'])) ?> —
+                                    <strong><?= htmlspecialchars($hg['guia_envio']) ?></strong>
+                                </li>
+                                <?php endforeach; ?>
+                            </ul>
                             <?php endif; ?>
 
                             <!-- Guía de envío -->

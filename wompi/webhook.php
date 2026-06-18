@@ -65,7 +65,15 @@ $estadoMapa = [
 $estadoInterno = $estadoMapa[$estado] ?? strtolower($estado);
 
 try {
-    $db   = conectarDb();
+    $db = conectarDb();
+
+    // Capturar el estado actual antes de sobrescribirlo (para el historial)
+    $stmtActual = $db->prepare(
+        'SELECT id, estado FROM pedidos WHERE wompi_referencia = :ref LIMIT 1'
+    );
+    $stmtActual->execute([':ref' => $referencia]);
+    $pedidoActual = $stmtActual->fetch();
+
     $stmt = $db->prepare(
         'UPDATE pedidos
          SET estado = :estado, wompi_transaction_id = :transaction_id
@@ -76,6 +84,17 @@ try {
         ':transaction_id' => $transaccionId,
         ':referencia'     => $referencia,
     ]);
+
+    if ($pedidoActual && $pedidoActual['estado'] !== $estadoInterno) {
+        registrarCambioEstado(
+            $db,
+            (int) $pedidoActual['id'],
+            $pedidoActual['estado'],
+            $estadoInterno,
+            'webhook',
+            $transaccionId
+        );
+    }
 
     // Acciones al aprobar el pago
     if ($estado === 'APPROVED') {

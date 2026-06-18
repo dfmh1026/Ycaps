@@ -61,6 +61,14 @@ if ($estado === 'APPROVED' && $referencia !== '') {
             $pedido = $stmtPedido->fetch();
 
             if ($pedido) {
+                registrarCambioEstado(
+                    $db,
+                    (int) $pedido['id'],
+                    'pendiente',
+                    'aprobado',
+                    'confirmacion_fallback',
+                    $transaccionId
+                );
                 // Decrementar stock (también lo hace el webhook si llega después,
                 // pero GREATEST(0, stock - n) lo hace idempotente).
                 $stmtItems = $db->prepare(
