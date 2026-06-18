@@ -153,7 +153,7 @@ function enviarEmailGuiaEnvio(string $emailCliente, string $nombreCliente, strin
         . "  Número de guía: {$guia}\n\n"
         . "Puedes rastrear tu paquete en el sitio web de la transportadora con ese número.\n\n"
         . "Si tienes alguna duda, escríbenos por WhatsApp:\n"
-        . "  https://wa.me/573105853626\n\n"
+        . "  https://wa.me/573004710483\n\n"
         . "Gracias por tu compra.\n"
         . "— El equipo de Ycaps | www.ycapsgorras.com";
 

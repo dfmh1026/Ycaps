@@ -437,7 +437,7 @@ btnPedirWhatsapp.addEventListener('click', () => {
     textoMensaje += "\n¿Tienen stock?";
 
     const urlTexto = encodeURIComponent(textoMensaje);
-    const waLink = `https://wa.me/573105853626?text=${urlTexto}`;
+    const waLink = `https://wa.me/573004710483?text=${urlTexto}`;
     window.location.href = waLink;
 });
 
