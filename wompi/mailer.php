@@ -134,6 +134,7 @@ function enviarEmailNuevoPedido(array $comprador, array $items, float $total, st
     $itemsTxt  = _listadoItems($items);
     $totalFmt  = _formatearPrecio($total);
     $nombre       = $comprador['nombre']       ?? '';
+    $cedula       = $comprador['cedula']       ?? '';
     $email        = $comprador['email']        ?? '';
     $telefono     = $comprador['telefono']     ?? '';
     $direccion    = $comprador['direccion']    ?? '';
@@ -155,6 +156,7 @@ function enviarEmailNuevoPedido(array $comprador, array $items, float $total, st
         "¡Nuevo pedido recibido!\n\n"
         . "Referencia:  {$referencia}\n"
         . "Cliente:     {$nombre}\n"
+        . "Cédula:      {$cedula}\n"
         . "Email:       {$email}\n"
         . "Teléfono:    {$telefono}\n"
         . "Dirección:   {$direccion}, {$ciudad}, {$departamento}\n\n"

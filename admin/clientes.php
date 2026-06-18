@@ -29,6 +29,7 @@ $st = $pdo->prepare(
     "SELECT
         email,
         MAX(nombre)   AS nombre,
+        MAX(cedula)   AS cedula,
         MAX(telefono) AS telefono,
         MAX(ciudad)   AS ciudad,
         MAX(departamento) AS departamento,
@@ -84,7 +85,7 @@ require __DIR__ . '/_head.php';
             <tbody>
             <?php foreach ($clientes as $c): ?>
                 <tr>
-                    <td><?= htmlspecialchars($c['nombre']) ?></td>
+                    <td><?= htmlspecialchars($c['nombre']) ?><?php if ($c['cedula'] ?? ''): ?><br><small style="color:var(--muted)">CC: <?= htmlspecialchars($c['cedula']) ?></small><?php endif; ?></td>
                     <td><?= htmlspecialchars($c['email']) ?></td>
                     <td><?= htmlspecialchars($c['telefono'] ?? '—') ?></td>
                     <td><?= htmlspecialchars($c['ciudad'] ?? '—') ?><?php if ($c['departamento'] ?? ''): ?><br><small style="color:var(--muted)"><?= htmlspecialchars($c['departamento']) ?></small><?php endif; ?></td>

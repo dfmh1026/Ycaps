@@ -122,6 +122,7 @@ function generarReciboPdf(array $pedido, array $items, string $numeroRecibo): st
     $lineas[] = 'Estado: ' . ucfirst($pedido['estado']);
     $lineas[] = '';
     $lineas[] = 'Cliente: ' . $pedido['nombre'];
+    $lineas[] = 'Cedula: ' . ($pedido['cedula'] ?? '');
     $lineas[] = 'Email: ' . $pedido['email'];
     $lineas[] = 'Telefono: ' . $pedido['telefono'];
     $lineas[] = 'Direccion: ' . $pedido['direccion'] . ', ' . $pedido['ciudad']

@@ -7,6 +7,7 @@
 CREATE TABLE IF NOT EXISTS pedidos (
     id                   INT AUTO_INCREMENT PRIMARY KEY,
     nombre               VARCHAR(150) NOT NULL,
+    cedula               VARCHAR(20)  NOT NULL DEFAULT '',
     email                VARCHAR(150) NOT NULL,
     telefono             VARCHAR(50)  NOT NULL,
     direccion            VARCHAR(255) NOT NULL,
@@ -102,6 +103,9 @@ INSERT IGNORE INTO productos (nombre, precio, precio_original, stock, categoria,
 
 -- Departamento (agregar si ya tenías la tabla pedidos sin esta columna):
 -- ALTER TABLE pedidos ADD COLUMN departamento VARCHAR(100) DEFAULT NULL;
+
+-- Cédula (agregar si ya tenías la tabla pedidos sin esta columna):
+-- ALTER TABLE pedidos ADD COLUMN cedula VARCHAR(20) NOT NULL DEFAULT '' AFTER nombre;
 
 -- Historial de estados (agregar si ya tenías la base de datos creada):
 -- CREATE TABLE IF NOT EXISTS pedido_estado_historial (

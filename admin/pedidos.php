@@ -155,6 +155,9 @@ require __DIR__ . '/_head.php';
                     <td><code style="font-size:.78rem"><?= htmlspecialchars($p['wompi_referencia'] ?? '—') ?></code></td>
                     <td>
                         <?= htmlspecialchars($p['nombre']) ?>
+                        <?php if ($p['cedula'] ?? ''): ?>
+                        <br><small style="color:var(--muted)">CC: <?= htmlspecialchars($p['cedula']) ?></small>
+                        <?php endif; ?>
                         <?php if ($p['telefono'] ?? ''): ?>
                         <br><small style="color:var(--muted)"><?= htmlspecialchars($p['telefono']) ?></small>
                         <?php endif; ?>

@@ -407,15 +407,35 @@ bannerCookiesEnlace.addEventListener('click', (event) => {
 });
 
 function obtenerDatosComprador() {
+    const selectCiudad = document.getElementById('checkout-ciudad');
+    const inputCiudadOtra = document.getElementById('checkout-ciudad-otra');
+    const ciudad = selectCiudad.value === 'otra' ? inputCiudadOtra.value.trim() : selectCiudad.value;
+
     return {
         nombre: document.getElementById('checkout-nombre').value.trim(),
+        cedula: document.getElementById('checkout-cedula').value.trim(),
         email: document.getElementById('checkout-email').value.trim(),
         telefono: document.getElementById('checkout-telefono').value.trim(),
         direccion: document.getElementById('checkout-direccion').value.trim(),
-        ciudad: document.getElementById('checkout-ciudad').value.trim(),
+        ciudad: ciudad,
         departamento: document.getElementById('checkout-departamento').value.trim()
     };
 }
+
+// Mostrar/ocultar el campo de texto cuando el cliente elige "Otra" ciudad
+(function () {
+    const selectCiudad = document.getElementById('checkout-ciudad');
+    const campoCiudadOtra = document.getElementById('campo-ciudad-otra');
+    const inputCiudadOtra = document.getElementById('checkout-ciudad-otra');
+    if (!selectCiudad || !campoCiudadOtra || !inputCiudadOtra) return;
+
+    selectCiudad.addEventListener('change', () => {
+        const esOtra = selectCiudad.value === 'otra';
+        campoCiudadOtra.hidden = !esOtra;
+        inputCiudadOtra.required = esOtra;
+        if (esOtra) inputCiudadOtra.focus();
+    });
+})();
 
 // --- ENVIAR PEDIDO POR WHATSAPP (incluye datos del comprador) ---
 btnPedirWhatsapp.addEventListener('click', () => {
@@ -432,6 +452,7 @@ btnPedirWhatsapp.addEventListener('click', () => {
     });
     textoMensaje += `\nDatos de envío:\n`;
     textoMensaje += `Nombre: ${comprador.nombre}\n`;
+    textoMensaje += `Cédula: ${comprador.cedula}\n`;
     textoMensaje += `Email: ${comprador.email}\n`;
     textoMensaje += `Teléfono: ${comprador.telefono}\n`;
     textoMensaje += `Dirección: ${comprador.direccion}, ${comprador.ciudad}, ${comprador.departamento}\n`;
