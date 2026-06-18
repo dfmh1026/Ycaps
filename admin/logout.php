@@ -1,5 +1,5 @@
 <?php
-if (session_status() === PHP_SESSION_NONE) session_start();
+require __DIR__ . '/_sesion.php';
 session_destroy();
 header('Location: /admin/index.php');
 exit;

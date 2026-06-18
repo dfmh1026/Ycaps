@@ -1,9 +1,7 @@
 <?php
 // Verificación de sesión admin. Incluir al inicio de cada página protegida.
 
-if (session_status() === PHP_SESSION_NONE) {
-    session_start();
-}
+require __DIR__ . '/_sesion.php';
 
 $logado  = $_SESSION['admin_logado']       ?? false;
 $ultimo  = $_SESSION['admin_ultimo_acceso'] ?? 0;

@@ -475,7 +475,7 @@ formCheckout.addEventListener('submit', async (event) => {
 
         window.location.href = datos.checkout_url;
     } catch (error) {
-        checkoutMensaje.textContent = 'No se pudo iniciar el pago. Intenta de nuevo o usa WhatsApp.';
+        checkoutMensaje.textContent = error.message || 'No se pudo iniciar el pago. Intenta de nuevo o usa WhatsApp.';
         checkoutMensaje.classList.add('error');
         console.log('Error al crear transacción Wompi:', error);
     } finally {

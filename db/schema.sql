@@ -62,6 +62,15 @@ CREATE TABLE IF NOT EXISTS recibos (
     FOREIGN KEY (pedido_id) REFERENCES pedidos(id) ON DELETE CASCADE
 );
 
+-- Límite de intentos de login del panel admin (1 fila por IP)
+CREATE TABLE IF NOT EXISTS admin_login_intentos (
+    id              INT AUTO_INCREMENT PRIMARY KEY,
+    ip              VARCHAR(45) NOT NULL UNIQUE,
+    intentos        INT NOT NULL DEFAULT 1,
+    bloqueado_hasta DATETIME DEFAULT NULL,
+    actualizado_en  DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+);
+
 -- Tabla de productos e inventario
 CREATE TABLE IF NOT EXISTS productos (
     id               INT AUTO_INCREMENT PRIMARY KEY,
@@ -134,6 +143,15 @@ INSERT IGNORE INTO productos (nombre, precio, precio_original, stock, categoria,
 --     pedido_id  INT NOT NULL UNIQUE,
 --     creado_en  DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
 --     FOREIGN KEY (pedido_id) REFERENCES pedidos(id) ON DELETE CASCADE
+-- );
+
+-- Límite de intentos de login admin (agregar si ya tenías la base de datos creada):
+-- CREATE TABLE IF NOT EXISTS admin_login_intentos (
+--     id              INT AUTO_INCREMENT PRIMARY KEY,
+--     ip              VARCHAR(45) NOT NULL UNIQUE,
+--     intentos        INT NOT NULL DEFAULT 1,
+--     bloqueado_hasta DATETIME DEFAULT NULL,
+--     actualizado_en  DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 -- );
 
 -- Columnas Wompi (solo si venías de MercadoPago):

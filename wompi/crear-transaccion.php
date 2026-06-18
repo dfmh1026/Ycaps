@@ -23,16 +23,70 @@ if (!is_array($entrada) || empty($entrada['items']) || !is_array($entrada['items
 
 $comprador = is_array($entrada['comprador'] ?? null) ? $entrada['comprador'] : [];
 
-// Procesar ítems y calcular total en centavos (Wompi usa centavos de COP)
+// Sumar cantidades solicitadas por nombre de producto (el navegador puede mandar
+// duplicados); el precio NUNCA se toma de aquí — solo se usa para saber qué y
+// cuánto pidieron. El precio real se busca en la base de datos más abajo.
+$cantidadesPedidas = [];
+foreach ($entrada['items'] as $item) {
+    $nombre   = isset($item['nombre'])   ? trim((string) $item['nombre']) : '';
+    $cantidad = isset($item['cantidad']) ? (int) $item['cantidad']        : 0;
+
+    if ($nombre === '' || $cantidad <= 0) {
+        continue;
+    }
+
+    $cantidadesPedidas[$nombre] = ($cantidadesPedidas[$nombre] ?? 0) + $cantidad;
+}
+
+if (empty($cantidadesPedidas)) {
+    http_response_code(400);
+    echo json_encode(['error' => 'El carrito no tiene productos válidos.']);
+    exit;
+}
+
+// Validar cada producto contra la base de datos: precio real y stock disponible.
+// Así evitamos que alguien manipule el precio o la cantidad desde el navegador.
+try {
+    $db = conectarDb();
+} catch (Throwable $e) {
+    error_log('Error conectando a la base de datos en crear-transaccion.php: ' . $e->getMessage());
+    http_response_code(503);
+    echo json_encode(['error' => 'No se pudo validar el pedido. Intenta de nuevo en un momento.']);
+    exit;
+}
+
+$placeholders = implode(',', array_fill(0, count($cantidadesPedidas), '?'));
+$stmtProductos = $db->prepare(
+    "SELECT nombre, precio, stock FROM productos WHERE activo = 1 AND nombre IN ({$placeholders})"
+);
+$stmtProductos->execute(array_keys($cantidadesPedidas));
+$productosDb = [];
+foreach ($stmtProductos->fetchAll() as $p) {
+    $productosDb[$p['nombre']] = $p;
+}
+
 $items         = [];
 $totalCentavos = 0;
-foreach ($entrada['items'] as $item) {
-    $nombre   = isset($item['nombre'])   ? trim((string) $item['nombre'])   : '';
-    $precio   = isset($item['precio'])   ? (float) $item['precio']          : 0;
-    $cantidad = isset($item['cantidad']) ? (int)   $item['cantidad']        : 0;
+foreach ($cantidadesPedidas as $nombre => $cantidad) {
+    if (!isset($productosDb[$nombre])) {
+        http_response_code(400);
+        echo json_encode(['error' => "El producto \"{$nombre}\" ya no está disponible."]);
+        exit;
+    }
 
-    if ($nombre === '' || $precio <= 0 || $cantidad <= 0) {
-        continue;
+    $precio = (float) $productosDb[$nombre]['precio'];
+    $stock  = (int) $productosDb[$nombre]['stock'];
+
+    if ($precio <= 0) {
+        http_response_code(400);
+        echo json_encode(['error' => "El producto \"{$nombre}\" no está disponible para compra en línea."]);
+        exit;
+    }
+
+    if ($cantidad > $stock) {
+        http_response_code(409);
+        echo json_encode(['error' => "Stock insuficiente para \"{$nombre}\" (disponible: {$stock})."]);
+        exit;
     }
 
     $items[] = [
@@ -41,12 +95,6 @@ foreach ($entrada['items'] as $item) {
         'quantity'   => $cantidad,
     ];
     $totalCentavos += (int) round($precio * $cantidad * 100);
-}
-
-if (empty($items)) {
-    http_response_code(400);
-    echo json_encode(['error' => 'El carrito no tiene productos válidos.']);
-    exit;
 }
 
 // Referencia única por pedido — se guarda en la DB y Wompi la devuelve en el webhook
@@ -59,7 +107,6 @@ $firma = hash('sha256', $referencia . $totalCentavos . 'COP' . WOMPI_INTEGRITY_S
 // Guardar el pedido ANTES de redirigir (estado inicial: "pendiente")
 $total = $totalCentavos / 100;
 try {
-    $db = conectarDb();
     guardarPedido($db, $comprador, $items, $total, $referencia);
 } catch (Throwable $e) {
     error_log('Error guardando pedido en la base de datos: ' . $e->getMessage());

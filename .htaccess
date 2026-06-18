@@ -1,5 +1,12 @@
 # Seguridad básica del sitio Ycaps
 
+# Forzar HTTPS — necesario para pagos en línea
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+    RewriteCond %{HTTPS} off
+    RewriteRule ^ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
+</IfModule>
+
 # Evitar que se listen los archivos de las carpetas
 Options -Indexes
 
@@ -39,9 +46,14 @@ Options -Indexes
     Require all denied
 </Files>
 
+<Files "_sesion.php">
+    Require all denied
+</Files>
+
 # Cabeceras de seguridad
 <IfModule mod_headers.c>
     Header set X-Content-Type-Options "nosniff"
     Header set X-Frame-Options "SAMEORIGIN"
     Header set Referrer-Policy "strict-origin-when-cross-origin"
+    Header always set Strict-Transport-Security "max-age=31536000; includeSubDomains" env=HTTPS
 </IfModule>
