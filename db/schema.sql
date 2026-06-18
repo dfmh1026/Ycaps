@@ -90,22 +90,38 @@ CREATE TABLE IF NOT EXISTS productos (
 -- DATOS SEMILLA — productos actuales del catálogo
 -- ============================================================
 INSERT IGNORE INTO productos (nombre, precio, precio_original, stock, categoria, imagen) VALUES
-('Gorra Negra Azabache',      85000, 95000, 10, 'negra',         'gorra-negra.png'),
-('Gorra Gris',                85000, 95000, 10, 'gris',          'gorra-gris.png'),
-('Gorra Blanca Caballo Negro',85000, 95000, 10, 'blanca',        'gorra-blancan.png'),
-('Gorra Blanca',              85000, 95000, 10, 'blanca',        'gorra-blancat.png'),
-('Gorra Negra Firma YJ',      85000, 95000, 10, 'negra',         'gorra-negrayj.png'),
-('Gorra Caqui',               85000, 95000, 10, 'caqui',         'gorra-caqui.png'),
-('Gorra Negra Caballo Dorado',85000, 95000, 10, 'negra',         'gorra-negrad.png'),
-('Gorra Blanca Dorado',       85000, 95000, 10, 'blanca',        'gorra-blancad.png'),
-('Gorra Negra Malla Dorado',  85000, 95000, 10, 'negra',         'gorra-negramallad.png'),
-('Gorra Blanca Edición YJ',   85000, 95000, 10, 'blanca',        'gorra-blancayj.png'),
-('Gorra Caqui Edición YJ',    85000, 95000, 10, 'caqui',         'gorra-caquiyj.png'),
-('Gorras Personalizadas',         0,     0,  0, 'personalizada', 'personalizada1.png');
+('Gorra Negra Azabache',      85000, 95000, 10, 'negra',         'gorra-negra.jpg'),
+('Gorra Gris',                85000, 95000, 10, 'gris',          'gorra-gris.jpg'),
+('Gorra Blanca Caballo Negro',85000, 95000, 10, 'blanca',        'gorra-blancan.jpg'),
+('Gorra Blanca',              85000, 95000, 10, 'blanca',        'gorra-blancat.jpg'),
+('Gorra Negra Firma YJ',      85000, 95000, 10, 'negra',         'gorra-negrayj.jpg'),
+('Gorra Caqui',               85000, 95000, 10, 'caqui',         'gorra-caqui.jpg'),
+('Gorra Negra Caballo Dorado',85000, 95000, 10, 'negra',         'gorra-negrad.jpg'),
+('Gorra Blanca Dorado',       85000, 95000, 10, 'blanca',        'gorra-blancad.jpg'),
+('Gorra Negra Malla Dorado',  85000, 95000, 10, 'negra',         'gorra-negramallad.jpg'),
+('Gorra Blanca Edición YJ',   85000, 95000, 10, 'blanca',        'gorra-blancayj.jpg'),
+('Gorra Caqui Edición YJ',    85000, 95000, 10, 'caqui',         'gorra-caquiyj.jpg'),
+('Gorras Personalizadas',         0,     0,  0, 'personalizada', 'personalizada1.jpg');
 
 -- ============================================================
 -- MIGRACIONES — ejecuta solo las que apliquen a tu instalación.
 -- ============================================================
+
+-- Las fotos de producto se optimizaron y pasaron de .png a .jpg (mismo nombre
+-- base) para que el catálogo cargue mucho más rápido. Si tu tabla "productos"
+-- ya tenía filas con el nombre antiguo en .png, ejecuta esto una sola vez:
+UPDATE productos SET imagen = 'gorra-negra.jpg'        WHERE imagen = 'gorra-negra.png';
+UPDATE productos SET imagen = 'gorra-gris.jpg'         WHERE imagen = 'gorra-gris.png';
+UPDATE productos SET imagen = 'gorra-blancan.jpg'      WHERE imagen = 'gorra-blancan.png';
+UPDATE productos SET imagen = 'gorra-blancat.jpg'      WHERE imagen = 'gorra-blancat.png';
+UPDATE productos SET imagen = 'gorra-negrayj.jpg'      WHERE imagen = 'gorra-negrayj.png';
+UPDATE productos SET imagen = 'gorra-caqui.jpg'        WHERE imagen = 'gorra-caqui.png';
+UPDATE productos SET imagen = 'gorra-negrad.jpg'       WHERE imagen = 'gorra-negrad.png';
+UPDATE productos SET imagen = 'gorra-blancad.jpg'      WHERE imagen = 'gorra-blancad.png';
+UPDATE productos SET imagen = 'gorra-negramallad.jpg'  WHERE imagen = 'gorra-negramallad.png';
+UPDATE productos SET imagen = 'gorra-blancayj.jpg'     WHERE imagen = 'gorra-blancayj.png';
+UPDATE productos SET imagen = 'gorra-caquiyj.jpg'      WHERE imagen = 'gorra-caquiyj.png';
+UPDATE productos SET imagen = 'personalizada1.jpg'     WHERE imagen = 'personalizada1.png';
 
 -- Guía de envío (agregar si ya tenías la tabla pedidos sin esta columna):
 -- ALTER TABLE pedidos ADD COLUMN guia_envio VARCHAR(150) DEFAULT NULL;
