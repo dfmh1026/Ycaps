@@ -498,7 +498,8 @@ formCheckout.addEventListener('submit', async (event) => {
         actualizarInterfaz();
 
         banner.innerHTML = '¡Pago exitoso! Gracias por tu compra. Te contactaremos pronto para coordinar el envío.'
-            + (ref ? ` — Referencia: <strong>${ref}</strong>` : '');
+            + (ref ? ` — Referencia: <strong>${ref}</strong>` : '')
+            + (ref ? ` <a href="wompi/recibo-pdf.php?ref=${encodeURIComponent(ref)}" target="_blank" style="color:#fff;text-decoration:underline;margin-left:8px;white-space:nowrap">Descargar recibo PDF</a>` : '');
     } else if (estadoPago === 'pendiente') {
         banner.innerHTML = 'Tu pago está siendo procesado. Te notificaremos cuando se confirme.'
             + (ref ? ` — Referencia: <strong>${ref}</strong>` : '');
@@ -598,6 +599,15 @@ if (formRastreo) {
                 li.textContent = item;
                 listaEl.appendChild(li);
             });
+
+            const descargaDiv  = document.getElementById('rastreo-descarga');
+            const descargaLink = document.getElementById('rastreo-descarga-link');
+            if (datos.estado === 'aprobado') {
+                descargaLink.href = 'wompi/recibo-pdf.php?ref=' + encodeURIComponent(datos.referencia);
+                descargaDiv.hidden = false;
+            } else {
+                descargaDiv.hidden = true;
+            }
 
             rastreoResultado.hidden = false;
         } catch (err) {
