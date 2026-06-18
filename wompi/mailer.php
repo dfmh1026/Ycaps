@@ -323,3 +323,63 @@ function enviarEmailPagoConfirmado(
         . "Panel: https://www.ycapsgorras.com/admin/"
     );
 }
+
+// $pedido debe incluir: nombre, email, telefono, direccion, ciudad, departamento, total
+// $estadoInterno: 'rechazado' | 'anulado' | 'error'
+function enviarEmailPagoRechazado(array $pedido, string $referencia, string $estadoInterno): void
+{
+    $emailCliente  = $pedido['email']        ?? '';
+    $nombreCliente = $pedido['nombre']        ?? '';
+    $telefono      = $pedido['telefono']      ?? '';
+    $direccion     = $pedido['direccion']     ?? '';
+    $ciudad        = $pedido['ciudad']        ?? '';
+    $departamento  = $pedido['departamento']  ?? '';
+    $total         = (float) ($pedido['total'] ?? 0);
+    $direccionCompleta = trim($direccion . ', ' . $ciudad . ($departamento !== '' ? ', ' . $departamento : ''), ', ');
+    $totalFmt = _formatearPrecio($total);
+
+    $etiquetas = [
+        'rechazado' => 'Pago rechazado',
+        'anulado'   => 'Pago anulado',
+        'error'     => 'Error al procesar el pago',
+    ];
+    $etiquetaEstado = $etiquetas[$estadoInterno] ?? 'Pago no completado';
+
+    $asunto = "{$etiquetaEstado} — Ycaps #{$referencia}";
+
+    $contenidoCliente =
+        '<p style="margin:0 0 14px;font-size:15px;">Hola <strong>' . htmlspecialchars($nombreCliente) . '</strong>,</p>'
+        . '<p style="margin:0 0 14px;">Tu pago no pudo completarse (' . htmlspecialchars(mb_strtolower($etiquetaEstado)) . '). No te preocupes, no se realizó ningún cobro.</p>'
+        . '<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin-top:6px;">'
+        . _filaDato('Referencia', $referencia)
+        . _filaDato('Estado', $etiquetaEstado)
+        . '</table>'
+        . _cajaTotal($totalFmt)
+        . '<p style="margin:14px 0 14px;">Puedes intentar nuevamente desde <a href="https://www.ycapsgorras.com" style="color:#d4af37;text-decoration:none;">www.ycapsgorras.com</a> o hacer tu pedido directamente por <a href="https://wa.me/573004710483" style="color:#d4af37;text-decoration:none;">WhatsApp</a>.</p>'
+        . '<p style="margin:0;">Estamos atentos si necesitas ayuda.</p>';
+
+    $contenidoTienda =
+        '<p style="margin:0 0 16px;font-size:16px;color:#d4af37;font-weight:bold;">⚠️ ' . htmlspecialchars($etiquetaEstado) . '</p>'
+        . '<table role="presentation" width="100%" cellpadding="0" cellspacing="0">'
+        . _filaDato('Referencia', $referencia)
+        . _filaDato('Cliente', $nombreCliente)
+        . _filaDato('Email', $emailCliente)
+        . _filaDato('Teléfono', $telefono)
+        . _filaDato('Dirección', $direccionCompleta)
+        . _filaDato('Estado', $etiquetaEstado)
+        . '</table>'
+        . _cajaTotal($totalFmt)
+        . '<p style="margin:0;"><a href="https://www.ycapsgorras.com/admin/" style="color:#d4af37;text-decoration:none;">Ver en el panel admin →</a></p>';
+
+    if ($emailCliente !== '') {
+        _smtpEnviar($emailCliente, $asunto, _plantillaEmail($contenidoCliente));
+    }
+    _smtpEnviar(TIENDA_EMAIL, $etiquetaEstado . ' — ' . $asunto, _plantillaEmail($contenidoTienda));
+
+    _telegramNotificar(
+        "⚠️ " . mb_strtoupper($etiquetaEstado) . "\n"
+        . "Cliente: {$nombreCliente}\n"
+        . "Ref: {$referencia}\n"
+        . "Total: {$totalFmt}"
+    );
+}

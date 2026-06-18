@@ -103,6 +103,47 @@ if ($estado === 'APPROVED' && $referencia !== '') {
     }
 }
 
+// Pago rechazado/anulado/con error: actualizamos y avisamos solo si el webhook
+// todavía no lo había hecho (mismo patrón de idempotencia que el caso APPROVED).
+$estadoMapaRechazo = ['DECLINED' => 'rechazado', 'VOIDED' => 'anulado', 'ERROR' => 'error'];
+if (isset($estadoMapaRechazo[$estado]) && $referencia !== '') {
+    try {
+        $db = conectarDb();
+        $estadoInterno = $estadoMapaRechazo[$estado];
+
+        $upd = $db->prepare(
+            "UPDATE pedidos
+             SET estado = :estado, wompi_transaction_id = :tid
+             WHERE wompi_referencia = :ref AND estado = 'pendiente'"
+        );
+        $upd->execute([':estado' => $estadoInterno, ':tid' => $transaccionId, ':ref' => $referencia]);
+
+        if ($upd->rowCount() > 0) {
+            $stmtPedido = $db->prepare(
+                'SELECT * FROM pedidos WHERE wompi_referencia = :ref LIMIT 1'
+            );
+            $stmtPedido->execute([':ref' => $referencia]);
+            $pedido = $stmtPedido->fetch();
+
+            if ($pedido) {
+                registrarCambioEstado(
+                    $db,
+                    (int) $pedido['id'],
+                    'pendiente',
+                    $estadoInterno,
+                    'confirmacion_fallback',
+                    $transaccionId
+                );
+
+                require_once __DIR__ . '/mailer.php';
+                enviarEmailPagoRechazado($pedido, $referencia, $estadoInterno);
+            }
+        }
+    } catch (Throwable $e) {
+        error_log('Error en confirmacion.php al rechazar pedido: ' . $e->getMessage());
+    }
+}
+
 $refParam = $referencia !== '' ? '&ref=' . urlencode($referencia) : '';
 
 switch ($estado) {

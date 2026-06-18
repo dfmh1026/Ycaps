@@ -138,6 +138,23 @@ try {
                 error_log('Error enviando email de pago confirmado: ' . $e->getMessage());
             }
         }
+    } elseif (in_array($estado, ['DECLINED', 'VOIDED', 'ERROR'], true)
+        && $pedidoActual && $pedidoActual['estado'] !== $estadoInterno) {
+        // Avisar de pago rechazado/anulado/con error solo cuando el estado realmente cambió
+        try {
+            $stmtPedido = $db->prepare(
+                'SELECT * FROM pedidos WHERE wompi_referencia = :ref LIMIT 1'
+            );
+            $stmtPedido->execute([':ref' => $referencia]);
+            $pedido = $stmtPedido->fetch();
+
+            if ($pedido) {
+                require_once __DIR__ . '/mailer.php';
+                enviarEmailPagoRechazado($pedido, $referencia, $estadoInterno);
+            }
+        } catch (Throwable $e) {
+            error_log('Error enviando email de pago rechazado: ' . $e->getMessage());
+        }
     }
 
     echo json_encode(['ok' => true]);
