@@ -35,7 +35,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $bloqueado) {
     $usuario = trim($_POST['usuario'] ?? '');
     $clave   = trim($_POST['clave']   ?? '');
 
-    if ($usuario === ADMIN_USUARIO && hash_equals(ADMIN_CLAVE, $clave)) {
+    // Soporta ADMIN_CLAVE como hash bcrypt (recomendado) o como texto plano
+    // (compatibilidad con configuraciones existentes).
+    $claveValida = (strncmp(ADMIN_CLAVE, '$2y$', 4) === 0)
+        ? password_verify($clave, ADMIN_CLAVE)
+        : hash_equals(ADMIN_CLAVE, $clave);
+
+    if ($usuario === ADMIN_USUARIO && $claveValida) {
         $pdo->prepare('DELETE FROM admin_login_intentos WHERE ip = :ip')->execute([':ip' => $ip]);
 
         session_regenerate_id(true);

@@ -23,6 +23,15 @@ if (!is_array($entrada) || empty($entrada['items']) || !is_array($entrada['items
 
 $comprador = is_array($entrada['comprador'] ?? null) ? $entrada['comprador'] : [];
 
+// Validar el email del comprador: rechaza valores mal formados o con saltos de
+// línea (que podrían usarse para inyectar cabeceras en los correos de alerta).
+$emailComprador = trim((string) ($comprador['email'] ?? ''));
+if (!filter_var($emailComprador, FILTER_VALIDATE_EMAIL)) {
+    http_response_code(400);
+    echo json_encode(['error' => 'El correo electrónico no es válido.']);
+    exit;
+}
+
 // Sumar cantidades solicitadas por nombre de producto (el navegador puede mandar
 // duplicados); el precio NUNCA se toma de aquí — solo se usa para saber qué y
 // cuánto pidieron. El precio real se busca en la base de datos más abajo.

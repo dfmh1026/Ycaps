@@ -26,6 +26,16 @@ function _telegramNotificar(string $mensaje): void
 // $cuerpoHtml debe venir ya envuelto con _plantillaEmail().
 function _smtpEnviar(string $para, string $asunto, string $cuerpoHtml, ?array $adjunto = null): void
 {
+    // El destinatario puede venir de datos enviados por el cliente (formulario de
+    // compra). Sin esta validación, un correo malicioso con salto de línea podría
+    // inyectar cabeceras SMTP adicionales (ej. Bcc a terceros) o comandos al
+    // servidor de correo. filter_var con FILTER_VALIDATE_EMAIL rechaza cualquier
+    // valor que no sea un correo válido, incluyendo los que llevan \r o \n.
+    if (!filter_var($para, FILTER_VALIDATE_EMAIL)) {
+        error_log('_smtpEnviar: destinatario inválido, envío bloqueado.');
+        return;
+    }
+
     $host = defined('SMTP_HOST') ? SMTP_HOST : 'smtp.hostinger.com';
     $port = defined('SMTP_PORT') ? (int) SMTP_PORT : 465;
     $user = defined('SMTP_USER') ? SMTP_USER : TIENDA_EMAIL;

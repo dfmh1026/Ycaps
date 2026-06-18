@@ -10,6 +10,14 @@
 # Evitar que se listen los archivos de las carpetas
 Options -Indexes
 
+# Bloquear acceso a la carpeta .git por si quedara expuesta en el servidor
+<IfModule mod_rewrite.c>
+    RewriteRule ^\.git/ - [F,L]
+</IfModule>
+<DirectoryMatch "\.git">
+    Require all denied
+</DirectoryMatch>
+
 # Bloquear acceso directo a archivos sensibles
 <FilesMatch "\.(sql|env|log)$">
     Require all denied
