@@ -37,18 +37,7 @@ try {
     $stmtItems->execute([':id' => $pedido['id']]);
     $items = $stmtItems->fetchAll();
 
-    // Obtener o crear el número consecutivo del recibo (uno por pedido, fijo)
-    $stmtRecibo = $db->prepare('SELECT id FROM recibos WHERE pedido_id = :pid LIMIT 1');
-    $stmtRecibo->execute([':pid' => $pedido['id']]);
-    $reciboId = $stmtRecibo->fetchColumn();
-
-    if (!$reciboId) {
-        $db->prepare('INSERT INTO recibos (pedido_id) VALUES (:pid)')->execute([':pid' => $pedido['id']]);
-        $reciboId = (int) $db->lastInsertId();
-    }
-
-    $numeroRecibo = 'YCAPS-REC-' . str_pad((string) $reciboId, 6, '0', STR_PAD_LEFT);
-
+    $numeroRecibo  = obtenerOCrearNumeroRecibo($db, (int) $pedido['id']);
     $pdfContenido  = generarReciboPdf($pedido, $items, $numeroRecibo);
     $nombreArchivo = 'recibo-' . preg_replace('/[^A-Za-z0-9\-]/', '', $referencia) . '.pdf';
 

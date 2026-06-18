@@ -98,9 +98,9 @@ try {
 
     // Acciones al aprobar el pago
     if ($estado === 'APPROVED') {
-        // Obtener datos del pedido
+        // Obtener datos completos del pedido (necesarios también para el recibo PDF)
         $stmtPedido = $db->prepare(
-            'SELECT id, nombre, email, total FROM pedidos WHERE wompi_referencia = :ref LIMIT 1'
+            'SELECT * FROM pedidos WHERE wompi_referencia = :ref LIMIT 1'
         );
         $stmtPedido->execute([':ref' => $referencia]);
         $pedido = $stmtPedido->fetch();
@@ -108,7 +108,7 @@ try {
         if ($pedido) {
             // Decrementar stock de cada producto comprado
             $stmtItems = $db->prepare(
-                'SELECT nombre_producto, cantidad FROM pedido_items WHERE pedido_id = :id'
+                'SELECT nombre_producto, precio, cantidad FROM pedido_items WHERE pedido_id = :id'
             );
             $stmtItems->execute([':id' => $pedido['id']]);
             $items = $stmtItems->fetchAll();
@@ -124,14 +124,22 @@ try {
                 ]);
             }
 
-            // Email de confirmación al cliente
+            // Email de confirmación al cliente, con recibo PDF adjunto a la alerta de la tienda
             try {
                 require_once __DIR__ . '/mailer.php';
+                require_once __DIR__ . '/pdf.php';
+
+                $numeroRecibo = obtenerOCrearNumeroRecibo($db, (int) $pedido['id']);
+                $pdfDatos     = generarReciboPdf($pedido, $items, $numeroRecibo);
+                $pdfNombre    = 'recibo-' . preg_replace('/[^A-Za-z0-9\-]/', '', $referencia) . '.pdf';
+
                 enviarEmailPagoConfirmado(
                     $pedido['email'],
                     $pedido['nombre'],
                     $referencia,
-                    (float) $pedido['total']
+                    (float) $pedido['total'],
+                    $pdfDatos,
+                    $pdfNombre
                 );
             } catch (Throwable $e) {
                 error_log('Error enviando email de pago confirmado: ' . $e->getMessage());

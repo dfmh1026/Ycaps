@@ -86,3 +86,18 @@ function registrarCambioEstado(
         ':detalle'         => $detalle,
     ]);
 }
+
+// Devuelve el número consecutivo de recibo de un pedido, creándolo si no existe.
+function obtenerOCrearNumeroRecibo(PDO $db, int $pedidoId): string
+{
+    $stmt = $db->prepare('SELECT id FROM recibos WHERE pedido_id = :pid LIMIT 1');
+    $stmt->execute([':pid' => $pedidoId]);
+    $reciboId = $stmt->fetchColumn();
+
+    if (!$reciboId) {
+        $db->prepare('INSERT INTO recibos (pedido_id) VALUES (:pid)')->execute([':pid' => $pedidoId]);
+        $reciboId = (int) $db->lastInsertId();
+    }
+
+    return 'YCAPS-REC-' . str_pad((string) $reciboId, 6, '0', STR_PAD_LEFT);
+}

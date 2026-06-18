@@ -55,7 +55,7 @@ if ($estado === 'APPROVED' && $referencia !== '') {
         // como aprobado (el webhook aún no había llegado) → enviamos el correo.
         if ($upd->rowCount() > 0) {
             $stmtPedido = $db->prepare(
-                'SELECT id, nombre, email, total FROM pedidos WHERE wompi_referencia = :ref LIMIT 1'
+                'SELECT * FROM pedidos WHERE wompi_referencia = :ref LIMIT 1'
             );
             $stmtPedido->execute([':ref' => $referencia]);
             $pedido = $stmtPedido->fetch();
@@ -72,7 +72,7 @@ if ($estado === 'APPROVED' && $referencia !== '') {
                 // Decrementar stock (también lo hace el webhook si llega después,
                 // pero GREATEST(0, stock - n) lo hace idempotente).
                 $stmtItems = $db->prepare(
-                    'SELECT nombre_producto, cantidad FROM pedido_items WHERE pedido_id = :id'
+                    'SELECT nombre_producto, precio, cantidad FROM pedido_items WHERE pedido_id = :id'
                 );
                 $stmtItems->execute([':id' => $pedido['id']]);
                 $items = $stmtItems->fetchAll();
@@ -89,11 +89,19 @@ if ($estado === 'APPROVED' && $referencia !== '') {
                 }
 
                 require_once __DIR__ . '/mailer.php';
+                require_once __DIR__ . '/pdf.php';
+
+                $numeroRecibo = obtenerOCrearNumeroRecibo($db, (int) $pedido['id']);
+                $pdfDatos     = generarReciboPdf($pedido, $items, $numeroRecibo);
+                $pdfNombre    = 'recibo-' . preg_replace('/[^A-Za-z0-9\-]/', '', $referencia) . '.pdf';
+
                 enviarEmailPagoConfirmado(
                     $pedido['email'],
                     $pedido['nombre'],
                     $referencia,
-                    (float) $pedido['total']
+                    (float) $pedido['total'],
+                    $pdfDatos,
+                    $pdfNombre
                 );
             }
         }

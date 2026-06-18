@@ -22,7 +22,8 @@ function _telegramNotificar(string $mensaje): void
     curl_close($ch);
 }
 
-function _smtpEnviar(string $para, string $asunto, string $cuerpo): void
+// $adjunto opcional: ['nombre' => 'recibo.pdf', 'datos' => $bytesBinarios, 'tipo' => 'application/pdf']
+function _smtpEnviar(string $para, string $asunto, string $cuerpo, ?array $adjunto = null): void
 {
     $host = defined('SMTP_HOST') ? SMTP_HOST : 'smtp.hostinger.com';
     $port = defined('SMTP_PORT') ? (int) SMTP_PORT : 465;
@@ -36,7 +37,7 @@ function _smtpEnviar(string $para, string $asunto, string $cuerpo): void
     $socket = @stream_socket_client("ssl://{$host}:{$port}", $errno, $errstr, 15, STREAM_CLIENT_CONNECT, $ctx);
 
     if (!$socket) {
-        // Fallback a mail() si SMTP no conecta
+        // Fallback a mail() si SMTP no conecta (sin adjunto, mail() multipart es más limitado)
         $headers = "From: {$nombre} <{$from}>\r\nReply-To: {$from}\r\nMIME-Version: 1.0\r\nContent-Type: text/plain; charset=UTF-8\r\n";
         @mail($para, '=?UTF-8?B?' . base64_encode($asunto) . '?=', $cuerpo, $headers, '-f' . $from);
         return;
@@ -69,14 +70,38 @@ function _smtpEnviar(string $para, string $asunto, string $cuerpo): void
     $subjectB64 = '=?UTF-8?B?' . base64_encode($asunto) . '?=';
     $cuerpoB64  = chunk_split(base64_encode($cuerpo));
 
-    $mensaje = "From: {$nombre} <{$from}>\r\n"
-             . "To: {$para}\r\n"
-             . "Subject: {$subjectB64}\r\n"
-             . "MIME-Version: 1.0\r\n"
-             . "Content-Type: text/plain; charset=UTF-8\r\n"
-             . "Content-Transfer-Encoding: base64\r\n"
-             . "\r\n"
-             . $cuerpoB64;
+    if ($adjunto) {
+        $boundary   = 'YCAPS-' . bin2hex(random_bytes(12));
+        $adjuntoB64 = chunk_split(base64_encode($adjunto['datos']));
+
+        $mensaje = "From: {$nombre} <{$from}>\r\n"
+                 . "To: {$para}\r\n"
+                 . "Subject: {$subjectB64}\r\n"
+                 . "MIME-Version: 1.0\r\n"
+                 . "Content-Type: multipart/mixed; boundary=\"{$boundary}\"\r\n"
+                 . "\r\n"
+                 . "--{$boundary}\r\n"
+                 . "Content-Type: text/plain; charset=UTF-8\r\n"
+                 . "Content-Transfer-Encoding: base64\r\n"
+                 . "\r\n"
+                 . $cuerpoB64
+                 . "\r\n--{$boundary}\r\n"
+                 . "Content-Type: {$adjunto['tipo']}; name=\"{$adjunto['nombre']}\"\r\n"
+                 . "Content-Transfer-Encoding: base64\r\n"
+                 . "Content-Disposition: attachment; filename=\"{$adjunto['nombre']}\"\r\n"
+                 . "\r\n"
+                 . $adjuntoB64
+                 . "\r\n--{$boundary}--";
+    } else {
+        $mensaje = "From: {$nombre} <{$from}>\r\n"
+                 . "To: {$para}\r\n"
+                 . "Subject: {$subjectB64}\r\n"
+                 . "MIME-Version: 1.0\r\n"
+                 . "Content-Type: text/plain; charset=UTF-8\r\n"
+                 . "Content-Transfer-Encoding: base64\r\n"
+                 . "\r\n"
+                 . $cuerpoB64;
+    }
 
     $cmd($mensaje . "\r\n.");
     $leer();
@@ -166,8 +191,14 @@ function enviarEmailGuiaEnvio(string $emailCliente, string $nombreCliente, strin
     );
 }
 
-function enviarEmailPagoConfirmado(string $emailCliente, string $nombreCliente, string $referencia, float $total): void
-{
+function enviarEmailPagoConfirmado(
+    string $emailCliente,
+    string $nombreCliente,
+    string $referencia,
+    float $total,
+    ?string $pdfDatos = null,
+    ?string $pdfNombre = null
+): void {
     $asunto   = "¡Pago confirmado! — Ycaps #{$referencia}";
     $totalFmt = _formatearPrecio($total);
 
@@ -188,12 +219,18 @@ function enviarEmailPagoConfirmado(string $emailCliente, string $nombreCliente, 
         . "Email:      {$emailCliente}\n"
         . "Total:      {$totalFmt}\n\n"
         . "Alista el pedido para envío.\n"
-        . "Panel admin: https://www.ycapsgorras.com/admin/";
+        . "Panel admin: https://www.ycapsgorras.com/admin/"
+        . ($pdfDatos !== null ? "\n\nSe adjunta el recibo en PDF de esta compra." : '');
 
     if ($emailCliente !== '') {
         _smtpEnviar($emailCliente, $asunto, $cuerpoCliente);
     }
-    _smtpEnviar(TIENDA_EMAIL, 'Pago confirmado — ' . $asunto, $cuerpoTienda);
+
+    $adjunto = ($pdfDatos !== null)
+        ? ['nombre' => $pdfNombre ?: "recibo-{$referencia}.pdf", 'datos' => $pdfDatos, 'tipo' => 'application/pdf']
+        : null;
+
+    _smtpEnviar(TIENDA_EMAIL, 'Pago confirmado — ' . $asunto, $cuerpoTienda, $adjunto);
 
     _telegramNotificar(
         "✅ NUEVO PEDIDO PAGADO\n"
