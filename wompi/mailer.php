@@ -197,7 +197,9 @@ function enviarEmailNuevoPedido(array $comprador, array $items, float $total, st
         . '<p style="margin:0 0 4px;">Hemos recibido tu pedido en Ycaps. Aquí están los detalles:</p>'
         . '<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin-top:10px;">'
         . _filaDato('Referencia', $referencia)
+        . _filaDato('Cédula', $cedula)
         . _filaDato('Dirección', $direccionCompleta)
+        . _filaDato('Método de pago', 'Wompi (pago en línea)')
         . _filaDato('Estado', 'Pendiente de pago')
         . '</table>'
         . _tituloSeccion('Productos')
@@ -215,6 +217,7 @@ function enviarEmailNuevoPedido(array $comprador, array $items, float $total, st
         . _filaDato('Email', $email)
         . _filaDato('Teléfono', $telefono)
         . _filaDato('Dirección', $direccionCompleta)
+        . _filaDato('Método de pago', 'Wompi (pago en línea)')
         . _filaDato('Estado', 'Pendiente de pago')
         . '</table>'
         . _tituloSeccion('Productos')
@@ -265,6 +268,7 @@ function enviarEmailPagoConfirmado(
     $direccion     = $pedido['direccion']     ?? '';
     $ciudad        = $pedido['ciudad']        ?? '';
     $departamento  = $pedido['departamento']  ?? '';
+    $metodoPago    = ucfirst($pedido['metodo_pago'] ?? 'wompi');
     $total         = (float) ($pedido['total'] ?? 0);
     $direccionCompleta = trim($direccion . ', ' . $ciudad . ($departamento !== '' ? ', ' . $departamento : ''), ', ');
 
@@ -276,7 +280,9 @@ function enviarEmailPagoConfirmado(
         . '<p style="margin:0 0 14px;">¡Tu pago ha sido confirmado! Pronto te contactaremos por WhatsApp para coordinar el envío.</p>'
         . '<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin-top:6px;">'
         . _filaDato('Referencia', $referencia)
+        . _filaDato('Cédula', $cedula)
         . _filaDato('Dirección', $direccionCompleta)
+        . _filaDato('Método de pago', $metodoPago)
         . '</table>'
         . _cajaTotal($totalFmt)
         . '<p style="margin:0 0 14px;">Puedes rastrear tu pedido en <a href="https://www.ycapsgorras.com" style="color:#d4af37;text-decoration:none;">www.ycapsgorras.com</a> — sección "Estado pedido".</p>'
@@ -291,6 +297,7 @@ function enviarEmailPagoConfirmado(
         . _filaDato('Email', $emailCliente)
         . _filaDato('Teléfono', $telefono)
         . _filaDato('Dirección', $direccionCompleta)
+        . _filaDato('Método de pago', $metodoPago)
         . '</table>'
         . _cajaTotal($totalFmt)
         . '<p style="margin:0 0 6px;">Alista el pedido para envío.</p>'

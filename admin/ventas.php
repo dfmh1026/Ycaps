@@ -41,7 +41,7 @@ $totalPags = max(1, (int) ceil($totalVentas / $porPag));
 $offset    = ($pagina - 1) * $porPag;
 
 $stVentas = $pdo->prepare(
-    "SELECT id, wompi_referencia, nombre, ciudad, departamento, total, creado_en
+    "SELECT id, wompi_referencia, nombre, ciudad, departamento, metodo_pago, total, creado_en
      FROM pedidos WHERE {$where}
      ORDER BY creado_en DESC
      LIMIT {$porPag} OFFSET {$offset}"
@@ -120,6 +120,7 @@ require __DIR__ . '/_head.php';
                     <th>Referencia</th>
                     <th>Cliente</th>
                     <th>Destino</th>
+                    <th>Método de pago</th>
                     <th>Total</th>
                     <th>Fecha</th>
                 </tr>
@@ -131,6 +132,7 @@ require __DIR__ . '/_head.php';
                     <td><code style="font-size:.78rem"><?= htmlspecialchars($v['wompi_referencia'] ?? '—') ?></code></td>
                     <td><?= htmlspecialchars($v['nombre']) ?></td>
                     <td><?= htmlspecialchars($v['ciudad'] ?? '—') ?><?php if ($v['departamento'] ?? ''): ?>, <?= htmlspecialchars($v['departamento']) ?><?php endif; ?></td>
+                    <td><?= htmlspecialchars(ucfirst($v['metodo_pago'] ?? 'wompi')) ?></td>
                     <td><strong>$<?= number_format((float) $v['total'], 0, ',', '.') ?></strong></td>
                     <td style="white-space:nowrap"><?= date('d/m/Y H:i', strtotime($v['creado_en'])) ?></td>
                 </tr>

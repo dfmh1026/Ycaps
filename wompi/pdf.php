@@ -143,14 +143,15 @@ function generarReciboPdf(array $pedido, array $items, string $numeroRecibo): st
         . (!empty($pedido['departamento']) ? ', ' . $pedido['departamento'] : '');
 
     $campos = [
-        'Referencia' => $pedido['wompi_referencia'],
-        'Fecha'      => date('d/m/Y H:i', strtotime($pedido['creado_en'])),
-        'Estado'     => ucfirst($pedido['estado']),
-        'Cliente'    => $pedido['nombre'],
-        'Cedula'     => $pedido['cedula'] ?? '',
-        'Email'      => $pedido['email'],
-        'Telefono'   => $pedido['telefono'],
-        'Direccion'  => $direccionCompleta,
+        'Referencia'    => $pedido['wompi_referencia'],
+        'Fecha'         => date('d/m/Y H:i', strtotime($pedido['creado_en'])),
+        'Estado'        => ucfirst($pedido['estado']),
+        'Cliente'       => $pedido['nombre'],
+        'Cedula'        => $pedido['cedula'] ?? '',
+        'Email'         => $pedido['email'],
+        'Telefono'      => $pedido['telefono'],
+        'Direccion'     => $direccionCompleta,
+        'Metodo de pago' => ucfirst($pedido['metodo_pago'] ?? 'wompi'),
     ];
 
     foreach ($campos as $etiqueta => $valor) {
