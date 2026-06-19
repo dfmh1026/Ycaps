@@ -645,7 +645,7 @@ if (formRastreo) {
 // Click en logo o H1 recarga la página (mejor experiencia móvil/desktop)
 document.addEventListener('DOMContentLoaded', () => {
     const logoImg = document.querySelector('.imagen-logo');
-    const logoH1 = document.querySelector('.logo h1');
+    const logoH1 = document.querySelector('.logo p');
 
     function recargarPagina(event) {
         event.preventDefault();

@@ -5,11 +5,8 @@
     --dorado: #d4af37;
     --dorado-claro: #f1d785;
     --dorado-hover: #bda032;
-    --bronce: #8a6a2f;
-    --oliva: #6b6f47;
     --blanco: #ffffff;
     --gris-claro: #cccccc;
-    --gris-medio: #8c8c8c;
 
     /* Curva de easing premium: arranque rápido, llegada suave */
     --ease-premium: cubic-bezier(0.22, 1, 0.36, 1);
@@ -138,15 +135,6 @@ header {
 
 .logo span {
     color: var(--dorado);
-}
-
-.subtitulo-logo {
-    font-family: 'Poppins', sans-serif;
-    font-size: 0.85rem;
-    letter-spacing: 1.5px;
-    color: var(--gris-claro);
-    text-transform: uppercase;
-    opacity: 0.9;
 }
 
 
@@ -1493,11 +1481,6 @@ footer a:hover {
         white-space: nowrap;
     }
 
-    .subtitulo-logo {
-        font-size: 0.75rem;
-        letter-spacing: 1px;
-    }
-
     .hero {
         padding: 5rem 1rem 3rem;
         margin-top: 0;
@@ -1665,11 +1648,6 @@ footer a:hover {
         order: 1;
         white-space: nowrap;
         margin-left: 8rem;
-    }
-
-    .subtitulo-logo {
-        font-size: 0.7rem;
-        letter-spacing: 0.75px;
     }
 
     .hero {
@@ -1948,15 +1926,6 @@ footer a:hover {
     border-bottom-color: var(--dorado);
 }
 
-.nav-link-wa {
-    color: #4ade80;
-}
-
-.nav-link-wa:hover {
-    color: #86efac;
-    border-bottom-color: #4ade80;
-}
-
 /* ── Filtros del catálogo ── */
 .filtros-catalogo {
     display: flex;
@@ -2028,22 +1997,6 @@ footer a:hover {
     margin-bottom: 1rem;
 }
 
-.btn-quienes-wa {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.5rem;
-    background: #25d366;
-    color: #fff;
-    font-weight: 700;
-    font-size: 0.9rem;
-    padding: 0.75rem 1.5rem;
-    border-radius: 8px;
-    text-decoration: none;
-    margin-top: 0.5rem;
-    transition: background 0.2s;
-}
-
-.btn-quienes-wa:hover { background: #1ebe5a; }
 
 .quienes-valores {
     display: grid;
