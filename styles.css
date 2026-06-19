@@ -107,7 +107,7 @@ header {
     order: 1;
 }
 
-.logo h1 {
+.logo p {
     font-family: 'Bebas Neue', sans-serif;
     font-size: 2.8rem;
     letter-spacing: 0.2em;
@@ -120,7 +120,7 @@ header {
     cursor: pointer;
 }
 
-.logo h1 .y-impacto {
+.logo p .y-impacto {
     color: var(--blanco);
     font-size: 1.55em;
     text-shadow: 0 6px 16px rgba(212, 175, 55, 0.3), 0 0 24px rgba(212, 175, 55, 0.15);
@@ -128,7 +128,7 @@ header {
     letter-spacing: 0.08em;
 }
 
-.logo h1 .caps-dorado {
+.logo p .caps-dorado {
     background: linear-gradient(90deg, var(--dorado), rgba(212, 175, 55, 0.85));
     -webkit-background-clip: text;
     background-clip: text;
@@ -385,7 +385,7 @@ header {
     background: linear-gradient(90deg, var(--dorado), transparent);
 }
 
-.hero h2 {
+.hero h1 {
     font-family: 'Bebas Neue', sans-serif;
     font-size: 3.4rem;
     letter-spacing: 0.04em;
@@ -1464,13 +1464,13 @@ footer a:hover {
         min-width: 0;
     }
 
-    .logo h1 {
+    .logo p {
         font-size: 1.75rem;
         letter-spacing: 0.12em;
         gap: 0.05em;
     }
 
-    .logo h1 .y-impacto {
+    .logo p .y-impacto {
         font-size: 1.35em;
     }
 
@@ -1527,7 +1527,7 @@ footer a:hover {
         font-size: 0.7rem;
     }
 
-    .hero h2 {
+    .hero h1 {
         font-size: 2rem;
     }
 
@@ -1646,12 +1646,12 @@ footer a:hover {
         order: 0;
     }
 
-    .logo h1 {
+    .logo p {
         font-size: 1.35rem;
         letter-spacing: 0.09em;
     }
 
-    .logo h1 .y-impacto {
+    .logo p .y-impacto {
         font-size: 1.25em;
     }
     
@@ -1695,7 +1695,7 @@ footer a:hover {
         z-index: 1;
     }
 
-    .hero h2 {
+    .hero h1 {
         font-size: 1.6rem;
     }
 
