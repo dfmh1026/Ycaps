@@ -946,6 +946,28 @@ header {
     background: linear-gradient(135deg, var(--dorado-hover), var(--dorado));
 }
 
+/* Botón de pago: imita el estilo oficial del widget de Wompi (azul + escudo) */
+.btn-pagar-wompi {
+    background: #1C5BD8;
+    color: var(--blanco);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    box-shadow: 0 14px 24px rgba(28, 91, 216, 0.28);
+}
+
+.btn-pagar-wompi svg {
+    width: 18px;
+    height: 18px;
+    flex-shrink: 0;
+}
+
+.btn-pagar-wompi:hover {
+    background: #1949b3;
+    box-shadow: 0 18px 28px rgba(28, 91, 216, 0.34);
+}
+
 /* --- MODAL DE CHECKOUT (DATOS DE ENVÍO) --- */
 .modal-checkout {
     position: fixed;
