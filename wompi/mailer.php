@@ -40,7 +40,11 @@ function _smtpEnviar(string $para, string $asunto, string $cuerpoHtml, ?array $a
     $port = defined('SMTP_PORT') ? (int) SMTP_PORT : 465;
     $user = defined('SMTP_USER') ? SMTP_USER : TIENDA_EMAIL;
     $pass = defined('SMTP_PASS') ? SMTP_PASS : '';
-    $from = TIENDA_EMAIL;
+    // El remitente SIEMPRE debe ser la misma cuenta que se autentica por SMTP.
+    // Si TIENDA_EMAIL es una dirección distinta a SMTP_USER, muchos proveedores
+    // (Gmail, Outlook) rechazan el correo de forma silenciosa por no coincidir
+    // con SPF/DKIM/DMARC — el cliente nunca lo recibe, ni siquiera en spam.
+    $from = $user;
     $nombre = TIENDA_NOMBRE;
 
     // Conexión SSL directa (puerto 465)
@@ -48,8 +52,14 @@ function _smtpEnviar(string $para, string $asunto, string $cuerpoHtml, ?array $a
     $socket = @stream_socket_client("ssl://{$host}:{$port}", $errno, $errstr, 15, STREAM_CLIENT_CONNECT, $ctx);
 
     if (!$socket) {
+        error_log("_smtpEnviar: no se pudo conectar a {$host}:{$port} ({$errno} {$errstr}). Usando mail() de respaldo para {$para}.");
         // Fallback a mail() si SMTP no conecta (sin adjunto, mail() multipart es más limitado)
-        $headers = "From: {$nombre} <{$from}>\r\nReply-To: {$from}\r\nMIME-Version: 1.0\r\nContent-Type: text/html; charset=UTF-8\r\n";
+        $dominioFrom = preg_replace('/^.*@/', '', $from) ?: 'ycapsgorras.com';
+        $headers = "From: {$nombre} <{$from}>\r\n"
+                 . "Reply-To: {$from}\r\n"
+                 . "Message-ID: <" . bin2hex(random_bytes(16)) . "@{$dominioFrom}>\r\n"
+                 . "MIME-Version: 1.0\r\n"
+                 . "Content-Type: text/html; charset=UTF-8\r\n";
         @mail($para, '=?UTF-8?B?' . base64_encode($asunto) . '?=', $cuerpoHtml, $headers, '-f' . $from);
         return;
     }
@@ -57,65 +67,107 @@ function _smtpEnviar(string $para, string $asunto, string $cuerpoHtml, ?array $a
     $leer = function() use ($socket) { return fgets($socket, 512); };
     $cmd  = function(string $c) use ($socket) { fputs($socket, $c . "\r\n"); };
 
+    // Verifica que la respuesta del servidor empiece por 2xx/3xx (éxito);
+    // si no, lo registra para poder diagnosticar a qué destinatario falló y por qué.
+    $verificar = function(string $paso, string $respuesta) use ($para) {
+        $codigo = substr(trim($respuesta), 0, 3);
+        if ($codigo === '' || ($codigo[0] !== '2' && $codigo[0] !== '3')) {
+            error_log("_smtpEnviar: fallo en '{$paso}' para {$para} — respuesta: " . trim($respuesta));
+            return false;
+        }
+        return true;
+    };
+
     $leer(); // greeting
 
     $cmd("EHLO {$host}");
     while ($l = $leer()) { if (substr($l, 3, 1) === ' ') break; }
 
     $cmd("AUTH LOGIN");
-    $leer();
+    $verificar('AUTH LOGIN', $leer());
     $cmd(base64_encode($user));
-    $leer();
+    $verificar('usuario SMTP', $leer());
     $cmd(base64_encode($pass));
-    $leer();
+    if (!$verificar('contraseña SMTP', $leer())) {
+        fclose($socket);
+        return;
+    }
 
     $cmd("MAIL FROM:<{$from}>");
-    $leer();
+    $verificar('MAIL FROM', $leer());
 
     $cmd("RCPT TO:<{$para}>");
-    $leer();
+    if (!$verificar('RCPT TO (destinatario rechazado)', $leer())) {
+        fclose($socket);
+        return;
+    }
 
     $cmd("DATA");
-    $leer();
+    $verificar('DATA', $leer());
 
     $subjectB64 = '=?UTF-8?B?' . base64_encode($asunto) . '?=';
-    $cuerpoB64  = chunk_split(base64_encode($cuerpoHtml));
+
+    // Versión en texto plano derivada del HTML — los correos solo-HTML (sin
+    // alternativa de texto) son una señal clásica de spam para Gmail/Outlook.
+    $textoPlano = strip_tags(str_replace(
+        ['</tr>', '</p>', '<br>', '<br/>', '<br />'],
+        "\n",
+        $cuerpoHtml
+    ));
+    $textoPlano = trim(preg_replace('/[ \t]+/', ' ', html_entity_decode($textoPlano, ENT_QUOTES, 'UTF-8')));
+    $textoPlano = preg_replace('/\n{3,}/', "\n\n", $textoPlano);
+    if ($textoPlano === '') {
+        $textoPlano = 'Este correo contiene contenido HTML. Usa un cliente de correo compatible para verlo.';
+    }
+
+    // Cabeceras estándar de un correo legítimo — Date y Message-ID ausentes
+    // también son señales fuertes de spam para los filtros antispam.
+    $dominioFrom = preg_replace('/^.*@/', '', $from) ?: 'ycapsgorras.com';
+    $cabeceras = "From: {$nombre} <{$from}>\r\n"
+               . "To: {$para}\r\n"
+               . "Reply-To: {$from}\r\n"
+               . "Date: " . date('r') . "\r\n"
+               . "Message-ID: <" . bin2hex(random_bytes(16)) . "@{$dominioFrom}>\r\n"
+               . "Subject: {$subjectB64}\r\n"
+               . "MIME-Version: 1.0\r\n";
+
+    $boundaryAlt = 'YCAPS-ALT-' . bin2hex(random_bytes(12));
+    $cuerpoAlternativo = "Content-Type: multipart/alternative; boundary=\"{$boundaryAlt}\"\r\n"
+                       . "\r\n"
+                       . "--{$boundaryAlt}\r\n"
+                       . "Content-Type: text/plain; charset=UTF-8\r\n"
+                       . "Content-Transfer-Encoding: base64\r\n"
+                       . "\r\n"
+                       . chunk_split(base64_encode($textoPlano))
+                       . "\r\n--{$boundaryAlt}\r\n"
+                       . "Content-Type: text/html; charset=UTF-8\r\n"
+                       . "Content-Transfer-Encoding: base64\r\n"
+                       . "\r\n"
+                       . chunk_split(base64_encode($cuerpoHtml))
+                       . "\r\n--{$boundaryAlt}--";
 
     if ($adjunto) {
-        $boundary   = 'YCAPS-' . bin2hex(random_bytes(12));
-        $adjuntoB64 = chunk_split(base64_encode($adjunto['datos']));
+        $boundaryMix = 'YCAPS-MIX-' . bin2hex(random_bytes(12));
+        $adjuntoB64  = chunk_split(base64_encode($adjunto['datos']));
 
-        $mensaje = "From: {$nombre} <{$from}>\r\n"
-                 . "To: {$para}\r\n"
-                 . "Subject: {$subjectB64}\r\n"
-                 . "MIME-Version: 1.0\r\n"
-                 . "Content-Type: multipart/mixed; boundary=\"{$boundary}\"\r\n"
+        $mensaje = $cabeceras
+                 . "Content-Type: multipart/mixed; boundary=\"{$boundaryMix}\"\r\n"
                  . "\r\n"
-                 . "--{$boundary}\r\n"
-                 . "Content-Type: text/html; charset=UTF-8\r\n"
-                 . "Content-Transfer-Encoding: base64\r\n"
-                 . "\r\n"
-                 . $cuerpoB64
-                 . "\r\n--{$boundary}\r\n"
+                 . "--{$boundaryMix}\r\n"
+                 . $cuerpoAlternativo
+                 . "\r\n--{$boundaryMix}\r\n"
                  . "Content-Type: {$adjunto['tipo']}; name=\"{$adjunto['nombre']}\"\r\n"
                  . "Content-Transfer-Encoding: base64\r\n"
                  . "Content-Disposition: attachment; filename=\"{$adjunto['nombre']}\"\r\n"
                  . "\r\n"
                  . $adjuntoB64
-                 . "\r\n--{$boundary}--";
+                 . "\r\n--{$boundaryMix}--";
     } else {
-        $mensaje = "From: {$nombre} <{$from}>\r\n"
-                 . "To: {$para}\r\n"
-                 . "Subject: {$subjectB64}\r\n"
-                 . "MIME-Version: 1.0\r\n"
-                 . "Content-Type: text/html; charset=UTF-8\r\n"
-                 . "Content-Transfer-Encoding: base64\r\n"
-                 . "\r\n"
-                 . $cuerpoB64;
+        $mensaje = $cabeceras . $cuerpoAlternativo;
     }
 
     $cmd($mensaje . "\r\n.");
-    $leer();
+    $verificar('envío del mensaje', $leer());
 
     $cmd("QUIT");
     fclose($socket);
