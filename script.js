@@ -323,28 +323,11 @@ function abrirModalCheckout() {
     checkoutMensaje.textContent = '';
     checkoutMensaje.classList.remove('error');
     modalCheckout.classList.add('activo');
-    ajustarInsigniaPagosTexto();
 }
 
 function cerrarModalCheckout() {
     modalCheckout.classList.remove('activo');
 }
-
-// Encoge el texto de la insignia de pagos seguros lo justo para que siempre
-// quepa en una sola línea (igual que en desktop), sin importar el ancho del dispositivo.
-function ajustarInsigniaPagosTexto() {
-    const contenedor = document.getElementById('insignia-pagos-texto');
-    const interior = document.getElementById('insignia-pagos-texto-inner');
-    if (!contenedor || !interior) return;
-    interior.style.transform = 'scale(1)';
-    const anchoDisponible = contenedor.clientWidth;
-    const anchoTexto = interior.scrollWidth;
-    if (anchoDisponible > 0 && anchoTexto > anchoDisponible) {
-        interior.style.transform = `scale(${anchoDisponible / anchoTexto})`;
-    }
-}
-
-window.addEventListener('resize', ajustarInsigniaPagosTexto);
 
 btnAbrirCheckout.addEventListener('click', abrirModalCheckout);
 cerrarModalCheckoutBtn.addEventListener('click', cerrarModalCheckout);

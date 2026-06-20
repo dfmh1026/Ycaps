@@ -981,28 +981,37 @@ header {
 
 .insignia-pagos-texto {
     margin: 0 0 0.7rem;
-    overflow: hidden;
-}
-
-.insignia-pagos-texto-inner {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.35rem;
-    white-space: nowrap;
     font-size: 0.8rem;
     line-height: 1.5;
     color: rgba(255, 255, 255, 0.65);
-    transform-origin: center;
+    white-space: nowrap;
 }
 
-.insignia-pagos-texto-inner svg {
+.insignia-pagos-texto svg {
     width: 16px;
     height: 16px;
     color: var(--dorado);
-    flex-shrink: 0;
+    vertical-align: -3px;
+    margin-right: 0.35rem;
 }
 
-.insignia-pagos-texto-inner strong {
+@media (max-width: 480px) {
+    .insignia-pagos {
+        padding: 0.85rem 0.5rem;
+    }
+
+    .insignia-pagos-texto {
+        font-size: clamp(0.6rem, 3.6vw, 0.8rem);
+    }
+
+    .insignia-pagos-texto svg {
+        width: 14px;
+        height: 14px;
+        margin-right: 0.25rem;
+    }
+}
+
+.insignia-pagos-texto strong {
     color: var(--dorado);
 }
 
