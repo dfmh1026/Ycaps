@@ -331,11 +331,8 @@ function cerrarModalCheckout() {
 
 btnAbrirCheckout.addEventListener('click', abrirModalCheckout);
 cerrarModalCheckoutBtn.addEventListener('click', cerrarModalCheckout);
-modalCheckout.addEventListener('click', (event) => {
-    if (event.target === modalCheckout) {
-        cerrarModalCheckout();
-    }
-});
+// A diferencia de los demás modales, este solo se cierra con el botón "×" —
+// es fácil cerrarlo por accidente haciendo clic afuera mientras se llena el formulario.
 
 // --- MODALES LEGALES (Política de Privacidad y Términos y Condiciones) ---
 function inicializarModalLegal(modalId, abrirId, cerrarId) {
