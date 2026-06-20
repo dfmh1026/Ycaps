@@ -948,13 +948,14 @@ header {
 
 /* Botón de pago: imita el estilo oficial del widget de Wompi (azul + escudo) */
 .btn-pagar-wompi {
-    background: #1C5BD8;
-    color: var(--blanco);
+    background: #99D1FC;
+    color: rgb(26, 69, 148);
+    font-family: 'CIBFont Sans', 'Poppins', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     display: inline-flex;
     align-items: center;
     justify-content: center;
     gap: 0.5rem;
-    box-shadow: 0 14px 24px rgba(28, 91, 216, 0.28);
+    box-shadow: none;
 }
 
 .btn-pagar-wompi svg {
@@ -964,8 +965,55 @@ header {
 }
 
 .btn-pagar-wompi:hover {
-    background: #1949b3;
-    box-shadow: 0 18px 28px rgba(28, 91, 216, 0.34);
+    background: #7cc3fb;
+    box-shadow: none;
+}
+
+/* Insignia compuesta: "pago seguro con Wompi" + franquicias aceptadas */
+.insignia-pagos {
+    margin-top: 0.9rem;
+    padding: 0.85rem 1rem;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(212, 175, 55, 0.18);
+    border-radius: 12px;
+    text-align: center;
+}
+
+.insignia-pagos-texto {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.45rem;
+    margin: 0 0 0.7rem;
+    font-size: 0.8rem;
+    color: rgba(255, 255, 255, 0.65);
+}
+
+.insignia-pagos-texto svg {
+    width: 16px;
+    height: 16px;
+    color: var(--dorado);
+    flex-shrink: 0;
+}
+
+.insignia-pagos-texto strong {
+    color: var(--dorado);
+}
+
+.insignia-pagos-imagen-wrap {
+    display: inline-flex;
+    width: 100%;
+    max-width: 320px;
+    background: #ffffff;
+    padding: 0.7rem 1.1rem;
+    border-radius: 10px;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.18);
+}
+
+.insignia-pagos-imagen {
+    display: block;
+    width: 100%;
+    height: auto;
 }
 
 /* --- MODAL DE CHECKOUT (DATOS DE ENVÍO) --- */
