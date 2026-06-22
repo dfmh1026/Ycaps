@@ -24,7 +24,10 @@ function _telegramNotificar(string $mensaje): void
 
 // $adjunto opcional: ['nombre' => 'recibo.pdf', 'datos' => $bytesBinarios, 'tipo' => 'application/pdf']
 // $cuerpoHtml debe venir ya envuelto con _plantillaEmail().
-function _smtpEnviar(string $para, string $asunto, string $cuerpoHtml, ?array $adjunto = null): void
+// $replyTo opcional: a quién debe ir la respuesta si el destinatario le da "Responder"
+// (por defecto, la propia cuenta remitente). Útil para el formulario de contacto,
+// donde "Responder" debe ir al correo del cliente, no a la cuenta de la tienda.
+function _smtpEnviar(string $para, string $asunto, string $cuerpoHtml, ?array $adjunto = null, ?string $replyTo = null): void
 {
     // El destinatario puede venir de datos enviados por el cliente (formulario de
     // compra). Sin esta validación, un correo malicioso con salto de línea podría
@@ -46,6 +49,7 @@ function _smtpEnviar(string $para, string $asunto, string $cuerpoHtml, ?array $a
     // con SPF/DKIM/DMARC — el cliente nunca lo recibe, ni siquiera en spam.
     $from = $user;
     $nombre = TIENDA_NOMBRE;
+    $replyTo = ($replyTo !== null && filter_var($replyTo, FILTER_VALIDATE_EMAIL)) ? $replyTo : $from;
 
     // Conexión SSL directa (puerto 465)
     $ctx    = stream_context_create(['ssl' => ['verify_peer' => false, 'verify_peer_name' => false]]);
@@ -56,7 +60,7 @@ function _smtpEnviar(string $para, string $asunto, string $cuerpoHtml, ?array $a
         // Fallback a mail() si SMTP no conecta (sin adjunto, mail() multipart es más limitado)
         $dominioFrom = preg_replace('/^.*@/', '', $from) ?: 'ycapsgorras.com';
         $headers = "From: {$nombre} <{$from}>\r\n"
-                 . "Reply-To: {$from}\r\n"
+                 . "Reply-To: {$replyTo}\r\n"
                  . "Message-ID: <" . bin2hex(random_bytes(16)) . "@{$dominioFrom}>\r\n"
                  . "MIME-Version: 1.0\r\n"
                  . "Content-Type: text/html; charset=UTF-8\r\n";
@@ -125,7 +129,7 @@ function _smtpEnviar(string $para, string $asunto, string $cuerpoHtml, ?array $a
     $dominioFrom = preg_replace('/^.*@/', '', $from) ?: 'ycapsgorras.com';
     $cabeceras = "From: {$nombre} <{$from}>\r\n"
                . "To: {$para}\r\n"
-               . "Reply-To: {$from}\r\n"
+               . "Reply-To: {$replyTo}\r\n"
                . "Date: " . date('r') . "\r\n"
                . "Message-ID: <" . bin2hex(random_bytes(16)) . "@{$dominioFrom}>\r\n"
                . "Subject: {$subjectB64}\r\n"
@@ -465,5 +469,7 @@ function enviarEmailContacto(string $nombre, string $email, string $telefono, st
         . '<p style="margin:18px 0 6px;color:#d4af37;font-weight:bold;font-size:12px;letter-spacing:1px;text-transform:uppercase;">Mensaje</p>'
         . '<p style="margin:0;white-space:pre-wrap;">' . nl2br(htmlspecialchars($mensaje)) . '</p>';
 
-    _smtpEnviar($destinatarioContacto, $asunto, _plantillaEmail($contenido));
+    // Reply-To al correo del cliente: si le das "Responder" a este correo,
+    // la respuesta le llega directo a él, no a la propia cuenta de ventas.
+    _smtpEnviar($destinatarioContacto, $asunto, _plantillaEmail($contenido), null, $email);
 }
