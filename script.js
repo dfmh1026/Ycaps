@@ -516,11 +516,31 @@ const acordeonCookies = inicializarAcordeon('toggle-cookies', 'contenido-cookies
 
 // --- AVISO DE COOKIES ---
 const COOKIES_STORAGE_KEY = 'ycaps-cookies-aceptadas';
+const GA_MEDIDA_ID = 'G-Z2XV57ZH7W';
 const bannerCookies = document.getElementById('banner-cookies');
 const btnCookiesAceptar = document.getElementById('btn-cookies-aceptar');
 const bannerCookiesEnlace = document.getElementById('banner-cookies-enlace');
 
-if (!localStorage.getItem(COOKIES_STORAGE_KEY)) {
+// Google Analytics solo se carga si el usuario aceptó el aviso de cookies —
+// antes se cargaba siempre, lo cual contradecía la propia Política de Privacidad.
+function cargarGoogleAnalytics() {
+    if (window.gaCargado) return;
+    window.gaCargado = true;
+
+    const script = document.createElement('script');
+    script.async = true;
+    script.src = `https://www.googletagmanager.com/gtag/js?id=${GA_MEDIDA_ID}`;
+    document.head.appendChild(script);
+
+    window.dataLayer = window.dataLayer || [];
+    window.gtag = function () { window.dataLayer.push(arguments); };
+    window.gtag('js', new Date());
+    window.gtag('config', GA_MEDIDA_ID);
+}
+
+if (localStorage.getItem(COOKIES_STORAGE_KEY)) {
+    cargarGoogleAnalytics();
+} else {
     bannerCookies.hidden = false;
     document.body.style.paddingBottom = `${bannerCookies.offsetHeight}px`;
 }
@@ -529,6 +549,7 @@ btnCookiesAceptar.addEventListener('click', () => {
     localStorage.setItem(COOKIES_STORAGE_KEY, 'true');
     bannerCookies.hidden = true;
     document.body.style.paddingBottom = '';
+    cargarGoogleAnalytics();
 });
 
 bannerCookiesEnlace.addEventListener('click', (event) => {
