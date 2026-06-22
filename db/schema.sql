@@ -19,6 +19,7 @@ CREATE TABLE IF NOT EXISTS pedidos (
     wompi_referencia     VARCHAR(100) DEFAULT NULL,
     wompi_transaction_id VARCHAR(100) DEFAULT NULL,
     guia_envio           VARCHAR(150) DEFAULT NULL,
+    recibo               LONGBLOB DEFAULT NULL,
     creado_en            DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     actualizado_en       DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 );
@@ -128,6 +129,11 @@ UPDATE productos SET imagen = 'personalizada1.jpg'     WHERE imagen = 'personali
 
 -- Departamento (agregar si ya tenías la tabla pedidos sin esta columna):
 -- ALTER TABLE pedidos ADD COLUMN departamento VARCHAR(100) DEFAULT NULL;
+
+-- Recibo PDF guardado (agregar si ya tenías la tabla pedidos sin esta columna):
+-- guarda el mismo PDF que se envía por correo al confirmarse el pago, para
+-- poder consultarlo después desde el panel admin sin tener que regenerarlo.
+-- ALTER TABLE pedidos ADD COLUMN recibo LONGBLOB DEFAULT NULL;
 
 -- Cédula (agregar si ya tenías la tabla pedidos sin esta columna):
 -- ALTER TABLE pedidos ADD COLUMN cedula VARCHAR(20) NOT NULL DEFAULT '' AFTER nombre;

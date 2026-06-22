@@ -103,3 +103,14 @@ function obtenerOCrearNumeroRecibo(PDO $db, int $pedidoId): string
 
     return 'YCAPS-REC-' . str_pad((string) $reciboId, 6, '0', STR_PAD_LEFT);
 }
+
+// Guarda en el pedido el mismo PDF que se envió por correo al confirmarse el
+// pago. Así queda trazabilidad de exactamente qué recibo se mandó, y se puede
+// consultar después desde el panel admin sin tener que regenerarlo.
+function guardarReciboPdf(PDO $db, int $pedidoId, string $pdfDatos): void
+{
+    $stmt = $db->prepare('UPDATE pedidos SET recibo = :recibo WHERE id = :id');
+    $stmt->bindParam(':recibo', $pdfDatos, PDO::PARAM_LOB);
+    $stmt->bindParam(':id', $pedidoId, PDO::PARAM_INT);
+    $stmt->execute();
+}

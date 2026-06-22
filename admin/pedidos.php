@@ -67,8 +67,13 @@ $total     = (int) $stTotal->fetchColumn();
 $totalPags = max(1, (int) ceil($total / $porPag));
 $offset    = ($pagina - 1) * $porPag;
 
+// No se selecciona la columna "recibo" (el PDF guardado) en el listado — es un
+// LONGBLOB y traerlo en cada fila de la tabla sería innecesariamente pesado.
 $stPed = $pdo->prepare(
-    "SELECT * FROM pedidos WHERE {$where} ORDER BY creado_en DESC LIMIT {$porPag} OFFSET {$offset}"
+    "SELECT id, nombre, cedula, email, telefono, direccion, ciudad, departamento,
+            total, metodo_pago, estado, wompi_referencia, wompi_transaction_id,
+            guia_envio, creado_en, actualizado_en
+     FROM pedidos WHERE {$where} ORDER BY creado_en DESC LIMIT {$porPag} OFFSET {$offset}"
 );
 $stPed->execute($params);
 $pedidos = $stPed->fetchAll(PDO::FETCH_ASSOC);
@@ -175,6 +180,12 @@ require __DIR__ . '/_head.php';
                                 · <span style="color:var(--success)">Guía: <?= htmlspecialchars($guiaActual) ?></span>
                                 <?php endif; ?>
                             </summary>
+
+                            <?php if ($estado_p === 'aprobado'): ?>
+                            <p style="margin:.5rem 0 0">
+                                <a href="/admin/recibo.php?id=<?= (int)$p['id'] ?>" target="_blank" class="btn-secondary btn-sm">📄 Ver recibo PDF</a>
+                            </p>
+                            <?php endif; ?>
 
                             <ul style="margin:.5rem 0 .75rem 1rem;font-size:.8rem">
                             <?php foreach ($items as $it): ?>
