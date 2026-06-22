@@ -1621,6 +1621,7 @@ footer a:hover {
         min-width: 0;
         align-items: center;
         padding-right: 4.5rem; /* dejar espacio para el botón absoluto */
+        padding-left: 3rem; /* dejar espacio para el botón de favoritos absoluto */
     }
 
     .texto-logo {
@@ -1654,6 +1655,15 @@ footer a:hover {
         transform: translateY(-50%);
         order: 0;
         white-space: nowrap;
+    }
+
+    /* Se saca del flujo igual que el botón del carrito, para no competir por
+       espacio con el logo en el header-acciones (ya muy ajustado en móvil). */
+    .btn-favoritos {
+        position: absolute;
+        left: 1rem;
+        top: 50%;
+        transform: translateY(-50%);
     }
 
     .hero {
