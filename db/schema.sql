@@ -63,6 +63,17 @@ CREATE TABLE IF NOT EXISTS recibos (
     FOREIGN KEY (pedido_id) REFERENCES pedidos(id) ON DELETE CASCADE
 );
 
+-- Mensajes del formulario de "Contacto" del sitio — respaldo en base de datos
+-- por si el envío del correo a ventas@ycapsgorras.com llegara a fallar.
+CREATE TABLE IF NOT EXISTS mensajes_contacto (
+    id        INT AUTO_INCREMENT PRIMARY KEY,
+    nombre    VARCHAR(150) NOT NULL,
+    email     VARCHAR(150) NOT NULL,
+    telefono  VARCHAR(50)  DEFAULT NULL,
+    mensaje   TEXT NOT NULL,
+    creado_en DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+
 -- Límite de intentos de login del panel admin (1 fila por IP)
 CREATE TABLE IF NOT EXISTS admin_login_intentos (
     id              INT AUTO_INCREMENT PRIMARY KEY,
@@ -165,6 +176,16 @@ UPDATE productos SET imagen = 'personalizada1.jpg'     WHERE imagen = 'personali
 --     pedido_id  INT NOT NULL UNIQUE,
 --     creado_en  DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
 --     FOREIGN KEY (pedido_id) REFERENCES pedidos(id) ON DELETE CASCADE
+-- );
+
+-- Mensajes de contacto (agregar si ya tenías la base de datos creada):
+-- CREATE TABLE IF NOT EXISTS mensajes_contacto (
+--     id        INT AUTO_INCREMENT PRIMARY KEY,
+--     nombre    VARCHAR(150) NOT NULL,
+--     email     VARCHAR(150) NOT NULL,
+--     telefono  VARCHAR(50)  DEFAULT NULL,
+--     mensaje   TEXT NOT NULL,
+--     creado_en DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
 -- );
 
 -- Límite de intentos de login admin (agregar si ya tenías la base de datos creada):

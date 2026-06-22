@@ -1179,8 +1179,14 @@ header {
     color: var(--blanco);
 }
 
+.campo-formulario textarea {
+    resize: vertical;
+    min-height: 110px;
+}
+
 .campo-formulario input,
-.campo-formulario select {
+.campo-formulario select,
+.campo-formulario textarea {
     background: rgba(255, 255, 255, 0.06);
     border: 1px solid rgba(255, 255, 255, 0.12);
     border-radius: 10px;
@@ -1193,7 +1199,8 @@ header {
 }
 
 .campo-formulario input:focus,
-.campo-formulario select:focus {
+.campo-formulario select:focus,
+.campo-formulario textarea:focus {
     outline: none;
     border-color: var(--dorado);
     background: rgba(255, 255, 255, 0.1);
@@ -2276,6 +2283,78 @@ footer a:hover {
     line-height: 1.5;
 }
 
+/* ── Sección Contacto ── */
+.seccion-contacto {
+    background: linear-gradient(180deg, #111 0%, #0d0d0d 100%);
+    padding: 5rem 2rem;
+    border-top: 1px solid rgba(212, 175, 55, 0.12);
+}
+
+.contacto-contenedor {
+    max-width: 1100px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: 1fr 1.3fr;
+    gap: 4rem;
+    align-items: start;
+}
+
+.contacto-info h3 {
+    font-size: 1.15rem;
+    color: var(--dorado);
+    margin-bottom: 1.5rem;
+}
+
+.contacto-dato {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+}
+
+.contacto-icono {
+    width: 44px;
+    height: 44px;
+    border-radius: 10px;
+    background: rgba(212, 175, 55, 0.1);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.contacto-icono svg {
+    width: 20px;
+    height: 20px;
+    color: var(--dorado);
+}
+
+.contacto-etiqueta {
+    display: block;
+    font-size: 0.78rem;
+    color: rgba(255, 255, 255, 0.5);
+    margin-bottom: 0.15rem;
+}
+
+.contacto-dato a {
+    color: var(--blanco);
+    font-size: 1rem;
+    font-weight: 600;
+    text-decoration: none;
+    transition: color var(--duracion-rapida) var(--ease-premium);
+}
+
+.contacto-dato a:hover {
+    color: var(--dorado);
+}
+
+.contacto-form {
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(212, 175, 55, 0.12);
+    border-radius: 16px;
+    padding: 2rem;
+}
+
 @media (max-width: 768px) {
     .nav-secciones {
         top: 90px;
@@ -2289,6 +2368,9 @@ footer a:hover {
     .nav-link-sec  { padding: 0.7rem 0.9rem; font-size: 0.8rem; white-space: nowrap; flex-shrink: 0; }
     .quienes-contenedor { grid-template-columns: 1fr; gap: 2.5rem; }
     .seccion-quienes-somos { padding: 3.5rem 1.25rem; }
+    .contacto-contenedor { grid-template-columns: 1fr; gap: 2.5rem; }
+    .seccion-contacto { padding: 3.5rem 1.25rem; }
+    .contacto-form { padding: 1.5rem; }
 }
 
 /* Este bloque debe ir al final: hay otro @media (max-width: 768px) arriba que

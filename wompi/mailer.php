@@ -445,3 +445,25 @@ function enviarEmailPagoRechazado(array $pedido, string $referencia, string $est
         . "Total: {$totalFmt}"
     );
 }
+
+// Envía a la tienda un mensaje recibido desde el formulario de "Contacto" del sitio.
+// A diferencia de los demás correos (que van a TIENDA_EMAIL), este siempre se
+// envía a ventas@ycapsgorras.com — es el correo que se muestra públicamente
+// en la sección "Envíanos un mensaje", así que debe coincidir siempre.
+function enviarEmailContacto(string $nombre, string $email, string $telefono, string $mensaje): void
+{
+    $destinatarioContacto = 'ventas@ycapsgorras.com';
+    $asunto = "Nuevo mensaje de contacto — {$nombre}";
+
+    $contenido =
+        '<p style="margin:0 0 16px;font-size:16px;color:#d4af37;font-weight:bold;">📩 Nuevo mensaje de contacto</p>'
+        . '<table role="presentation" width="100%" cellpadding="0" cellspacing="0">'
+        . _filaDato('Nombre', $nombre)
+        . _filaDato('Correo', $email)
+        . _filaDato('Teléfono', $telefono !== '' ? $telefono : '—')
+        . '</table>'
+        . '<p style="margin:18px 0 6px;color:#d4af37;font-weight:bold;font-size:12px;letter-spacing:1px;text-transform:uppercase;">Mensaje</p>'
+        . '<p style="margin:0;white-space:pre-wrap;">' . nl2br(htmlspecialchars($mensaje)) . '</p>';
+
+    _smtpEnviar($destinatarioContacto, $asunto, _plantillaEmail($contenido));
+}

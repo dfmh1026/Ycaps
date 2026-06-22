@@ -114,3 +114,21 @@ function guardarReciboPdf(PDO $db, int $pedidoId, string $pdfDatos): void
     $stmt->bindParam(':id', $pedidoId, PDO::PARAM_INT);
     $stmt->execute();
 }
+
+// Guarda un mensaje del formulario de "Contacto" del sitio — respaldo en base
+// de datos por si el envío del correo llegara a fallar.
+function guardarMensajeContacto(PDO $db, string $nombre, string $email, string $telefono, string $mensaje): int
+{
+    $stmt = $db->prepare(
+        'INSERT INTO mensajes_contacto (nombre, email, telefono, mensaje)
+         VALUES (:nombre, :email, :telefono, :mensaje)'
+    );
+    $stmt->execute([
+        ':nombre'   => $nombre,
+        ':email'    => $email,
+        ':telefono' => $telefono,
+        ':mensaje'  => $mensaje,
+    ]);
+
+    return (int) $db->lastInsertId();
+}

@@ -18,7 +18,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="styles.css?v=9">
+    <link rel="stylesheet" href="styles.css?v=10">
 </head>
 <body>
 
@@ -45,6 +45,7 @@
 <nav class="nav-secciones" id="nav-secciones">
     <a href="#catalogo"      class="nav-link-sec">Catálogo</a>
     <a href="#quienes-somos" class="nav-link-sec">Quiénes Somos</a>
+    <a href="#contacto"      class="nav-link-sec">Contacto</a>
 </nav>
 
 <div class="modal-checkout" id="modal-rastreo">
@@ -393,6 +394,59 @@
         </div>
     </section>
 
+    <section id="contacto" class="seccion-contacto">
+        <div class="encabezado-seccion reveal">
+            <span class="eyebrow">Estamos para ayudarte</span>
+            <h2>Envíanos un mensaje</h2>
+            <p>¿Tienes una pregunta, sugerencia o comentario? Escríbenos y te responderemos pronto.</p>
+        </div>
+
+        <div class="contacto-contenedor reveal">
+            <div class="contacto-info">
+                <h3>Información de contacto</h3>
+                <div class="contacto-dato">
+                    <span class="contacto-icono">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92Z" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                    </span>
+                    <div>
+                        <span class="contacto-etiqueta">Teléfono</span>
+                        <a href="tel:+573004710483">+57 300 471 0483</a>
+                    </div>
+                </div>
+                <div class="contacto-dato">
+                    <span class="contacto-icono">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2" stroke-linecap="round" stroke-linejoin="round"/><path d="m3 7 9 6 9-6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                    </span>
+                    <div>
+                        <span class="contacto-etiqueta">Correo</span>
+                        <a href="mailto:ventas@ycapsgorras.com">ventas@ycapsgorras.com</a>
+                    </div>
+                </div>
+            </div>
+
+            <form id="form-contacto" class="contacto-form">
+                <div class="campo-formulario">
+                    <label for="contacto-nombre">Nombre</label>
+                    <input type="text" id="contacto-nombre" name="nombre" required autocomplete="name">
+                </div>
+                <div class="campo-formulario">
+                    <label for="contacto-email">Correo electrónico</label>
+                    <input type="email" id="contacto-email" name="email" required autocomplete="email">
+                </div>
+                <div class="campo-formulario">
+                    <label for="contacto-telefono">Teléfono</label>
+                    <input type="tel" id="contacto-telefono" name="telefono" autocomplete="tel">
+                </div>
+                <div class="campo-formulario">
+                    <label for="contacto-texto">Mensaje</label>
+                    <textarea id="contacto-texto" name="mensaje" rows="5" required></textarea>
+                </div>
+                <button type="submit" class="btn-checkout" id="btn-enviar-contacto">Enviar mensaje</button>
+                <p class="checkout-mensaje" id="contacto-mensaje-estado"></p>
+            </form>
+        </div>
+    </section>
+
     <div class="favoritos-panel" id="favoritos-panel">
         <div class="cabecera-carrito">
             <h3>Tus Favoritos</h3>
@@ -693,6 +747,6 @@
         <button type="button" class="btn-cookies-aceptar" id="btn-cookies-aceptar">Aceptar</button>
     </div>
 
-    <script src="script.js?v=4"></script>
+    <script src="script.js?v=5"></script>
 </body>
 </html>

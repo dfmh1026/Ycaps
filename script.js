@@ -637,6 +637,54 @@ formCheckout.addEventListener('submit', async (event) => {
     }
 });
 
+// --- FORMULARIO DE CONTACTO ---
+const formContacto = document.getElementById('form-contacto');
+const contactoMensajeEstado = document.getElementById('contacto-mensaje-estado');
+
+formContacto.addEventListener('submit', async (event) => {
+    event.preventDefault();
+
+    if (!formContacto.checkValidity()) {
+        formContacto.reportValidity();
+        return;
+    }
+
+    const btnEnviarContacto = document.getElementById('btn-enviar-contacto');
+    const datosContacto = {
+        nombre: document.getElementById('contacto-nombre').value.trim(),
+        email: document.getElementById('contacto-email').value.trim(),
+        telefono: document.getElementById('contacto-telefono').value.trim(),
+        mensaje: document.getElementById('contacto-texto').value.trim(),
+    };
+
+    contactoMensajeEstado.textContent = 'Enviando mensaje...';
+    contactoMensajeEstado.classList.remove('error');
+    btnEnviarContacto.disabled = true;
+
+    try {
+        const respuesta = await fetch('wompi/contacto.php', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(datosContacto)
+        });
+
+        const datos = await respuesta.json();
+
+        if (!respuesta.ok || !datos.ok) {
+            throw new Error(datos.error || 'No se pudo enviar el mensaje.');
+        }
+
+        contactoMensajeEstado.textContent = '¡Mensaje enviado! Gracias por escribirnos, te responderemos pronto.';
+        formContacto.reset();
+    } catch (error) {
+        contactoMensajeEstado.textContent = error.message || 'No se pudo enviar el mensaje. Intenta de nuevo.';
+        contactoMensajeEstado.classList.add('error');
+        console.log('Error al enviar el formulario de contacto:', error);
+    } finally {
+        btnEnviarContacto.disabled = false;
+    }
+});
+
 // --- MOSTRAR RESULTADO DEL PAGO AL VOLVER DE WOMPI ---
 (function mostrarResultadoPago() {
     const params     = new URLSearchParams(window.location.search);
