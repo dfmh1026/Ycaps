@@ -1603,25 +1603,31 @@ footer a:hover {
 
 /* --- RESPONSIVE MOBILE --- */
 @media (max-width: 768px) {
-    html { scroll-padding-top: 140px; }
-    body { padding-top: 90px; }
+    html { scroll-padding-top: 160px; }
+    body { padding-top: 150px; } /* el header ahora siempre ocupa 2 filas en móvil (logo + botones) */
 
     header {
         padding: 0.7rem 1rem;
         flex-wrap: wrap;
-        gap: 0.75rem;
-        justify-content: space-between;
+        gap: 0.6rem;
+        justify-content: flex-start;
         align-items: center;
-        position: relative; /* permitir posicionar absolute el botón */
     }
 
     .logo {
         gap: 0.45rem;
-        flex: 1 1 auto;
+        flex: 0 1 auto;
         min-width: 0;
         align-items: center;
-        padding-right: 4.5rem; /* dejar espacio para el botón absoluto */
-        padding-left: 3rem; /* dejar espacio para el botón de favoritos absoluto */
+    }
+
+    /* Los botones siempre van en su propia fila completa debajo del logo;
+       así evitamos calcular a mano dónde cabe cada uno (ver historial: esto
+       se rompía con cada cambio de ancho de texto). "Carrito" se empuja solo
+       al extremo derecho con margin-left:auto, en vez de un valor fijo. */
+    .header-acciones {
+        width: 100%;
+        justify-content: flex-start;
     }
 
     .texto-logo {
@@ -1649,21 +1655,8 @@ footer a:hover {
         border-radius: 999px;
         box-shadow: 0 8px 14px rgba(212, 175, 55, 0.14);
         min-width: auto;
-        position: absolute;
-        right: 1rem;
-        top: 50%;
-        transform: translateY(-50%);
-        order: 0;
         white-space: nowrap;
-    }
-
-    /* Se saca del flujo igual que el botón del carrito, para no competir por
-       espacio con el logo en el header-acciones (ya muy ajustado en móvil). */
-    .btn-favoritos {
-        position: absolute;
-        left: 1rem;
-        top: 50%;
-        transform: translateY(-50%);
+        margin-left: auto; /* lo manda al extremo derecho de su fila, sea cual sea el ancho de los demás botones */
     }
 
     .hero {
@@ -1787,7 +1780,7 @@ footer a:hover {
 
     header {
         padding: 0.6rem 0.75rem;
-        justify-content: space-between;
+        justify-content: flex-start;
         gap: 0.5rem;
         position: sticky;
         align-items: center;
@@ -1798,7 +1791,6 @@ footer a:hover {
         gap: 0.35rem;
         flex: 0 1 auto;
         justify-content: flex-start;
-        padding-right: 0;
         position: relative;
     }
 
@@ -1831,13 +1823,8 @@ footer a:hover {
     .boton-carrito {        /*(max-width: 480px)*/
         padding: 0.45rem 0.75rem;
         font-size: 0.78rem;
-        position: static;
-        right: auto;
-        top: auto;
-        transform: none;
-        order: 1;
         white-space: nowrap;
-        margin-left: 8rem;
+        margin-left: auto;
     }
 
     .hero {
