@@ -571,6 +571,48 @@ header {
     transform: scale(1.05);
 }
 
+.btn-favorito {
+    position: absolute;
+    top: 0.6rem;
+    right: 0.6rem;
+    z-index: 5;
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    background: rgba(17, 17, 17, 0.55);
+    border: 1px solid rgba(212, 175, 55, 0.35);
+    color: var(--blanco);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    cursor: pointer;
+    transition: transform var(--duracion-rapida) var(--ease-premium),
+                background var(--duracion-rapida) var(--ease-premium),
+                border-color var(--duracion-rapida) var(--ease-premium),
+                color var(--duracion-rapida) var(--ease-premium);
+}
+
+.btn-favorito svg {
+    width: 18px;
+    height: 18px;
+}
+
+.btn-favorito:hover {
+    transform: scale(1.08);
+    border-color: var(--dorado);
+}
+
+.btn-favorito.activo {
+    background: rgba(212, 175, 55, 0.95);
+    border-color: var(--dorado);
+    color: var(--negro-principal);
+}
+
+.btn-favorito.activo svg {
+    fill: currentColor;
+}
+
 .btn-agregar {
     position: relative;
     overflow: hidden;
@@ -896,6 +938,54 @@ header {
     color: #ff4d4d;
     cursor: pointer;
     font-size: 0.8rem;
+}
+
+/* --- PANEL LATERAL DE FAVORITOS (mismo patrón visual del carrito, abre desde la izquierda) --- */
+.favoritos-panel {
+    position: fixed;
+    top: 0;
+    left: -400px;
+    width: 100%;
+    max-width: 400px;
+    height: 100%;
+    background: rgba(17, 17, 17, 0.98);
+    box-shadow: 8px 0 30px rgba(0,0,0,0.35);
+    transition: left 0.3s ease;
+    z-index: 1100;
+    padding: 2rem;
+    display: flex;
+    flex-direction: column;
+    border-right: 1px solid rgba(212, 175, 55, 0.18);
+}
+
+.favoritos-panel.activo {
+    left: 0;
+}
+
+.favoritos-vacio {
+    color: var(--gris-claro);
+    font-size: 0.9rem;
+    text-align: center;
+    margin-top: 2rem;
+}
+
+.item-favorito-acciones {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 0.4rem;
+}
+
+.btn-agregar-mini {
+    background: linear-gradient(135deg, var(--dorado), var(--dorado-hover));
+    border: none;
+    color: var(--negro-principal);
+    padding: 0.3rem 0.7rem;
+    font-size: 0.72rem;
+    font-weight: 700;
+    border-radius: 999px;
+    cursor: pointer;
+    white-space: nowrap;
 }
 
 .subtotal-seccion {
@@ -1656,6 +1746,11 @@ footer a:hover {
         right: -100%;
     }
 
+    .favoritos-panel {
+        max-width: 100%;
+        left: -100%;
+    }
+
     .btn-arriba {
         right: 1rem;
         bottom: 1rem;
@@ -1823,6 +1918,10 @@ footer a:hover {
         padding: 1.25rem;
     }
 
+    .favoritos-panel {
+        padding: 1.25rem;
+    }
+
     .filtros-catalogo {
         gap: 0.35rem;
         padding: 0.75rem 0.5rem 0.4rem;
@@ -1882,6 +1981,52 @@ footer a:hover {
     align-items: center;
     gap: 0.75rem;
     flex-shrink: 0;
+}
+
+/* ===== BOTÓN FAVORITOS (header) ===== */
+.btn-favoritos {
+    position: relative;
+    background: transparent;
+    border: 1px solid var(--dorado, #c9a84c);
+    color: var(--dorado, #c9a84c);
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    cursor: pointer;
+    flex-shrink: 0;
+    transition: background 0.2s, color 0.2s;
+}
+
+.btn-favoritos svg {
+    width: 18px;
+    height: 18px;
+}
+
+.btn-favoritos:hover {
+    background: var(--dorado, #c9a84c);
+    color: #000;
+}
+
+.btn-favoritos #contador-favoritos {
+    position: absolute;
+    top: -6px;
+    right: -6px;
+    background: var(--dorado, #c9a84c);
+    color: #000;
+    font-size: 0.65rem;
+    font-weight: 700;
+    min-width: 16px;
+    height: 16px;
+    border-radius: 999px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0 3px;
+    line-height: 1;
 }
 
 /* ===== BOTÓN RASTREAR PEDIDO (header) ===== */

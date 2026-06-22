@@ -48,6 +48,142 @@ document.addEventListener('click', (event) => {
     }
 });
 
+// --- FAVORITOS ---
+const FAVORITOS_STORAGE_KEY = 'ycaps-favoritos';
+
+function cargarFavoritos() {
+    try {
+        const guardado = localStorage.getItem(FAVORITOS_STORAGE_KEY);
+        const datos = guardado ? JSON.parse(guardado) : [];
+        return Array.isArray(datos) ? datos : [];
+    } catch (e) {
+        console.log('No se pudo leer los favoritos guardados:', e);
+        return [];
+    }
+}
+
+function guardarFavoritos() {
+    try {
+        localStorage.setItem(FAVORITOS_STORAGE_KEY, JSON.stringify(favoritos));
+    } catch (e) {
+        console.log('No se pudo guardar los favoritos:', e);
+    }
+}
+
+let favoritos = cargarFavoritos();
+
+const panelFavoritos = document.getElementById('favoritos-panel');
+const abrirFavoritosBtn = document.getElementById('abrir-favoritos');
+const cerrarFavoritosBtn = document.getElementById('cerrar-favoritos');
+const contenedorFavoritos = document.getElementById('items-favoritos');
+const contadorFavoritos = document.getElementById('contador-favoritos');
+
+abrirFavoritosBtn.addEventListener('click', () => panelFavoritos.classList.add('activo'));
+cerrarFavoritosBtn.addEventListener('click', () => panelFavoritos.classList.remove('activo'));
+
+document.addEventListener('click', (event) => {
+    if (!panelFavoritos.classList.contains('activo')) return;
+
+    const clickDentroPanel = panelFavoritos.contains(event.target);
+    const clickEnBotonAbrir = abrirFavoritosBtn.contains(event.target);
+    const clickEnCorazon = event.target.closest('.btn-favorito');
+
+    if (!clickDentroPanel && !clickEnBotonAbrir && !clickEnCorazon) {
+        panelFavoritos.classList.remove('activo');
+    }
+});
+
+function toggleFavorito(nombre, precio, btn) {
+    const existe = favoritos.some(item => item.nombre === nombre);
+
+    if (existe) {
+        favoritos = favoritos.filter(item => item.nombre !== nombre);
+    } else {
+        favoritos.push({ nombre, precio });
+    }
+
+    if (btn) btn.classList.toggle('activo', !existe);
+
+    guardarFavoritos();
+    actualizarInterfazFavoritos();
+}
+
+function eliminarDeFavoritos(nombre) {
+    favoritos = favoritos.filter(item => item.nombre !== nombre);
+    guardarFavoritos();
+    actualizarInterfazFavoritos();
+
+    const btnTarjeta = document.querySelector(`.btn-favorito[data-nombre="${nombre}"]`);
+    if (btnTarjeta) btnTarjeta.classList.remove('activo');
+}
+
+function actualizarInterfazFavoritos() {
+    contenedorFavoritos.innerHTML = '';
+
+    if (favoritos.length === 0) {
+        const vacio = document.createElement('p');
+        vacio.classList.add('favoritos-vacio');
+        vacio.textContent = 'Aún no tienes gorras favoritas.';
+        contenedorFavoritos.appendChild(vacio);
+    }
+
+    favoritos.forEach(item => {
+        const div = document.createElement('div');
+        div.classList.add('item-en-carrito');
+
+        const detalles = document.createElement('div');
+        detalles.classList.add('item-detalles');
+
+        const titulo = document.createElement('h4');
+        titulo.textContent = item.nombre;
+        detalles.appendChild(titulo);
+
+        if (item.precio > 0) {
+            const precio = document.createElement('p');
+            precio.textContent = `$${item.precio.toLocaleString('es-CO')}`;
+            detalles.appendChild(precio);
+        }
+
+        const acciones = document.createElement('div');
+        acciones.classList.add('item-favorito-acciones');
+
+        if (item.precio > 0) {
+            const btnAgregar = document.createElement('button');
+            btnAgregar.classList.add('btn-agregar-mini');
+            btnAgregar.textContent = 'Agregar al carrito';
+            btnAgregar.addEventListener('click', () => agregarAlCarrito(item.nombre, item.precio, null));
+            acciones.appendChild(btnAgregar);
+        }
+
+        const btnQuitar = document.createElement('button');
+        btnQuitar.classList.add('btn-eliminar');
+        btnQuitar.textContent = 'Quitar';
+        btnQuitar.addEventListener('click', () => eliminarDeFavoritos(item.nombre));
+        acciones.appendChild(btnQuitar);
+
+        div.append(detalles, acciones);
+        contenedorFavoritos.appendChild(div);
+    });
+
+    contadorFavoritos.textContent = favoritos.length;
+}
+
+// Restaurar favoritos guardados y marcar los corazones activos en el catálogo
+actualizarInterfazFavoritos();
+document.querySelectorAll('.btn-favorito').forEach(btn => {
+    const nombre = btn.dataset.nombre;
+    const precio = Number(btn.dataset.precio) || 0;
+
+    if (favoritos.some(item => item.nombre === nombre)) {
+        btn.classList.add('activo');
+    }
+
+    btn.addEventListener('click', (event) => {
+        event.stopPropagation();
+        toggleFavorito(nombre, precio, btn);
+    });
+});
+
 const modalImagen = document.getElementById('modal-imagen');
 const modalImg = document.getElementById('modal-img');
 const modalCaption = document.getElementById('modal-caption');
