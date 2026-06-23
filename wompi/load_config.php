@@ -3,6 +3,8 @@
 // (fuera del alcance del deploy de git en Hostinger).
 // En desarrollo local usa wompi/config.php como fallback.
 
+date_default_timezone_set('America/Bogota');
+
 $rutaHostinger = dirname(__DIR__, 2) . '/ycaps_config.php';
 $rutaLocal     = __DIR__ . '/config.php';
 

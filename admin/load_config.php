@@ -2,6 +2,8 @@
 // Carga el archivo de configuración desde fuera de public_html (inmune al deploy de git).
 // Fallback a wompi/config.php para desarrollo local.
 
+date_default_timezone_set('America/Bogota');
+
 $rutaHostinger = dirname(__DIR__, 2) . '/ycaps_config.php';
 $rutaLocal     = dirname(__DIR__)    . '/wompi/config.php';
 

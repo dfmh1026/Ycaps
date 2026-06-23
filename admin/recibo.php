@@ -15,7 +15,7 @@ if ($pedidoId <= 0) {
 $pdo = new PDO(
     "mysql:host=" . DB_HOST . ";dbname=" . DB_NAME . ";charset=utf8mb4",
     DB_USER, DB_PASS,
-    [PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION]
+    [PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION, PDO::MYSQL_ATTR_INIT_COMMAND => "SET time_zone = '-05:00'"]
 );
 
 $stmt = $pdo->prepare('SELECT recibo, wompi_referencia FROM pedidos WHERE id = :id LIMIT 1');
