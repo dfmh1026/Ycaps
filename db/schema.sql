@@ -116,6 +116,7 @@ INSERT IGNORE INTO productos (nombre, precio, precio_original, stock, categoria,
 ('Gorra Negra Caballo Blanco',85000, 95000, 10, 'negra',         'gorra-negra-caballo.blanco.jpeg'),
 ('Gorra Negra YJ Dorada',     90000, 95000, 10, 'negra',         'gorra-negra-yj-dorado.jpg'),
 ('Gorra Negra YJ Firma Dorada',90000, 95000, 10, 'negra',        'gorra-negra-yj-firma-dorada.jpg'),
+('Prueba',                     3000,  3000, 10, 'prueba',        'gorra-negra.jpg'),
 ('Gorras Personalizadas',         0,     0,  0, 'personalizada', 'personalizada1.jpg');
 
 -- ============================================================
