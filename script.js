@@ -829,7 +829,7 @@ function mostrarBannerResultado(tipo, mensajeHtml, autoCerrar = true) {
 
     mostrarBannerResultado(
         'whatsapp',
-        'Tu pedido fue enviado por WhatsApp y está en proceso. Verificaremos tu comprobante de pago y te confirmaremos por ese mismo medio.'
+        '¡Tu pedido fue recibido! En breve te enviaremos por WhatsApp la información de pago para completar tu compra.'
     );
 }());
 
