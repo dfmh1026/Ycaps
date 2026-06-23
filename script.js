@@ -1,6 +1,24 @@
 // --- VARIABLES GLOBALES Y SELECTORES ---
 const CARRITO_STORAGE_KEY = 'ycaps-carrito';
 
+// Evita que el navegador restaure el scroll anterior al volver con el botón
+// "atrás" (por ejemplo, al regresar desde WhatsApp) — así la recarga siempre
+// empieza arriba de la página.
+if ('scrollRestoration' in history) {
+    history.scrollRestoration = 'manual';
+}
+
+// Si el cliente vuelve a esta página desde el caché del navegador (al
+// presionar "atrás" después de ser redirigido a WhatsApp), se fuerza una
+// recarga limpia para que el carrito ya vacío y la página se vean frescos.
+window.addEventListener('pageshow', () => {
+    if (sessionStorage.getItem('ycaps-whatsapp-redirigido')) {
+        sessionStorage.removeItem('ycaps-whatsapp-redirigido');
+        window.scrollTo(0, 0);
+        location.reload();
+    }
+});
+
 function cargarCarrito() {
     try {
         const guardado = localStorage.getItem(CARRITO_STORAGE_KEY);
@@ -629,6 +647,7 @@ btnPedirWhatsapp.addEventListener('click', async () => {
     guardarCarrito();
     actualizarInterfaz();
     btnPedirWhatsapp.disabled = false;
+    sessionStorage.setItem('ycaps-whatsapp-redirigido', '1');
 
     const urlTexto = encodeURIComponent(textoMensaje);
     const waLink = `https://wa.me/573004710483?text=${urlTexto}`;
