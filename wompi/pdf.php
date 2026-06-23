@@ -200,10 +200,13 @@ function generarReciboPdf(array $pedido, array $items, string $numeroRecibo): st
     );
     $y -= 42;
 
+    $lineaTransaccion = ($pedido['metodo_pago'] ?? 'wompi') === 'wompi'
+        ? 'Transaccion Wompi: ' . ($pedido['wompi_transaction_id'] ?: '-')
+        : 'Pago verificado manualmente por la tienda';
     $stream .= _pdfTexto(
         $margenIzq,
         $y,
-        'Transaccion Wompi: ' . ($pedido['wompi_transaction_id'] ?: '-'),
+        $lineaTransaccion,
         'F1',
         8,
         $gris

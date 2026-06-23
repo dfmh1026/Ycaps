@@ -245,7 +245,7 @@ function _tituloSeccion(string $texto): string
         . htmlspecialchars($texto) . '</p>';
 }
 
-function enviarEmailNuevoPedido(array $comprador, array $items, float $total, string $referencia): void
+function enviarEmailNuevoPedido(array $comprador, array $items, float $total, string $referencia, string $metodoPago = 'wompi'): void
 {
     $asunto       = "Pedido recibido — Ycaps #{$referencia}";
     $totalFmt     = _formatearPrecio($total);
@@ -257,6 +257,9 @@ function enviarEmailNuevoPedido(array $comprador, array $items, float $total, st
     $ciudad       = $comprador['ciudad']       ?? '';
     $departamento = $comprador['departamento'] ?? '';
     $direccionCompleta = trim($direccion . ', ' . $ciudad . ($departamento !== '' ? ', ' . $departamento : ''), ', ');
+    $metodoPagoTexto = $metodoPago === 'whatsapp'
+        ? 'WhatsApp (transferencia/depósito — pendiente de verificación)'
+        : 'Wompi (pago en línea)';
 
     $contenidoCliente =
         '<p style="margin:0 0 14px;font-size:15px;">Hola <strong>' . htmlspecialchars($nombre) . '</strong>,</p>'
@@ -265,7 +268,7 @@ function enviarEmailNuevoPedido(array $comprador, array $items, float $total, st
         . _filaDato('Referencia', $referencia)
         . _filaDato('Cédula', $cedula)
         . _filaDato('Dirección', $direccionCompleta)
-        . _filaDato('Método de pago', 'Wompi (pago en línea)')
+        . _filaDato('Método de pago', $metodoPagoTexto)
         . _filaDato('Estado', 'Pendiente de pago')
         . '</table>'
         . _tituloSeccion('Productos')
@@ -283,7 +286,7 @@ function enviarEmailNuevoPedido(array $comprador, array $items, float $total, st
         . _filaDato('Email', $email)
         . _filaDato('Teléfono', $telefono)
         . _filaDato('Dirección', $direccionCompleta)
-        . _filaDato('Método de pago', 'Wompi (pago en línea)')
+        . _filaDato('Método de pago', $metodoPagoTexto)
         . _filaDato('Estado', 'Pendiente de pago')
         . '</table>'
         . _tituloSeccion('Productos')

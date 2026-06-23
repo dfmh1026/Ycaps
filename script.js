@@ -332,7 +332,8 @@ modalImagen.addEventListener('click', (event) => {
 
 tarjetasProductos.forEach(tarjeta => {
     tarjeta.addEventListener('click', (event) => {
-        if (event.target.closest('.btn-agregar') || event.target.closest('.nav-btn') || event.target.closest('.selector-cantidad')) return;
+        if (event.target.closest('.btn-agregar') || event.target.closest('.nav-btn') || event.target.closest('.selector-cantidad') || event.target.closest('h3')) return;
+        if (window.getSelection().toString().length > 0) return;
         const imagen = getVisibleImage(tarjeta);
         if (imagen) {
             const imagenes = Array.from(tarjeta.querySelectorAll('.imagen-producto'));
@@ -573,13 +574,43 @@ function obtenerDatosComprador() {
 }
 
 // --- ENVIAR PEDIDO POR WHATSAPP (incluye datos del comprador) ---
-btnPedirWhatsapp.addEventListener('click', () => {
+// Antes de abrir WhatsApp, el pedido se guarda en la base de datos (estado
+// "pendiente", método "whatsapp") para que quede registrado en el panel admin
+// y la tienda pueda marcarlo como pagado luego de verificar la transferencia.
+btnPedirWhatsapp.addEventListener('click', async () => {
     if (!formCheckout.checkValidity()) {
         formCheckout.reportValidity();
         return;
     }
 
     const comprador = obtenerDatosComprador();
+
+    checkoutMensaje.textContent = 'Registrando tu pedido...';
+    checkoutMensaje.classList.remove('error');
+    btnPedirWhatsapp.disabled = true;
+
+    let referencia = '';
+    try {
+        const respuesta = await fetch('wompi/crear-pedido-whatsapp.php', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ items: carrito, comprador })
+        });
+
+        const datos = await respuesta.json();
+
+        if (!respuesta.ok || !datos.ok) {
+            throw new Error(datos.error || 'No se pudo registrar el pedido.');
+        }
+
+        referencia = datos.referencia;
+    } catch (error) {
+        checkoutMensaje.textContent = error.message || 'No se pudo registrar el pedido. Intenta de nuevo.';
+        checkoutMensaje.classList.add('error');
+        console.log('Error al registrar pedido de WhatsApp:', error);
+        btnPedirWhatsapp.disabled = false;
+        return;
+    }
 
     let textoMensaje = "Hola, quiero comprar estas gorras:\n\n";
     carrito.forEach(item => {
@@ -591,7 +622,13 @@ btnPedirWhatsapp.addEventListener('click', () => {
     textoMensaje += `Email: ${comprador.email}\n`;
     textoMensaje += `Teléfono: ${comprador.telefono}\n`;
     textoMensaje += `Dirección: ${comprador.direccion}, ${comprador.ciudad}, ${comprador.departamento}\n`;
+    textoMensaje += `\nReferencia: ${referencia}`;
     textoMensaje += "\n¿Tienen stock?";
+
+    carrito = [];
+    guardarCarrito();
+    actualizarInterfaz();
+    btnPedirWhatsapp.disabled = false;
 
     const urlTexto = encodeURIComponent(textoMensaje);
     const waLink = `https://wa.me/573004710483?text=${urlTexto}`;

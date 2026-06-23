@@ -47,6 +47,68 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['accion'] ?? '') === 'guia'
     }
 }
 
+// ── Marcar pedido como pagado manualmente (transferencia/depósito verificado) ──
+// Para pedidos que llegaron por WhatsApp (o cualquier pedido aún pendiente):
+// aprueba el pedido, descuenta el stock y envía el recibo PDF al cliente, igual
+// que hace el webhook de Wompi cuando confirma un pago en línea.
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['accion'] ?? '') === 'aprobar_manual') {
+    $pedidoId = (int) ($_POST['pedido_id'] ?? 0);
+
+    $stmtActual = $pdo->prepare("SELECT * FROM pedidos WHERE id = :id AND estado = 'pendiente' LIMIT 1");
+    $stmtActual->execute([':id' => $pedidoId]);
+    $pedido = $stmtActual->fetch(PDO::FETCH_ASSOC);
+
+    if (!$pedido) {
+        $mensaje = 'Ese pedido no existe o ya no está pendiente.';
+        $tipoMsg = 'error';
+    } else {
+        try {
+            $upd = $pdo->prepare("UPDATE pedidos SET estado = 'aprobado' WHERE id = :id AND estado = 'pendiente'");
+            $upd->execute([':id' => $pedidoId]);
+
+            if ($upd->rowCount() > 0) {
+                require_once __DIR__ . '/../wompi/db.php';
+                require_once __DIR__ . '/../wompi/pdf.php';
+                require_once __DIR__ . '/../wompi/mailer.php';
+
+                registrarCambioEstado($pdo, $pedidoId, 'pendiente', 'aprobado', 'admin_manual', 'Pago verificado manualmente por la tienda');
+
+                $stmtItems = $pdo->prepare("SELECT nombre_producto, precio, cantidad FROM pedido_items WHERE pedido_id = :id");
+                $stmtItems->execute([':id' => $pedidoId]);
+                $items = $stmtItems->fetchAll(PDO::FETCH_ASSOC);
+
+                $stmtStock = $pdo->prepare(
+                    "UPDATE productos SET stock = GREATEST(0, stock - :cantidad) WHERE nombre = :nombre AND activo = 1"
+                );
+                foreach ($items as $item) {
+                    $stmtStock->execute([
+                        ':cantidad' => (int) $item['cantidad'],
+                        ':nombre'   => $item['nombre_producto'],
+                    ]);
+                }
+
+                $pedido['estado'] = 'aprobado';
+
+                $numeroRecibo = obtenerOCrearNumeroRecibo($pdo, $pedidoId);
+                $pdfDatos     = generarReciboPdf($pedido, $items, $numeroRecibo);
+                $pdfNombre    = 'recibo-' . preg_replace('/[^A-Za-z0-9\-]/', '', (string) $pedido['wompi_referencia']) . '.pdf';
+
+                guardarReciboPdf($pdo, $pedidoId, $pdfDatos);
+                enviarEmailPagoConfirmado($pedido, (string) $pedido['wompi_referencia'], $pdfDatos, $pdfNombre);
+
+                $mensaje = "Pedido #{$pedidoId} marcado como pagado. Stock actualizado y recibo enviado a " . htmlspecialchars($pedido['email']) . ".";
+            } else {
+                $mensaje = 'El pedido ya no estaba pendiente (puede que ya se haya procesado).';
+                $tipoMsg = 'error';
+            }
+        } catch (Throwable $e) {
+            error_log('Error aprobando pedido manualmente: ' . $e->getMessage());
+            $mensaje = 'Ocurrió un error al aprobar el pedido. Intenta de nuevo.';
+            $tipoMsg = 'error';
+        }
+    }
+}
+
 // ── Consulta de pedidos ───────────────────────────────────────────────────────
 $estado   = $_GET['estado']   ?? '';
 $busqueda = trim($_GET['q']   ?? '');
@@ -185,6 +247,14 @@ require __DIR__ . '/_head.php';
                             <p style="margin:.5rem 0 0">
                                 <a href="/admin/recibo.php?id=<?= (int)$p['id'] ?>" target="_blank" class="btn-secondary btn-sm">📄 Ver recibo PDF</a>
                             </p>
+                            <?php endif; ?>
+
+                            <?php if ($estado_p === 'pendiente'): ?>
+                            <form method="POST" style="margin:.5rem 0" onsubmit="return confirm('¿Confirmas que ya verificaste la transferencia/depósito de este pedido? Esto descontará el stock y enviará el recibo al cliente.');">
+                                <input type="hidden" name="accion" value="aprobar_manual">
+                                <input type="hidden" name="pedido_id" value="<?= (int)$p['id'] ?>">
+                                <button type="submit" class="btn-primary btn-sm">✅ Marcar pago recibido (transferencia)</button>
+                            </form>
                             <?php endif; ?>
 
                             <ul style="margin:.5rem 0 .75rem 1rem;font-size:.8rem">

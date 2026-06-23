@@ -14,7 +14,7 @@ function conectarDb(): PDO
 
 // Guarda un pedido con sus ítems en una transacción atómica.
 // Devuelve el id del pedido creado.
-function guardarPedido(PDO $db, array $comprador, array $items, float $total, string $wompiReferencia): int
+function guardarPedido(PDO $db, array $comprador, array $items, float $total, string $wompiReferencia, string $metodoPago = 'wompi'): int
 {
     $db->beginTransaction();
 
@@ -34,7 +34,7 @@ function guardarPedido(PDO $db, array $comprador, array $items, float $total, st
             ':ciudad'           => $comprador['ciudad']       ?? '',
             ':departamento'     => $comprador['departamento'] ?? '',
             ':total'            => $total,
-            ':metodo_pago'      => 'wompi',
+            ':metodo_pago'      => $metodoPago,
             ':estado'           => 'pendiente',
             ':wompi_referencia' => $wompiReferencia,
         ]);
