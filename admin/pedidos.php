@@ -200,7 +200,12 @@ require __DIR__ . '/_head.php';
             </thead>
             <tbody>
             <?php foreach ($pedidos as $p):
-                $stItems = $pdo->prepare("SELECT nombre_producto, cantidad, precio FROM pedido_items WHERE pedido_id = :id");
+                $stItems = $pdo->prepare(
+                    "SELECT pi.nombre_producto, pi.cantidad, pi.precio, pr.imagen, pr.descripcion
+                     FROM pedido_items pi
+                     LEFT JOIN productos pr ON pr.nombre = pi.nombre_producto
+                     WHERE pi.pedido_id = :id"
+                );
                 $stItems->execute([':id' => $p['id']]);
                 $items    = $stItems->fetchAll(PDO::FETCH_ASSOC);
 
@@ -257,12 +262,20 @@ require __DIR__ . '/_head.php';
                             </form>
                             <?php endif; ?>
 
-                            <ul style="margin:.5rem 0 .75rem 1rem;font-size:.8rem">
+                            <ul style="margin:.5rem 0 .75rem 0;list-style:none;font-size:.8rem">
                             <?php foreach ($items as $it): ?>
-                                <li>
-                                    <?= htmlspecialchars($it['nombre_producto']) ?>
-                                    &times;<?= (int)$it['cantidad'] ?>
-                                    &mdash; $<?= number_format((float)$it['precio'], 0, ',', '.') ?>
+                                <li style="display:flex;align-items:flex-start;gap:.5rem;margin-bottom:.4rem">
+                                    <?php if ($it['imagen'] ?? ''): ?>
+                                    <img src="/media/<?= htmlspecialchars($it['imagen']) ?>" alt="" style="width:36px;height:36px;object-fit:cover;border-radius:6px;flex-shrink:0">
+                                    <?php endif; ?>
+                                    <span>
+                                        <?= htmlspecialchars($it['nombre_producto']) ?>
+                                        &times;<?= (int)$it['cantidad'] ?>
+                                        &mdash; $<?= number_format((float)$it['precio'], 0, ',', '.') ?>
+                                        <?php if ($it['descripcion'] ?? ''): ?>
+                                        <br><small style="color:var(--muted)"><?= htmlspecialchars($it['descripcion']) ?></small>
+                                        <?php endif; ?>
+                                    </span>
                                 </li>
                             <?php endforeach; ?>
                             </ul>
