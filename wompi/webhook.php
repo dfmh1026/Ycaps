@@ -96,8 +96,10 @@ try {
         );
     }
 
-    // Acciones al aprobar el pago
-    if ($estado === 'APPROVED') {
+    // Acciones al aprobar el pago — solo si el pedido no estaba ya aprobado
+    // (Wompi puede reenviar el mismo evento más de una vez; sin esta
+    // verificación se descontaría el stock y se enviaría el correo dos veces).
+    if ($estado === 'APPROVED' && $pedidoActual && $pedidoActual['estado'] !== 'aprobado') {
         // Obtener datos completos del pedido (necesarios también para el recibo PDF)
         $stmtPedido = $db->prepare(
             'SELECT * FROM pedidos WHERE wompi_referencia = :ref LIMIT 1'
