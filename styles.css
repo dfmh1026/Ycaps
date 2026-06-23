@@ -1989,7 +1989,8 @@ footer a:hover {
     animation: slideDown 0.4s ease;
 }
 
-.banner-resultado-pago[data-tipo="exito"] {
+.banner-resultado-pago[data-tipo="exito"],
+.banner-resultado-pago[data-tipo="whatsapp"] {
     background-color: #1a7a3c;
     color: #fff;
     border-bottom: 3px solid #2ecc71;

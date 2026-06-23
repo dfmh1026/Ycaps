@@ -8,14 +8,22 @@ if ('scrollRestoration' in history) {
     history.scrollRestoration = 'manual';
 }
 
-// Si el cliente vuelve a esta página desde el caché del navegador (al
-// presionar "atrás" después de ser redirigido a WhatsApp), se fuerza una
-// recarga limpia para que el carrito ya vacío y la página se vean frescos.
-window.addEventListener('pageshow', () => {
+// Si el cliente vuelve a esta página después de ser redirigido a WhatsApp
+// (con el botón "atrás" en computador, o cambiando de vuelta a la app del
+// navegador en el celular), se fuerza una recarga limpia para que el carrito
+// ya vacío, los modales cerrados y la página se vean frescos desde el inicio.
+function volverLimpioDesdeWhatsapp() {
     if (sessionStorage.getItem('ycaps-whatsapp-redirigido')) {
         sessionStorage.removeItem('ycaps-whatsapp-redirigido');
         window.scrollTo(0, 0);
         location.reload();
+    }
+}
+
+window.addEventListener('pageshow', volverLimpioDesdeWhatsapp);
+document.addEventListener('visibilitychange', () => {
+    if (document.visibilityState === 'visible') {
+        volverLimpioDesdeWhatsapp();
     }
 });
 
@@ -648,6 +656,7 @@ btnPedirWhatsapp.addEventListener('click', async () => {
     actualizarInterfaz();
     btnPedirWhatsapp.disabled = false;
     sessionStorage.setItem('ycaps-whatsapp-redirigido', '1');
+    sessionStorage.setItem('ycaps-whatsapp-mensaje-pendiente', '1');
 
     const urlTexto = encodeURIComponent(textoMensaje);
     const waLink = `https://wa.me/573004710483?text=${urlTexto}`;
@@ -741,14 +750,46 @@ formContacto.addEventListener('submit', async (event) => {
     }
 });
 
+// --- BANNER SUPERIOR DE RESULTADO (pago con Wompi o pedido por WhatsApp) ---
+function mostrarBannerResultado(tipo, mensajeHtml, autoCerrar = true) {
+    const banner = document.getElementById('banner-resultado-pago');
+    if (!banner) return;
+
+    banner.innerHTML = `<span>${mensajeHtml}</span>`
+        + `<button type="button" id="banner-cerrar-btn" aria-label="Cerrar aviso" style="background:none;border:none;color:inherit;font-size:1.3rem;line-height:1;cursor:pointer;margin-left:14px;vertical-align:middle">&times;</button>`;
+
+    banner.dataset.tipo = tipo;
+    banner.hidden = false;
+    banner.scrollIntoView({ behavior: 'smooth', block: 'center' });
+
+    const cerrarBanner = () => {
+        banner.style.transition = 'opacity 0.6s ease';
+        banner.style.opacity    = '0';
+        setTimeout(() => {
+            banner.hidden        = true;
+            banner.style.opacity = '';
+        }, 650);
+    };
+
+    const btnCerrar = document.getElementById('banner-cerrar-btn');
+    if (btnCerrar) btnCerrar.addEventListener('click', cerrarBanner);
+
+    // Si hay enlace de descarga, cerrar el banner poco después de que el cliente descargue
+    const linkDescarga = document.getElementById('banner-descarga-recibo');
+    if (linkDescarga) {
+        linkDescarga.addEventListener('click', () => setTimeout(cerrarBanner, 800));
+    }
+
+    if (autoCerrar) {
+        setTimeout(cerrarBanner, 10000);
+    }
+}
+
 // --- MOSTRAR RESULTADO DEL PAGO AL VOLVER DE WOMPI ---
 (function mostrarResultadoPago() {
     const params     = new URLSearchParams(window.location.search);
     const estadoPago = params.get('pago');
     if (!estadoPago) return;
-
-    const banner = document.getElementById('banner-resultado-pago');
-    if (!banner) return;
 
     const ref = params.get('ref') || '';
     let mensajeHtml = '';
@@ -773,38 +814,23 @@ formContacto.addEventListener('submit', async (event) => {
         mensajeHtml = 'El pago no se completó. Inténtalo de nuevo o pide tu pedido por WhatsApp.';
     }
 
-    banner.innerHTML = `<span>${mensajeHtml}</span>`
-        + `<button type="button" id="banner-cerrar-btn" aria-label="Cerrar aviso" style="background:none;border:none;color:inherit;font-size:1.3rem;line-height:1;cursor:pointer;margin-left:14px;vertical-align:middle">&times;</button>`;
-
-    banner.dataset.tipo = estadoPago;
-    banner.hidden = false;
-    banner.scrollIntoView({ behavior: 'smooth', block: 'center' });
-
-    const cerrarBanner = () => {
-        banner.style.transition = 'opacity 0.6s ease';
-        banner.style.opacity    = '0';
-        setTimeout(() => {
-            banner.hidden        = true;
-            banner.style.opacity = '';
-        }, 650);
-    };
-
-    const btnCerrar = document.getElementById('banner-cerrar-btn');
-    if (btnCerrar) btnCerrar.addEventListener('click', cerrarBanner);
-
-    // Si hay enlace de descarga, cerrar el banner poco después de que el cliente descargue
-    const linkDescarga = document.getElementById('banner-descarga-recibo');
-    if (linkDescarga) {
-        linkDescarga.addEventListener('click', () => setTimeout(cerrarBanner, 800));
-    }
-
-    // Solo los avisos de pendiente/fallo se cierran solos; el de éxito espera la descarga
-    if (autoCerrar) {
-        setTimeout(cerrarBanner, 10000);
-    }
+    mostrarBannerResultado(estadoPago, mensajeHtml, autoCerrar);
 
     // Limpiar los parámetros de la URL sin recargar la página
     window.history.replaceState({}, document.title, window.location.pathname);
+}());
+
+// --- MOSTRAR AVISO AL VOLVER DEL PEDIDO POR WHATSAPP ---
+// No confirma la compra (eso requiere verificar manualmente la transferencia
+// y el comprobante con el banco) — solo avisa que el pedido quedó en proceso.
+(function mostrarAvisoWhatsapp() {
+    if (!sessionStorage.getItem('ycaps-whatsapp-mensaje-pendiente')) return;
+    sessionStorage.removeItem('ycaps-whatsapp-mensaje-pendiente');
+
+    mostrarBannerResultado(
+        'whatsapp',
+        'Tu pedido fue enviado por WhatsApp y está en proceso. Verificaremos tu comprobante de pago y te confirmaremos por ese mismo medio.'
+    );
 }());
 
 // --- MODAL DE RASTREO DE PEDIDO ---
