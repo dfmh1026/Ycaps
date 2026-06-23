@@ -189,6 +189,7 @@ require __DIR__ . '/_head.php';
                 <tr>
                     <th>#</th>
                     <th>Referencia</th>
+                    <th>Producto</th>
                     <th>Cliente</th>
                     <th>Email</th>
                     <th>Ciudad</th>
@@ -226,6 +227,16 @@ require __DIR__ . '/_head.php';
                     <td><?= (int)$p['id'] ?></td>
                     <td><code style="font-size:.78rem"><?= htmlspecialchars($p['wompi_referencia'] ?? '—') ?></code></td>
                     <td>
+                        <?php foreach ($items as $it): ?>
+                        <div style="display:flex;align-items:center;gap:.4rem;margin-bottom:.3rem">
+                            <?php if ($it['imagen'] ?? ''): ?>
+                            <img src="/media/<?= htmlspecialchars($it['imagen']) ?>" alt="" style="width:32px;height:32px;object-fit:cover;border-radius:6px;flex-shrink:0">
+                            <?php endif; ?>
+                            <span style="font-size:.78rem"><?= htmlspecialchars($it['nombre_producto']) ?> &times;<?= (int)$it['cantidad'] ?></span>
+                        </div>
+                        <?php endforeach; ?>
+                    </td>
+                    <td>
                         <?= htmlspecialchars($p['nombre']) ?>
                         <?php if ($p['cedula'] ?? ''): ?>
                         <br><small style="color:var(--muted)">CC: <?= htmlspecialchars($p['cedula']) ?></small>
@@ -262,20 +273,15 @@ require __DIR__ . '/_head.php';
                             </form>
                             <?php endif; ?>
 
-                            <ul style="margin:.5rem 0 .75rem 0;list-style:none;font-size:.8rem">
+                            <ul style="margin:.5rem 0 .75rem 1rem;font-size:.8rem">
                             <?php foreach ($items as $it): ?>
-                                <li style="display:flex;align-items:flex-start;gap:.5rem;margin-bottom:.4rem">
-                                    <?php if ($it['imagen'] ?? ''): ?>
-                                    <img src="/media/<?= htmlspecialchars($it['imagen']) ?>" alt="" style="width:36px;height:36px;object-fit:cover;border-radius:6px;flex-shrink:0">
+                                <li>
+                                    <?= htmlspecialchars($it['nombre_producto']) ?>
+                                    &times;<?= (int)$it['cantidad'] ?>
+                                    &mdash; $<?= number_format((float)$it['precio'], 0, ',', '.') ?>
+                                    <?php if ($it['descripcion'] ?? ''): ?>
+                                    <br><small style="color:var(--muted)"><?= htmlspecialchars($it['descripcion']) ?></small>
                                     <?php endif; ?>
-                                    <span>
-                                        <?= htmlspecialchars($it['nombre_producto']) ?>
-                                        &times;<?= (int)$it['cantidad'] ?>
-                                        &mdash; $<?= number_format((float)$it['precio'], 0, ',', '.') ?>
-                                        <?php if ($it['descripcion'] ?? ''): ?>
-                                        <br><small style="color:var(--muted)"><?= htmlspecialchars($it['descripcion']) ?></small>
-                                        <?php endif; ?>
-                                    </span>
                                 </li>
                             <?php endforeach; ?>
                             </ul>
