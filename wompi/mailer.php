@@ -455,11 +455,11 @@ function enviarEmailPagoRechazado(array $pedido, string $referencia, string $est
 
 // Envía a la tienda un mensaje recibido desde el formulario de "Contacto" del sitio.
 // A diferencia de los demás correos (que van a TIENDA_EMAIL), este siempre se
-// envía a ventas@ycapsgorras.com — es el correo que se muestra públicamente
+// envía a y.caps.gorras@gmail.com — es el correo que se muestra públicamente
 // en la sección "Envíanos un mensaje", así que debe coincidir siempre.
 function enviarEmailContacto(string $nombre, string $email, string $telefono, string $mensaje): void
 {
-    $destinatarioContacto = 'ventas@ycapsgorras.com';
+    $destinatarioContacto = 'y.caps.gorras@gmail.com';
     $asunto = "Nuevo mensaje de contacto — {$nombre}";
 
     $contenido =
