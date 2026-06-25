@@ -35,17 +35,28 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $bloqueado) {
     $usuario = trim($_POST['usuario'] ?? '');
     $clave   = trim($_POST['clave']   ?? '');
 
-    // Soporta ADMIN_CLAVE como hash bcrypt (recomendado) o como texto plano
-    // (compatibilidad con configuraciones existentes).
-    $claveValida = (strncmp(ADMIN_CLAVE, '$2y$', 4) === 0)
-        ? password_verify($clave, ADMIN_CLAVE)
-        : hash_equals(ADMIN_CLAVE, $clave);
+    // 1) Buscar primero en la tabla de usuarios del panel (admin_usuarios).
+    $stmtUsuario = $pdo->prepare('SELECT clave_hash, nombre FROM admin_usuarios WHERE usuario = :u AND activo = 1 LIMIT 1');
+    $stmtUsuario->execute([':u' => $usuario]);
+    $usuarioDb = $stmtUsuario->fetch(PDO::FETCH_ASSOC);
 
-    if ($usuario === ADMIN_USUARIO && $claveValida) {
+    $claveValida = false;
+    if ($usuarioDb) {
+        $claveValida = password_verify($clave, $usuarioDb['clave_hash']);
+    } elseif ($usuario === ADMIN_USUARIO) {
+        // 2) Respaldo: el usuario único definido en ycaps_config.php.
+        // Soporta ADMIN_CLAVE como hash bcrypt (recomendado) o como texto plano.
+        $claveValida = (strncmp(ADMIN_CLAVE, '$2y$', 4) === 0)
+            ? password_verify($clave, ADMIN_CLAVE)
+            : hash_equals(ADMIN_CLAVE, $clave);
+    }
+
+    if ($claveValida) {
         $pdo->prepare('DELETE FROM admin_login_intentos WHERE ip = :ip')->execute([':ip' => $ip]);
 
         session_regenerate_id(true);
         $_SESSION['admin_logado']        = true;
+        $_SESSION['admin_usuario']       = $usuario;
         $_SESSION['admin_ultimo_acceso'] = time();
         header('Location: /admin/dashboard.php');
         exit;

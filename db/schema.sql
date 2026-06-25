@@ -74,6 +74,17 @@ CREATE TABLE IF NOT EXISTS mensajes_contacto (
     creado_en DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
+-- Usuarios con acceso al panel admin (además del usuario único definido en
+-- ycaps_config.php, que sigue funcionando como respaldo).
+CREATE TABLE IF NOT EXISTS admin_usuarios (
+    id         INT AUTO_INCREMENT PRIMARY KEY,
+    usuario    VARCHAR(100) NOT NULL UNIQUE,
+    clave_hash VARCHAR(255) NOT NULL,
+    nombre     VARCHAR(150) DEFAULT NULL,
+    activo     TINYINT(1) NOT NULL DEFAULT 1,
+    creado_en  DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+
 -- Límite de intentos de login del panel admin (1 fila por IP)
 CREATE TABLE IF NOT EXISTS admin_login_intentos (
     id              INT AUTO_INCREMENT PRIMARY KEY,
@@ -191,6 +202,16 @@ UPDATE productos SET imagen = 'personalizada1.jpg'     WHERE imagen = 'personali
 --     telefono  VARCHAR(50)  DEFAULT NULL,
 --     mensaje   TEXT NOT NULL,
 --     creado_en DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
+-- );
+
+-- Usuarios del panel admin (agregar si ya tenías la base de datos creada):
+-- CREATE TABLE IF NOT EXISTS admin_usuarios (
+--     id         INT AUTO_INCREMENT PRIMARY KEY,
+--     usuario    VARCHAR(100) NOT NULL UNIQUE,
+--     clave_hash VARCHAR(255) NOT NULL,
+--     nombre     VARCHAR(150) DEFAULT NULL,
+--     activo     TINYINT(1) NOT NULL DEFAULT 1,
+--     creado_en  DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
 -- );
 
 -- Límite de intentos de login admin (agregar si ya tenías la base de datos creada):
