@@ -36,19 +36,30 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $bloqueado) {
     $clave   = trim($_POST['clave']   ?? '');
 
     // 1) Buscar primero en la tabla de usuarios del panel (admin_usuarios).
-    $stmtUsuario = $pdo->prepare('SELECT clave_hash, nombre FROM admin_usuarios WHERE usuario = :u AND activo = 1 LIMIT 1');
-    $stmtUsuario->execute([':u' => $usuario]);
-    $usuarioDb = $stmtUsuario->fetch(PDO::FETCH_ASSOC);
+    // Si la tabla todavía no existe (instalación que no ha corrido esa
+    // migración), no debe bloquear el login — se sigue con el respaldo.
+    $usuarioDb = false;
+    try {
+        $stmtUsuario = $pdo->prepare('SELECT clave_hash, nombre, es_admin FROM admin_usuarios WHERE usuario = :u AND activo = 1 LIMIT 1');
+        $stmtUsuario->execute([':u' => $usuario]);
+        $usuarioDb = $stmtUsuario->fetch(PDO::FETCH_ASSOC);
+    } catch (Throwable $e) {
+        $usuarioDb = false;
+    }
 
     $claveValida = false;
+    $esAdmin     = false;
     if ($usuarioDb) {
         $claveValida = password_verify($clave, $usuarioDb['clave_hash']);
+        $esAdmin     = (bool) $usuarioDb['es_admin'];
     } elseif ($usuario === ADMIN_USUARIO) {
         // 2) Respaldo: el usuario único definido en ycaps_config.php.
         // Soporta ADMIN_CLAVE como hash bcrypt (recomendado) o como texto plano.
+        // Este usuario siempre es administrador (es el dueño original de la tienda).
         $claveValida = (strncmp(ADMIN_CLAVE, '$2y$', 4) === 0)
             ? password_verify($clave, ADMIN_CLAVE)
             : hash_equals(ADMIN_CLAVE, $clave);
+        $esAdmin = true;
     }
 
     if ($claveValida) {
@@ -57,6 +68,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $bloqueado) {
         session_regenerate_id(true);
         $_SESSION['admin_logado']        = true;
         $_SESSION['admin_usuario']       = $usuario;
+        $_SESSION['admin_es_admin']      = $esAdmin;
         $_SESSION['admin_ultimo_acceso'] = time();
         header('Location: /admin/dashboard.php');
         exit;

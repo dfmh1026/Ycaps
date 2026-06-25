@@ -81,6 +81,7 @@ CREATE TABLE IF NOT EXISTS admin_usuarios (
     usuario    VARCHAR(100) NOT NULL UNIQUE,
     clave_hash VARCHAR(255) NOT NULL,
     nombre     VARCHAR(150) DEFAULT NULL,
+    es_admin   TINYINT(1) NOT NULL DEFAULT 0,
     activo     TINYINT(1) NOT NULL DEFAULT 1,
     creado_en  DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
@@ -209,9 +210,13 @@ UPDATE productos SET imagen = 'personalizada1.jpg'     WHERE imagen = 'personali
 --     usuario    VARCHAR(100) NOT NULL UNIQUE,
 --     clave_hash VARCHAR(255) NOT NULL,
 --     nombre     VARCHAR(150) DEFAULT NULL,
+--     es_admin   TINYINT(1) NOT NULL DEFAULT 0,
 --     activo     TINYINT(1) NOT NULL DEFAULT 1,
 --     creado_en  DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
 -- );
+
+-- Si ya tenías la tabla admin_usuarios creada sin la columna es_admin:
+-- ALTER TABLE admin_usuarios ADD COLUMN es_admin TINYINT(1) NOT NULL DEFAULT 0;
 
 -- Límite de intentos de login admin (agregar si ya tenías la base de datos creada):
 -- CREATE TABLE IF NOT EXISTS admin_login_intentos (
