@@ -70,6 +70,13 @@ const filaDescuentoPromo = document.getElementById('fila-descuento-promo');
 const montoDescuentoPromo = document.getElementById('monto-descuento-promo');
 
 btnAplicarPromo.addEventListener('click', () => {
+    if (carrito.length === 0) {
+        mensajeCodigoPromo.textContent = 'Agrega un producto al carrito para usar un código promocional.';
+        mensajeCodigoPromo.classList.remove('exito');
+        mensajeCodigoPromo.classList.add('error');
+        return;
+    }
+
     const codigo = inputCodigoPromo.value.trim().toUpperCase();
 
     if (codigo === '') {
@@ -469,6 +476,16 @@ function agregarAlCarrito(nombre, precio, btn) {
 function eliminarDelCarrito(nombre) {
     carrito = carrito.filter(item => item.nombre !== nombre);
     guardarCarrito();
+
+    // Si el carrito queda vacío, se quita también el código promocional
+    // aplicado — no debe quedar un descuento "guardado" sin productos.
+    if (carrito.length === 0) {
+        codigoPromoAplicado = null;
+        inputCodigoPromo.value = '';
+        mensajeCodigoPromo.textContent = '';
+        mensajeCodigoPromo.classList.remove('exito', 'error');
+    }
+
     actualizarInterfaz();
 }
 
@@ -507,6 +524,10 @@ function actualizarInterfaz() {
 
     // Actualizar el botón flotante y el total de la factura
     contador.innerText = totalGorras;
+
+    // El código promocional solo se puede usar si hay productos en el carrito
+    inputCodigoPromo.disabled = carrito.length === 0;
+    btnAplicarPromo.disabled = carrito.length === 0;
 
     const porcentajeDescuento = codigoPromoAplicado ? CODIGOS_PROMOCIONALES[codigoPromoAplicado] : 0;
     const montoDescuento = Math.round(total * porcentajeDescuento);
