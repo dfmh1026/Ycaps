@@ -8,6 +8,84 @@ $pdo = new PDO(
     [PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION, PDO::MYSQL_ATTR_INIT_COMMAND => "SET time_zone = '-05:00'"]
 );
 
+$mensaje = '';
+$tipoMsg = 'success';
+
+// ── Registrar una venta manual (mostrador, en persona) ────────────────────────
+// Usa el mismo flujo ya confiable de los pedidos en línea (guardarPedido +
+// registrarCambioEstado en wompi/db.php), pero la crea directo en estado
+// "aprobado" y descuenta el stock de una vez, porque ya se cobró en persona.
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['accion'] ?? '') === 'venta_manual') {
+    $productoId    = (int) ($_POST['producto_id'] ?? 0);
+    $cantidad      = (int) ($_POST['cantidad'] ?? 0);
+    $precio        = (float) ($_POST['precio'] ?? 0);
+    $clienteNombre = trim($_POST['cliente_nombre'] ?? '');
+
+    if ($productoId <= 0 || $cantidad <= 0 || $precio < 0 || $clienteNombre === '') {
+        $mensaje = 'Completa el producto, la cantidad, el precio y el nombre del cliente.';
+        $tipoMsg = 'error';
+    } else {
+        $stProd = $pdo->prepare('SELECT nombre, stock FROM productos WHERE id = :id AND activo = 1 LIMIT 1');
+        $stProd->execute([':id' => $productoId]);
+        $producto = $stProd->fetch(PDO::FETCH_ASSOC);
+
+        if (!$producto) {
+            $mensaje = 'Ese producto no existe o está inactivo.';
+            $tipoMsg = 'error';
+        } elseif ($cantidad > (int) $producto['stock']) {
+            $mensaje = "Stock insuficiente (disponible: {$producto['stock']}).";
+            $tipoMsg = 'error';
+        } else {
+            require_once __DIR__ . '/../wompi/db.php';
+
+            $comprador = [
+                'nombre'       => $clienteNombre,
+                'cedula'       => trim($_POST['cliente_cedula'] ?? ''),
+                'email'        => trim($_POST['cliente_email'] ?? ''),
+                'telefono'     => trim($_POST['cliente_telefono'] ?? ''),
+                'direccion'    => '',
+                'ciudad'       => '',
+                'departamento' => '',
+            ];
+            $items = [[
+                'title'      => $producto['nombre'],
+                'unit_price' => $precio,
+                'quantity'   => $cantidad,
+            ]];
+            $total      = $precio * $cantidad;
+            $referencia = 'YCAPS-MOSTRADOR-' . date('Ymd') . '-' . strtoupper(bin2hex(random_bytes(4)));
+
+            try {
+                $pedidoId = guardarPedido($pdo, $comprador, $items, $total, $referencia, 'mostrador');
+
+                $pdo->prepare("UPDATE pedidos SET estado = 'aprobado' WHERE id = :id")->execute([':id' => $pedidoId]);
+                $pdo->prepare('UPDATE productos SET stock = GREATEST(0, stock - :c) WHERE id = :id')
+                    ->execute([':c' => $cantidad, ':id' => $productoId]);
+                registrarCambioEstado($pdo, $pedidoId, 'pendiente', 'aprobado', 'venta_manual', 'Venta manual registrada en el panel');
+
+                $mensaje = "Venta registrada correctamente (Ref: {$referencia}).";
+            } catch (Throwable $e) {
+                error_log('Error registrando venta manual: ' . $e->getMessage());
+                $mensaje = 'Ocurrió un error al registrar la venta.';
+                $tipoMsg = 'error';
+            }
+        }
+    }
+}
+
+// Si la columna "codigo_interno" todavía no existe (falta correr la
+// migración en db/schema.sql), se sigue mostrando el listado sin ella en
+// vez de romper toda la página de Ventas.
+try {
+    $productosActivos = $pdo->query(
+        "SELECT id, nombre, codigo_interno, precio, stock FROM productos WHERE activo = 1 ORDER BY nombre"
+    )->fetchAll(PDO::FETCH_ASSOC);
+} catch (Throwable $e) {
+    $productosActivos = $pdo->query(
+        "SELECT id, nombre, precio, stock FROM productos WHERE activo = 1 ORDER BY nombre"
+    )->fetchAll(PDO::FETCH_ASSOC);
+}
+
 // Rango de fechas: por defecto, los últimos 30 días
 $hoy    = date('Y-m-d');
 $desde  = $_GET['desde'] ?? date('Y-m-d', strtotime('-30 days'));
@@ -53,6 +131,56 @@ $titulo = 'Ventas';
 $pag    = 'ventas';
 require __DIR__ . '/_head.php';
 ?>
+
+<?php if ($mensaje): ?>
+<div class="alerta alerta-<?= $tipoMsg === 'error' ? 'error' : 'success' ?>" style="margin-bottom:1rem"><?= htmlspecialchars($mensaje) ?></div>
+<?php endif; ?>
+
+<div class="card" style="margin-bottom:1.5rem">
+    <div class="card-header">
+        <h2>Registrar venta manual</h2>
+    </div>
+    <form method="POST" style="display:flex;gap:.6rem;flex-wrap:wrap;align-items:flex-end;padding-top:.5rem">
+        <input type="hidden" name="accion" value="venta_manual">
+        <div class="campo">
+            <label>Producto</label>
+            <select name="producto_id" required onchange="document.getElementById('venta-manual-precio').value = this.selectedOptions[0].dataset.precio || ''">
+                <option value="" disabled selected>Selecciona un producto</option>
+                <?php foreach ($productosActivos as $p): ?>
+                <?php $codigoMostrar = ($p['codigo_interno'] ?? '') !== '' ? $p['codigo_interno'] : 'S/C'; ?>
+                <option value="<?= (int) $p['id'] ?>" data-precio="<?= (int) $p['precio'] ?>">
+                    <?= htmlspecialchars($codigoMostrar) ?> — <?= htmlspecialchars($p['nombre']) ?> (Stock: <?= (int) $p['stock'] ?>)
+                </option>
+                <?php endforeach; ?>
+            </select>
+        </div>
+        <div class="campo">
+            <label>Cantidad</label>
+            <input type="number" name="cantidad" min="1" value="1" required style="width:80px">
+        </div>
+        <div class="campo">
+            <label>Precio de venta</label>
+            <input type="number" id="venta-manual-precio" name="precio" min="0" step="1000" required style="width:120px">
+        </div>
+        <div class="campo">
+            <label>Nombre del cliente</label>
+            <input type="text" name="cliente_nombre" required>
+        </div>
+        <div class="campo">
+            <label>Cédula (opcional)</label>
+            <input type="text" name="cliente_cedula">
+        </div>
+        <div class="campo">
+            <label>Teléfono (opcional)</label>
+            <input type="text" name="cliente_telefono">
+        </div>
+        <div class="campo">
+            <label>Email (opcional)</label>
+            <input type="email" name="cliente_email">
+        </div>
+        <button type="submit" class="btn-primary btn-sm">Registrar venta</button>
+    </form>
+</div>
 
 <div class="card" style="margin-bottom:1.5rem">
     <div class="card-header">

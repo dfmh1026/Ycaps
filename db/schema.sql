@@ -99,6 +99,7 @@ CREATE TABLE IF NOT EXISTS admin_login_intentos (
 CREATE TABLE IF NOT EXISTS productos (
     id               INT AUTO_INCREMENT PRIMARY KEY,
     nombre           VARCHAR(150) NOT NULL UNIQUE,
+    codigo_interno   VARCHAR(20)  DEFAULT NULL UNIQUE,
     descripcion      TEXT DEFAULT NULL,
     precio           DECIMAL(12,2) NOT NULL DEFAULT 85000,
     precio_original  DECIMAL(12,2) DEFAULT 95000,
@@ -113,23 +114,23 @@ CREATE TABLE IF NOT EXISTS productos (
 -- ============================================================
 -- DATOS SEMILLA — productos actuales del catálogo
 -- ============================================================
-INSERT IGNORE INTO productos (nombre, precio, precio_original, stock, categoria, imagen) VALUES
-('Gorra Negra Azabache',      90000, 95000, 10, 'negra',         'gorra-negra.jpg'),
-('Gorra Gris',                90000, 95000, 10, 'gris',          'gorra-gris.jpg'),
-('Gorra Blanca Caballo Negro',90000, 95000, 10, 'blanca',        'gorra-blancan.jpg'),
-('Gorra Blanca',              90000, 95000, 10, 'blanca',        'gorra-blancat.jpg'),
-('Gorra Negra Firma YJ',      90000, 95000, 10, 'negra',         'gorra-negrayj.jpg'),
-('Gorra Caqui',               90000, 95000, 10, 'caqui',         'gorra-caqui.jpg'),
-('Gorra Negra Caballo Dorado',90000, 95000, 10, 'negra',         'gorra-negrad.jpg'),
-('Gorra Blanca Dorado',       90000, 95000, 10, 'blanca',        'gorra-blancad.jpg'),
-('Gorra Negra Malla Dorado',  90000, 95000, 10, 'negra',         'gorra-negramallad.jpg'),
-('Gorra Blanca Edición YJ',   90000, 90000, 10, 'blanca',        'gorra-blancayj.jpg'),
-('Gorra Caqui Edición YJ',    90000, 90000, 10, 'caqui',         'gorra-caquiyj.jpg'),
-('Gorra Negra Caballo Blanco',90000, 95000, 10, 'negra',         'gorra-negra-caballo.blanco.jpeg'),
-('Gorra Negra YJ Dorada',     90000, 90000, 10, 'negra',         'gorra-negra-yj-dorado.jpg'),
-('Gorra Negra YJ Firma Dorada',90000, 90000, 10, 'negra',        'gorra-negra-yj-firma-dorada.jpg'),
-('Gorra Azul Turqui',         90000, 95000, 10, 'azul',          'gorra-azulturqui1.jpg'),
-('Gorras Personalizadas',         0,     0,  0, 'personalizada', 'personalizada1.jpg');
+INSERT IGNORE INTO productos (nombre, codigo_interno, precio, precio_original, stock, categoria, imagen) VALUES
+('Gorra Negra Azabache',      'YC-001', 90000, 95000, 10, 'negra',         'gorra-negra.jpg'),
+('Gorra Gris',                'YC-002', 90000, 95000, 10, 'gris',          'gorra-gris.jpg'),
+('Gorra Blanca Caballo Negro','YC-003', 90000, 95000, 10, 'blanca',        'gorra-blancan.jpg'),
+('Gorra Blanca',              'YC-004', 90000, 95000, 10, 'blanca',        'gorra-blancat.jpg'),
+('Gorra Negra Firma YJ',      'YC-005', 90000, 95000, 10, 'negra',         'gorra-negrayj.jpg'),
+('Gorra Caqui',               'YC-006', 90000, 95000, 10, 'caqui',         'gorra-caqui.jpg'),
+('Gorra Negra Caballo Dorado','YC-007', 90000, 95000, 10, 'negra',         'gorra-negrad.jpg'),
+('Gorra Blanca Dorado',       'YC-008', 90000, 95000, 10, 'blanca',        'gorra-blancad.jpg'),
+('Gorra Negra Malla Dorado',  'YC-009', 90000, 95000, 10, 'negra',         'gorra-negramallad.jpg'),
+('Gorra Blanca Edición YJ',   'YC-010', 90000, 90000, 10, 'blanca',        'gorra-blancayj.jpg'),
+('Gorra Caqui Edición YJ',    'YC-011', 90000, 90000, 10, 'caqui',         'gorra-caquiyj.jpg'),
+('Gorra Negra Caballo Blanco','YC-012', 90000, 95000, 10, 'negra',         'gorra-negra-caballo.blanco.jpeg'),
+('Gorra Negra YJ Dorada',     'YC-013', 90000, 90000, 10, 'negra',         'gorra-negra-yj-dorado.jpg'),
+('Gorra Negra YJ Firma Dorada','YC-014',90000, 90000, 10, 'negra',        'gorra-negra-yj-firma-dorada.jpg'),
+('Gorra Azul Turqui',         'YC-015', 90000, 95000, 10, 'azul',          'gorra-azulturqui1.jpg'),
+('Gorras Personalizadas',     'YC-016',     0,     0,  0, 'personalizada', 'personalizada1.jpg');
 
 -- ============================================================
 -- MIGRACIONES — ejecuta solo las que apliquen a tu instalación.
@@ -231,3 +232,24 @@ UPDATE productos SET imagen = 'personalizada1.jpg'     WHERE imagen = 'personali
 -- ALTER TABLE pedidos
 --     CHANGE COLUMN mp_preference_id wompi_referencia     VARCHAR(100) DEFAULT NULL,
 --     CHANGE COLUMN mp_payment_id    wompi_transaction_id VARCHAR(100) DEFAULT NULL;
+
+-- Código interno de producto, para identificar cada gorra en Inventario y al
+-- registrar una venta manual desde el panel (agregar si ya tenías la tabla
+-- "productos" creada, y luego asignar un código a cada producto existente):
+-- ALTER TABLE productos ADD COLUMN codigo_interno VARCHAR(20) DEFAULT NULL UNIQUE AFTER nombre;
+-- UPDATE productos SET codigo_interno = 'YC-001' WHERE nombre = 'Gorra Negra Azabache';
+-- UPDATE productos SET codigo_interno = 'YC-002' WHERE nombre = 'Gorra Gris';
+-- UPDATE productos SET codigo_interno = 'YC-003' WHERE nombre = 'Gorra Blanca Caballo Negro';
+-- UPDATE productos SET codigo_interno = 'YC-004' WHERE nombre = 'Gorra Blanca';
+-- UPDATE productos SET codigo_interno = 'YC-005' WHERE nombre = 'Gorra Negra Firma YJ';
+-- UPDATE productos SET codigo_interno = 'YC-006' WHERE nombre = 'Gorra Caqui';
+-- UPDATE productos SET codigo_interno = 'YC-007' WHERE nombre = 'Gorra Negra Caballo Dorado';
+-- UPDATE productos SET codigo_interno = 'YC-008' WHERE nombre = 'Gorra Blanca Dorado';
+-- UPDATE productos SET codigo_interno = 'YC-009' WHERE nombre = 'Gorra Negra Malla Dorado';
+-- UPDATE productos SET codigo_interno = 'YC-010' WHERE nombre = 'Gorra Blanca Edición YJ';
+-- UPDATE productos SET codigo_interno = 'YC-011' WHERE nombre = 'Gorra Caqui Edición YJ';
+-- UPDATE productos SET codigo_interno = 'YC-012' WHERE nombre = 'Gorra Negra Caballo Blanco';
+-- UPDATE productos SET codigo_interno = 'YC-013' WHERE nombre = 'Gorra Negra YJ Dorada';
+-- UPDATE productos SET codigo_interno = 'YC-014' WHERE nombre = 'Gorra Negra YJ Firma Dorada';
+-- UPDATE productos SET codigo_interno = 'YC-015' WHERE nombre = 'Gorra Azul Turqui';
+-- UPDATE productos SET codigo_interno = 'YC-016' WHERE nombre = 'Gorras Personalizadas';

@@ -45,6 +45,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $mensaje = 'Precios actualizados.';
         }
     }
+
+    if ($accion === 'codigo') {
+        $id     = (int)($_POST['id'] ?? 0);
+        $codigo = trim($_POST['codigo_interno'] ?? '');
+        if ($id > 0) {
+            try {
+                $pdo->prepare("UPDATE productos SET codigo_interno = :c WHERE id = :id")
+                    ->execute([':c' => $codigo !== '' ? $codigo : null, ':id' => $id]);
+                $mensaje = 'Código interno actualizado.';
+            } catch (Throwable $e) {
+                $mensaje = 'No se pudo guardar el código (puede que ya esté en uso por otro producto, o que falte la columna "codigo_interno" en tu base de datos).';
+                $tipoMsg = 'error';
+            }
+        }
+    }
 }
 
 $categoriaFiltro = $_GET['categoria'] ?? '';
@@ -64,7 +79,7 @@ require __DIR__ . '/_head.php';
 ?>
 
 <?php if ($mensaje): ?>
-<div class="alerta alerta-success" style="margin-bottom:1rem"><?= htmlspecialchars($mensaje) ?></div>
+<div class="alerta alerta-<?= $tipoMsg === 'error' ? 'error' : 'success' ?>" style="margin-bottom:1rem"><?= htmlspecialchars($mensaje) ?></div>
 <?php endif; ?>
 
 <div class="card">
@@ -86,6 +101,7 @@ require __DIR__ . '/_head.php';
             <thead>
                 <tr>
                     <th>ID</th>
+                    <th>Código</th>
                     <th>Producto</th>
                     <th>Categoría</th>
                     <th>Precio</th>
@@ -99,6 +115,14 @@ require __DIR__ . '/_head.php';
             <?php foreach ($productos as $prod): ?>
                 <tr style="<?= $prod['activo'] ? '' : 'opacity:.5' ?>">
                     <td><?= $prod['id'] ?></td>
+                    <td>
+                        <form method="POST" style="display:inline-flex;gap:.3rem;align-items:center">
+                            <input type="hidden" name="accion" value="codigo">
+                            <input type="hidden" name="id" value="<?= $prod['id'] ?>">
+                            <input type="text" name="codigo_interno" value="<?= htmlspecialchars($prod['codigo_interno'] ?? '') ?>" placeholder="Ej: YC-001" class="stock-input" style="width:90px">
+                            <button type="submit" class="btn-guardar-stock" title="Guardar código">&#10003;</button>
+                        </form>
+                    </td>
                     <td>
                         <?php if ($prod['imagen']): ?>
                         <img src="/media/<?= htmlspecialchars($prod['imagen']) ?>" alt="" style="width:36px;height:36px;object-fit:cover;border-radius:6px;margin-right:.5rem;vertical-align:middle">
