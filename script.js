@@ -534,9 +534,12 @@ function actualizarInterfaz() {
 
     if (porcentajeDescuento > 0 && total > 0) {
         filaDescuentoPromo.hidden = false;
+        filaDescuentoPromo.style.display = 'flex';
         montoDescuentoPromo.innerText = `-$${montoDescuento.toLocaleString('es-CO')}`;
     } else {
         filaDescuentoPromo.hidden = true;
+        filaDescuentoPromo.style.display = 'none';
+        montoDescuentoPromo.innerText = '-$0';
     }
 
     totalTxt.innerText = `$${(total - montoDescuento).toLocaleString('es-CO')}`;
