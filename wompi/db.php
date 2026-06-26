@@ -2,6 +2,25 @@
 // Conexión PDO a la base de datos MySQL.
 // Requiere las constantes DB_HOST, DB_NAME, DB_USER, DB_PASS definidas en config.php.
 
+// Códigos promocionales activos y su porcentaje de descuento (0.15 = 15%).
+// El descuento se calcula aquí, nunca se confía en el total/descuento que
+// pueda mandar el navegador.
+const CODIGOS_PROMOCIONALES = [
+    'INIT25' => 0.15,
+];
+
+// Devuelve el precio unitario con el descuento del código promocional
+// aplicado, o el precio original si el código no existe o no se envió.
+function aplicarDescuentoPromocional(float $precio, ?string $codigo): float
+{
+    $codigo = strtoupper(trim((string) $codigo));
+    if ($codigo === '' || !isset(CODIGOS_PROMOCIONALES[$codigo])) {
+        return $precio;
+    }
+
+    return round($precio * (1 - CODIGOS_PROMOCIONALES[$codigo]), 2);
+}
+
 function conectarDb(): PDO
 {
     $dsn = 'mysql:host=' . DB_HOST . ';dbname=' . DB_NAME . ';charset=utf8mb4';

@@ -21,7 +21,8 @@ if (!is_array($entrada) || empty($entrada['items']) || !is_array($entrada['items
     exit;
 }
 
-$comprador = is_array($entrada['comprador'] ?? null) ? $entrada['comprador'] : [];
+$comprador         = is_array($entrada['comprador'] ?? null) ? $entrada['comprador'] : [];
+$codigoPromocional = isset($entrada['codigo_promocional']) ? (string) $entrada['codigo_promocional'] : '';
 
 // Validar el email del comprador: rechaza valores mal formados o con saltos de
 // línea (que podrían usarse para inyectar cabeceras en los correos de alerta).
@@ -83,7 +84,7 @@ foreach ($cantidadesPedidas as $nombre => $cantidad) {
         exit;
     }
 
-    $precio = (float) $productosDb[$nombre]['precio'];
+    $precio = aplicarDescuentoPromocional((float) $productosDb[$nombre]['precio'], $codigoPromocional);
     $stock  = (int) $productosDb[$nombre]['stock'];
 
     if ($precio <= 0) {

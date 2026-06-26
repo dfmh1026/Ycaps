@@ -55,6 +55,46 @@ const contenedorItems = document.getElementById('items-carrito');
 const contador = document.getElementById('contador-carrito');
 const totalTxt = document.getElementById('precio-total');
 
+// --- CÓDIGO PROMOCIONAL ---
+// El descuento real SIEMPRE se vuelve a calcular en el servidor (ver
+// wompi/crear-transaccion.php y wompi/crear-pedido-whatsapp.php) — aquí solo
+// se calcula para mostrarle al cliente el total con descuento antes de pagar.
+const CODIGOS_PROMOCIONALES = { 'INIT25': 0.15 };
+
+let codigoPromoAplicado = null;
+
+const inputCodigoPromo = document.getElementById('input-codigo-promo');
+const btnAplicarPromo = document.getElementById('btn-aplicar-promo');
+const mensajeCodigoPromo = document.getElementById('mensaje-codigo-promo');
+const filaDescuentoPromo = document.getElementById('fila-descuento-promo');
+const montoDescuentoPromo = document.getElementById('monto-descuento-promo');
+
+btnAplicarPromo.addEventListener('click', () => {
+    const codigo = inputCodigoPromo.value.trim().toUpperCase();
+
+    if (codigo === '') {
+        mensajeCodigoPromo.textContent = 'Escribe un código promocional.';
+        mensajeCodigoPromo.classList.remove('exito');
+        mensajeCodigoPromo.classList.add('error');
+        return;
+    }
+
+    if (!CODIGOS_PROMOCIONALES[codigo]) {
+        codigoPromoAplicado = null;
+        mensajeCodigoPromo.textContent = 'Ese código promocional no es válido.';
+        mensajeCodigoPromo.classList.remove('exito');
+        mensajeCodigoPromo.classList.add('error');
+        actualizarInterfaz();
+        return;
+    }
+
+    codigoPromoAplicado = codigo;
+    mensajeCodigoPromo.textContent = '¡Código aplicado! 15% de descuento.';
+    mensajeCodigoPromo.classList.remove('error');
+    mensajeCodigoPromo.classList.add('exito');
+    actualizarInterfaz();
+});
+
 // --- EVENT LISTENERS PARA EL PANEL ---
 abrirBtn.addEventListener('click', () => panel.classList.add('activo'));
 cerrarBtn.addEventListener('click', () => panel.classList.remove('activo'));
@@ -467,7 +507,18 @@ function actualizarInterfaz() {
 
     // Actualizar el botón flotante y el total de la factura
     contador.innerText = totalGorras;
-    totalTxt.innerText = `$${total.toLocaleString('es-CO')}`;
+
+    const porcentajeDescuento = codigoPromoAplicado ? CODIGOS_PROMOCIONALES[codigoPromoAplicado] : 0;
+    const montoDescuento = Math.round(total * porcentajeDescuento);
+
+    if (porcentajeDescuento > 0 && total > 0) {
+        filaDescuentoPromo.hidden = false;
+        montoDescuentoPromo.innerText = `-$${montoDescuento.toLocaleString('es-CO')}`;
+    } else {
+        filaDescuentoPromo.hidden = true;
+    }
+
+    totalTxt.innerText = `$${(total - montoDescuento).toLocaleString('es-CO')}`;
 }
 
 // --- MODAL DE CHECKOUT (DATOS DE ENVÍO Y PAGO) ---
@@ -620,7 +671,7 @@ btnPedirWhatsapp.addEventListener('click', async () => {
         const respuesta = await fetch('wompi/crear-pedido-whatsapp.php', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ items: carrito, comprador })
+            body: JSON.stringify({ items: carrito, comprador, codigo_promocional: codigoPromoAplicado || '' })
         });
 
         const datos = await respuesta.json();
@@ -652,6 +703,7 @@ btnPedirWhatsapp.addEventListener('click', async () => {
     textoMensaje += "\n¿Tienen stock?";
 
     carrito = [];
+    codigoPromoAplicado = null;
     guardarCarrito();
     actualizarInterfaz();
     btnPedirWhatsapp.disabled = false;
@@ -683,7 +735,7 @@ formCheckout.addEventListener('submit', async (event) => {
         const respuesta = await fetch('wompi/crear-transaccion.php', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ items: carrito, comprador })
+            body: JSON.stringify({ items: carrito, comprador, codigo_promocional: codigoPromoAplicado || '' })
         });
 
         const datos = await respuesta.json();
