@@ -19,7 +19,14 @@ if ($busqueda) {
     $params[':q'] = "%$busqueda%";
 }
 
-$stTotal = $pdo->prepare("SELECT COUNT(DISTINCT email) FROM pedidos WHERE $where");
+// Las ventas manuales (mostrador) pueden no tener correo, a diferencia de
+// Wompi/WhatsApp que siempre exigen uno. Si agrupáramos solo por "email",
+// todas las ventas sin correo (de clientes distintos) se mezclarían en un
+// solo "cliente". Por eso, cuando el correo está vacío, cada pedido se trata
+// como un cliente aparte (clave única por id) en vez de agruparse.
+$claveCliente = "CASE WHEN email = '' THEN CONCAT('pedido-', id) ELSE email END";
+
+$stTotal = $pdo->prepare("SELECT COUNT(DISTINCT {$claveCliente}) FROM pedidos WHERE $where");
 $stTotal->execute($params);
 $total     = (int) $stTotal->fetchColumn();
 $totalPags = max(1, (int) ceil($total / $porPag));
@@ -37,7 +44,7 @@ $st = $pdo->prepare(
         SUM(CASE WHEN estado='aprobado' THEN total ELSE 0 END) AS total_gastado,
         MAX(creado_en) AS ultimo_pedido
      FROM pedidos WHERE $where
-     GROUP BY email
+     GROUP BY {$claveCliente}
      ORDER BY ultimo_pedido DESC
      LIMIT $porPag OFFSET $offset"
 );
@@ -86,14 +93,14 @@ require __DIR__ . '/_head.php';
             <?php foreach ($clientes as $c): ?>
                 <tr>
                     <td><?= htmlspecialchars($c['nombre']) ?><?php if ($c['cedula'] ?? ''): ?><br><small style="color:var(--muted)">CC: <?= htmlspecialchars($c['cedula']) ?></small><?php endif; ?></td>
-                    <td><?= htmlspecialchars($c['email']) ?></td>
+                    <td><?= ($c['email'] ?? '') !== '' ? htmlspecialchars($c['email']) : '<span style="color:var(--muted)">Sin correo (venta manual)</span>' ?></td>
                     <td><?= htmlspecialchars($c['telefono'] ?? '—') ?></td>
                     <td><?= htmlspecialchars($c['ciudad'] ?? '—') ?><?php if ($c['departamento'] ?? ''): ?><br><small style="color:var(--muted)"><?= htmlspecialchars($c['departamento']) ?></small><?php endif; ?></td>
                     <td><strong><?= $c['total_pedidos'] ?></strong></td>
                     <td>$<?= number_format($c['total_gastado'], 0, ',', '.') ?></td>
                     <td><?= date('d/m/Y', strtotime($c['ultimo_pedido'])) ?></td>
                     <td>
-                        <a href="/admin/pedidos.php?q=<?= urlencode($c['email']) ?>" class="btn-secondary btn-sm">Ver pedidos</a>
+                        <a href="/admin/pedidos.php?q=<?= urlencode($c['email'] !== '' ? $c['email'] : $c['nombre']) ?>" class="btn-secondary btn-sm">Ver pedidos</a>
                     </td>
                 </tr>
             <?php endforeach; ?>
