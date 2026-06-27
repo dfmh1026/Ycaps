@@ -196,6 +196,7 @@ tbody tr:hover { background: #f8fafc; }
 .badge-rechazado { background: #fee2e2; color: #991b1b; }
 .badge-voided    { background: #f1f5f9; color: #475569; }
 .badge-error     { background: #fee2e2; color: #991b1b; }
+.badge-anulado   { background: #f1f5f9; color: #475569; }
 
 /* ── Forms / Inputs ── */
 .campo { margin-bottom: 1.25rem; }

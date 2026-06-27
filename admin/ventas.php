@@ -73,6 +73,147 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['accion'] ?? '') === 'venta
     }
 }
 
+// ── Editar una venta ya registrada ────────────────────────────────────────────
+// Permite corregir los datos del cliente y la cantidad/precio de cada
+// producto de la venta. Si la cantidad cambia, se ajusta el stock por la
+// diferencia (se devuelve o se descuenta lo que corresponda) y el total del
+// pedido se recalcula a partir de los ítems ya actualizados.
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['accion'] ?? '') === 'editar_venta') {
+    require_once __DIR__ . '/../wompi/db.php';
+
+    $pedidoId = (int) ($_POST['pedido_id'] ?? 0);
+    $itemIds  = $_POST['item_id']  ?? [];
+    $cantidades = $_POST['item_cantidad'] ?? [];
+    $precios    = $_POST['item_precio']   ?? [];
+
+    $stPedido = $pdo->prepare("SELECT id, estado, metodo_pago FROM pedidos WHERE id = :id LIMIT 1");
+    $stPedido->execute([':id' => $pedidoId]);
+    $pedidoExiste = $stPedido->fetch(PDO::FETCH_ASSOC);
+
+    $clienteNombre = trim($_POST['cliente_nombre'] ?? '');
+
+    if (!$pedidoExiste) {
+        $mensaje = 'Esa venta ya no existe.';
+        $tipoMsg = 'error';
+    } elseif ($pedidoExiste['metodo_pago'] !== 'mostrador') {
+        // Solo las ventas manuales (registradas en el mostrador) se pueden
+        // editar — las pagadas por Wompi o gestionadas por WhatsApp ya tienen
+        // un monto cobrado/confirmado que no se debe alterar desde aquí.
+        $mensaje = 'Solo se pueden editar las ventas registradas manualmente.';
+        $tipoMsg = 'error';
+    } elseif ($clienteNombre === '') {
+        $mensaje = 'El nombre del cliente es obligatorio.';
+        $tipoMsg = 'error';
+    } else {
+        try {
+            $pdo->beginTransaction();
+
+            $stItemActual = $pdo->prepare("SELECT id, nombre_producto, cantidad FROM pedido_items WHERE id = :id AND pedido_id = :pedido_id LIMIT 1");
+            $stItemUpd    = $pdo->prepare("UPDATE pedido_items SET cantidad = :cantidad, precio = :precio WHERE id = :id AND pedido_id = :pedido_id");
+            $stAjusteStock = $pdo->prepare("UPDATE productos SET stock = GREATEST(0, stock - :delta) WHERE nombre = :nombre");
+
+            foreach ($itemIds as $i => $itemId) {
+                $itemId        = (int) $itemId;
+                $nuevaCantidad = max(1, (int) ($cantidades[$i] ?? 1));
+                $nuevoPrecio   = max(0, (float) ($precios[$i] ?? 0));
+
+                $stItemActual->execute([':id' => $itemId, ':pedido_id' => $pedidoId]);
+                $itemActual = $stItemActual->fetch(PDO::FETCH_ASSOC);
+                if (!$itemActual) {
+                    continue;
+                }
+
+                $delta = $nuevaCantidad - (int) $itemActual['cantidad'];
+                if ($delta !== 0) {
+                    $stAjusteStock->execute([':delta' => $delta, ':nombre' => $itemActual['nombre_producto']]);
+                }
+
+                $stItemUpd->execute([
+                    ':cantidad'   => $nuevaCantidad,
+                    ':precio'     => $nuevoPrecio,
+                    ':id'         => $itemId,
+                    ':pedido_id'  => $pedidoId,
+                ]);
+            }
+
+            $stTotal = $pdo->prepare("SELECT COALESCE(SUM(precio * cantidad), 0) FROM pedido_items WHERE pedido_id = :id");
+            $stTotal->execute([':id' => $pedidoId]);
+            $nuevoTotal = (float) $stTotal->fetchColumn();
+
+            $pdo->prepare(
+                "UPDATE pedidos SET nombre = :nombre, cedula = :cedula, telefono = :telefono, email = :email, total = :total WHERE id = :id"
+            )->execute([
+                ':nombre'   => $clienteNombre,
+                ':cedula'   => trim($_POST['cliente_cedula'] ?? ''),
+                ':telefono' => trim($_POST['cliente_telefono'] ?? ''),
+                ':email'    => trim($_POST['cliente_email'] ?? ''),
+                ':total'    => $nuevoTotal,
+                ':id'       => $pedidoId,
+            ]);
+
+            registrarCambioEstado($pdo, $pedidoId, $pedidoExiste['estado'], $pedidoExiste['estado'], 'edicion_manual', 'Venta editada manualmente desde el panel');
+
+            $pdo->commit();
+            $mensaje = 'Venta actualizada correctamente.';
+        } catch (Throwable $e) {
+            $pdo->rollBack();
+            error_log('Error editando venta manualmente: ' . $e->getMessage());
+            $mensaje = 'Ocurrió un error al guardar los cambios.';
+            $tipoMsg = 'error';
+        }
+    }
+}
+
+// ── Anular una venta ──────────────────────────────────────────────────────────
+// No se borra el pedido (se conserva el comprobante/historial para tu
+// contabilidad) — solo se devuelve al inventario el stock que se había
+// descontado y el pedido pasa a estado "anulado", por lo que deja de contar
+// en los reportes de Ventas (que solo muestran estado "aprobado").
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['accion'] ?? '') === 'anular_venta') {
+    require_once __DIR__ . '/../wompi/db.php';
+
+    $pedidoId = (int) ($_POST['pedido_id'] ?? 0);
+
+    $stItems = $pdo->prepare("SELECT nombre_producto, cantidad FROM pedido_items WHERE pedido_id = :id");
+    $stItems->execute([':id' => $pedidoId]);
+    $itemsAAnular = $stItems->fetchAll(PDO::FETCH_ASSOC);
+
+    if (empty($itemsAAnular)) {
+        $mensaje = 'Esa venta ya no existe.';
+        $tipoMsg = 'error';
+    } else {
+        try {
+            $pdo->beginTransaction();
+
+            // Solo anula si todavía estaba "aprobado" — evita devolver el
+            // stock dos veces si el formulario se envía más de una vez.
+            $upd = $pdo->prepare("UPDATE pedidos SET estado = 'anulado' WHERE id = :id AND estado = 'aprobado'");
+            $upd->execute([':id' => $pedidoId]);
+
+            if ($upd->rowCount() > 0) {
+                $stDevolverStock = $pdo->prepare("UPDATE productos SET stock = stock + :cantidad WHERE nombre = :nombre");
+                foreach ($itemsAAnular as $item) {
+                    $stDevolverStock->execute([':cantidad' => (int) $item['cantidad'], ':nombre' => $item['nombre_producto']]);
+                }
+
+                registrarCambioEstado($pdo, $pedidoId, 'aprobado', 'anulado', 'anulacion_manual', 'Venta anulada manualmente desde el panel');
+
+                $mensaje = 'Venta anulada. El stock fue devuelto al inventario.';
+            } else {
+                $mensaje = 'Esa venta ya no estaba aprobada (puede que ya se haya anulado).';
+                $tipoMsg = 'error';
+            }
+
+            $pdo->commit();
+        } catch (Throwable $e) {
+            $pdo->rollBack();
+            error_log('Error anulando venta: ' . $e->getMessage());
+            $mensaje = 'Ocurrió un error al anular la venta.';
+            $tipoMsg = 'error';
+        }
+    }
+}
+
 // Si la columna "codigo_interno" todavía no existe (falta correr la
 // migración en db/schema.sql), se sigue mostrando el listado sin ella en
 // vez de romper toda la página de Ventas.
@@ -119,7 +260,7 @@ $totalPags = max(1, (int) ceil($totalVentas / $porPag));
 $offset    = ($pagina - 1) * $porPag;
 
 $stVentas = $pdo->prepare(
-    "SELECT id, wompi_referencia, nombre, ciudad, departamento, metodo_pago, total, creado_en
+    "SELECT id, wompi_referencia, nombre, cedula, telefono, email, ciudad, departamento, metodo_pago, total, creado_en
      FROM pedidos WHERE {$where}
      ORDER BY creado_en DESC
      LIMIT {$porPag} OFFSET {$offset}"
@@ -251,10 +392,16 @@ require __DIR__ . '/_head.php';
                     <th>Método de pago</th>
                     <th>Total</th>
                     <th>Fecha</th>
+                    <th>Acciones</th>
                 </tr>
             </thead>
             <tbody>
             <?php foreach ($ventas as $v): ?>
+                <?php
+                    $stItemsVenta = $pdo->prepare("SELECT id, nombre_producto, precio, cantidad FROM pedido_items WHERE pedido_id = :id");
+                    $stItemsVenta->execute([':id' => $v['id']]);
+                    $itemsVenta = $stItemsVenta->fetchAll(PDO::FETCH_ASSOC);
+                ?>
                 <tr>
                     <td><?= (int) $v['id'] ?></td>
                     <td><code style="font-size:.78rem"><?= htmlspecialchars($v['wompi_referencia'] ?? '—') ?></code></td>
@@ -263,6 +410,48 @@ require __DIR__ . '/_head.php';
                     <td><?= htmlspecialchars(ucfirst($v['metodo_pago'] ?? 'wompi')) ?></td>
                     <td><strong>$<?= number_format((float) $v['total'], 0, ',', '.') ?></strong></td>
                     <td style="white-space:nowrap"><?= date('d/m/Y H:i', strtotime($v['creado_en'])) ?></td>
+                    <td style="min-width:160px">
+                        <?php if (($v['metodo_pago'] ?? '') === 'mostrador'): ?>
+                        <details>
+                            <summary class="btn-secondary btn-sm" style="display:inline-block;cursor:pointer">Editar</summary>
+                            <form method="POST" style="display:flex;flex-direction:column;gap:.4rem;margin-top:.6rem;min-width:260px">
+                                <input type="hidden" name="accion" value="editar_venta">
+                                <input type="hidden" name="pedido_id" value="<?= (int) $v['id'] ?>">
+
+                                <label style="font-size:.75rem;color:var(--muted)">Cliente</label>
+                                <input type="text" name="cliente_nombre" value="<?= htmlspecialchars($v['nombre']) ?>" required>
+
+                                <label style="font-size:.75rem;color:var(--muted)">Cédula</label>
+                                <input type="text" name="cliente_cedula" value="<?= htmlspecialchars($v['cedula'] ?? '') ?>">
+
+                                <label style="font-size:.75rem;color:var(--muted)">Teléfono</label>
+                                <input type="text" name="cliente_telefono" value="<?= htmlspecialchars($v['telefono'] ?? '') ?>">
+
+                                <label style="font-size:.75rem;color:var(--muted)">Email</label>
+                                <input type="email" name="cliente_email" value="<?= htmlspecialchars($v['email'] ?? '') ?>">
+
+                                <label style="font-size:.75rem;color:var(--muted)">Productos</label>
+                                <?php foreach ($itemsVenta as $it): ?>
+                                <div style="display:flex;gap:.3rem;align-items:center">
+                                    <input type="hidden" name="item_id[]" value="<?= (int) $it['id'] ?>">
+                                    <span style="font-size:.78rem;flex:1"><?= htmlspecialchars($it['nombre_producto']) ?></span>
+                                    <input type="number" name="item_cantidad[]" value="<?= (int) $it['cantidad'] ?>" min="1" style="width:60px" title="Cantidad">
+                                    <input type="number" name="item_precio[]" value="<?= (int) $it['precio'] ?>" min="0" step="1000" style="width:90px" title="Precio">
+                                </div>
+                                <?php endforeach; ?>
+
+                                <button type="submit" class="btn-guardar-stock" style="margin-top:.3rem">Guardar cambios</button>
+                            </form>
+                        </details>
+                        <?php else: ?>
+                        <span style="font-size:.72rem;color:var(--muted)" title="Solo se pueden editar las ventas registradas manualmente">No editable</span>
+                        <?php endif; ?>
+                        <form method="POST" style="margin-top:.4rem" onsubmit="return confirm('¿Anular esta venta? El producto volverá a quedar disponible en el inventario. La venta no se borra, solo deja de contar como venta aprobada.');">
+                            <input type="hidden" name="accion" value="anular_venta">
+                            <input type="hidden" name="pedido_id" value="<?= (int) $v['id'] ?>">
+                            <button type="submit" class="btn-danger btn-sm">Anular venta</button>
+                        </form>
+                    </td>
                 </tr>
             <?php endforeach; ?>
             </tbody>
