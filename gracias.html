@@ -9,6 +9,15 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Google Ads -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=AW-18270158959"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'AW-18270158959');
+    </script>
+
     <style>
         :root {
             --dorado: #d4af37;
@@ -175,6 +184,13 @@
         const ref = new URLSearchParams(window.location.search).get('ref');
         if (ref) document.getElementById('ref-pedido').textContent = ref;
         localStorage.removeItem('ycaps-carrito');
+
+        gtag('event', 'conversion', {
+            'send_to': 'AW-18270158959/2A2uCMHNkcUcEO-A8odE',
+            'value': 90000,
+            'currency': 'COP',
+            'transaction_id': ref || ''
+        });
     </script>
 
 </body>
