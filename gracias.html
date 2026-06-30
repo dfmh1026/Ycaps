@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>¡Gracias por tu compra! | Ycaps</title>
+    <meta name="robots" content="noindex, nofollow">
+    <link rel="icon" type="image/png" href="./media/logoycaps.png">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --dorado: #d4af37;
+            --dorado-claro: #f1d785;
+        }
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: #0d0d0d;
+            color: #fff;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem 1rem;
+            text-align: center;
+        }
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: .6rem;
+            margin-bottom: 2.5rem;
+            text-decoration: none;
+        }
+        .logo img { height: 52px; }
+        .logo-texto {
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: 2rem;
+            letter-spacing: 4px;
+            color: var(--dorado);
+        }
+        .icono-ok {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background: rgba(212, 175, 55, .12);
+            border: 2px solid var(--dorado);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1.5rem;
+        }
+        .icono-ok svg {
+            width: 40px;
+            height: 40px;
+            stroke: var(--dorado);
+        }
+        h1 {
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: 2.6rem;
+            letter-spacing: 3px;
+            color: var(--dorado);
+            margin-bottom: .5rem;
+        }
+        .subtitulo {
+            font-size: 1rem;
+            color: #ccc;
+            margin-bottom: 2rem;
+            font-weight: 300;
+        }
+        .referencia {
+            background: rgba(212, 175, 55, .08);
+            border: 1px solid rgba(212, 175, 55, .3);
+            border-radius: 10px;
+            padding: .75rem 1.5rem;
+            font-size: .9rem;
+            color: #ddd;
+            margin-bottom: 2rem;
+            display: inline-block;
+        }
+        .referencia strong {
+            color: var(--dorado);
+            font-family: monospace;
+            font-size: 1rem;
+        }
+        .pasos {
+            background: rgba(255, 255, 255, .04);
+            border-radius: 12px;
+            padding: 1.25rem 1.5rem;
+            max-width: 420px;
+            width: 100%;
+            margin: 0 auto 2rem;
+            text-align: left;
+        }
+        .pasos-titulo {
+            font-size: .75rem;
+            color: #888;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: .75rem;
+        }
+        .pasos ul { list-style: none; }
+        .pasos li {
+            font-size: .9rem;
+            color: #ddd;
+            padding: .55rem 0;
+            border-bottom: 1px solid rgba(255, 255, 255, .06);
+            display: flex;
+            gap: .7rem;
+            align-items: flex-start;
+            line-height: 1.4;
+        }
+        .pasos li:last-child { border-bottom: none; }
+        .paso-num {
+            color: var(--dorado);
+            font-weight: 700;
+            flex-shrink: 0;
+            margin-top: .05rem;
+        }
+        .btn-volver {
+            display: inline-block;
+            background: var(--dorado);
+            color: #0d0d0d;
+            font-family: 'Poppins', sans-serif;
+            font-weight: 700;
+            font-size: .95rem;
+            padding: .8rem 2.2rem;
+            border-radius: 8px;
+            text-decoration: none;
+            letter-spacing: .5px;
+            transition: opacity .15s;
+        }
+        .btn-volver:hover { opacity: .88; }
+        @media (max-width: 480px) {
+            h1 { font-size: 2rem; }
+            .icono-ok { width: 64px; height: 64px; }
+            .icono-ok svg { width: 32px; height: 32px; }
+        }
+    </style>
+</head>
+<body>
+
+    <a href="./index.html" class="logo">
+        <img src="./media/logoycaps.png" alt="Logo Ycaps">
+        <span class="logo-texto">YCAPS</span>
+    </a>
+
+    <div class="icono-ok">
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="20 6 9 17 4 12"/>
+        </svg>
+    </div>
+
+    <h1>¡Gracias por tu compra!</h1>
+    <p class="subtitulo">Tu pago fue confirmado exitosamente.</p>
+
+    <div class="referencia">
+        Pedido: <strong id="ref-pedido">—</strong>
+    </div>
+
+    <div class="pasos">
+        <p class="pasos-titulo">¿Qué sigue?</p>
+        <ul>
+            <li><span class="paso-num">1</span> Te enviamos el recibo de compra a tu correo electrónico.</li>
+            <li><span class="paso-num">2</span> Alistamos tu gorra y nos contactamos contigo para coordinar el envío.</li>
+            <li><span class="paso-num">3</span> Puedes rastrear tu pedido en cualquier momento desde la tienda.</li>
+        </ul>
+    </div>
+
+    <a href="./index.html" class="btn-volver">Volver a la tienda</a>
+
+    <script>
+        const ref = new URLSearchParams(window.location.search).get('ref');
+        if (ref) document.getElementById('ref-pedido').textContent = ref;
+    </script>
+
+</body>
+</html>

@@ -149,7 +149,7 @@ $refParam = $referencia !== '' ? '&ref=' . urlencode($referencia) : '';
 
 switch ($estado) {
     case 'APPROVED':
-        header('Location: ../index.html?pago=exito' . $refParam);
+        header('Location: ../gracias.html' . ($referencia !== '' ? '?ref=' . urlencode($referencia) : ''));
         break;
     case 'PENDING':
         header('Location: ../index.html?pago=pendiente' . $refParam);
