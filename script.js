@@ -871,19 +871,7 @@ function mostrarBannerResultado(tipo, mensajeHtml, autoCerrar = true) {
     let mensajeHtml = '';
     let autoCerrar  = true;
 
-    if (estadoPago === 'exito') {
-        // Vaciar carrito al confirmar pago exitoso
-        carrito = [];
-        guardarCarrito();
-        actualizarInterfaz();
-
-        // No cerrar automáticamente: dejamos que el cliente descargue su recibo primero
-        autoCerrar = false;
-
-        mensajeHtml = '¡Pago exitoso! Gracias por tu compra. Te contactaremos pronto para coordinar el envío.'
-            + (ref ? ` — Referencia: <strong>${ref}</strong>` : '')
-            + (ref ? ` <a id="banner-descarga-recibo" href="wompi/recibo-pdf.php?ref=${encodeURIComponent(ref)}" target="_blank" style="color:#fff;text-decoration:underline;margin-left:8px;white-space:nowrap;font-weight:700">Descargar recibo PDF</a>` : '');
-    } else if (estadoPago === 'pendiente') {
+    if (estadoPago === 'pendiente') {
         mensajeHtml = 'Tu pago está siendo procesado. Te notificaremos cuando se confirme.'
             + (ref ? ` — Referencia: <strong>${ref}</strong>` : '');
     } else {
