@@ -110,10 +110,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['accion'] ?? '') === 'aprob
 }
 
 // ── Consulta de pedidos ───────────────────────────────────────────────────────
-$estado   = $_GET['estado']   ?? '';
-$busqueda = trim($_GET['q']   ?? '');
-$pagina   = max(1, (int)($_GET['pag'] ?? 1));
-$porPag   = 20;
+$estado      = $_GET['estado'] ?? '';
+$busqueda    = trim($_GET['q'] ?? '');
+$envioFiltro = $_GET['envio']  ?? '';
+$pagina      = max(1, (int)($_GET['pag'] ?? 1));
+$porPag      = 20;
 
 $where  = '1=1';
 $params = [];
@@ -121,6 +122,11 @@ if ($estado !== '')   { $where .= ' AND estado = :estado'; $params[':estado'] = 
 if ($busqueda !== '') {
     $where .= ' AND (wompi_referencia LIKE :q OR nombre LIKE :q OR email LIKE :q)';
     $params[':q'] = '%' . $busqueda . '%';
+}
+if ($envioFiltro === 'por_enviar') {
+    $where .= " AND estado = 'aprobado' AND (guia_envio IS NULL OR guia_envio = '')";
+} elseif ($envioFiltro === 'enviados') {
+    $where .= " AND estado = 'aprobado' AND guia_envio IS NOT NULL AND guia_envio != ''";
 }
 
 $stTotal = $pdo->prepare("SELECT COUNT(*) FROM pedidos WHERE {$where}");
@@ -153,9 +159,19 @@ require __DIR__ . '/_head.php';
 
 <div class="card">
     <div class="card-header">
-        <h2>Todos los pedidos (<?= $total ?>)</h2>
-        <div class="card-header-actions">
+        <h2><?= $envioFiltro === 'por_enviar' ? 'Por enviar' : ($envioFiltro === 'enviados' ? 'Enviados' : 'Todos los pedidos') ?> (<?= $total ?>)</h2>
+        <div class="card-header-actions" style="flex-direction:column;align-items:flex-end;gap:.5rem">
+            <div style="display:flex;gap:.3rem">
+                <?php $qBase = $busqueda !== '' ? ['q' => $busqueda] : []; ?>
+                <a href="/admin/pedidos.php<?= $qBase ? '?' . http_build_query($qBase) : '' ?>"
+                   class="btn-sm <?= $envioFiltro === '' ? 'btn-primary' : 'btn-secondary' ?>">Todos</a>
+                <a href="?<?= http_build_query($qBase + ['envio' => 'por_enviar']) ?>"
+                   class="btn-sm <?= $envioFiltro === 'por_enviar' ? 'btn-primary' : 'btn-secondary' ?>">&#128230; Por enviar</a>
+                <a href="?<?= http_build_query($qBase + ['envio' => 'enviados']) ?>"
+                   class="btn-sm <?= $envioFiltro === 'enviados' ? 'btn-primary' : 'btn-secondary' ?>">&#10003; Enviados</a>
+            </div>
             <form method="GET" style="display:flex;gap:.5rem;flex-wrap:wrap">
+                <input type="hidden" name="envio" value="<?= htmlspecialchars($envioFiltro) ?>">
                 <input type="text" name="q" placeholder="Referencia, nombre o email..."
                        value="<?= htmlspecialchars($busqueda) ?>" style="width:220px">
                 <select name="estado">
@@ -167,7 +183,7 @@ require __DIR__ . '/_head.php';
                     <?php endforeach; ?>
                 </select>
                 <button type="submit" class="btn-primary btn-sm">Filtrar</button>
-                <?php if ($busqueda !== '' || $estado !== ''): ?>
+                <?php if ($busqueda !== '' || $estado !== '' || $envioFiltro !== ''): ?>
                 <a href="/admin/pedidos.php" class="btn-secondary btn-sm">Limpiar</a>
                 <?php endif; ?>
             </form>
@@ -196,7 +212,8 @@ require __DIR__ . '/_head.php';
                     <th>Total</th>
                     <th>Estado</th>
                     <th>Fecha</th>
-                    <th>Detalle / Guía</th>
+                    <th>Guía de envío</th>
+                    <th>Detalle</th>
                 </tr>
             </thead>
             <tbody>
@@ -250,13 +267,25 @@ require __DIR__ . '/_head.php';
                     <td><strong>$<?= number_format((float)$p['total'], 0, ',', '.') ?></strong></td>
                     <td><span class="badge badge-<?= $cls ?>"><?= ucfirst($p['estado']) ?></span></td>
                     <td style="white-space:nowrap"><?= date('d/m/Y H:i', strtotime($p['creado_en'])) ?></td>
+                    <td style="min-width:190px">
+                        <form method="POST" style="display:flex;gap:.3rem;align-items:center;flex-wrap:wrap">
+                            <input type="hidden" name="accion" value="guia">
+                            <input type="hidden" name="pedido_id" value="<?= (int)$p['id'] ?>">
+                            <input type="text"
+                                   name="guia_envio"
+                                   value="<?= htmlspecialchars($guiaActual) ?>"
+                                   placeholder="Ej: TCC-123456"
+                                   style="width:140px;font-size:.78rem;padding:.28rem .5rem">
+                            <button type="submit" class="btn-guardar-stock" title="Guardar y notificar al cliente">&#10003;</button>
+                        </form>
+                        <?php if ($guiaActual !== ''): ?>
+                        <small style="color:var(--success);font-size:.72rem">&#10003; En camino</small>
+                        <?php endif; ?>
+                    </td>
                     <td>
                         <details>
                             <summary style="cursor:pointer;color:var(--info);font-size:.8rem">
                                 <?= count($items) ?> item(s)
-                                <?php if ($guiaActual !== ''): ?>
-                                · <span style="color:var(--success)">Guía: <?= htmlspecialchars($guiaActual) ?></span>
-                                <?php endif; ?>
                             </summary>
 
                             <?php if ($estado_p === 'aprobado'): ?>
@@ -319,26 +348,6 @@ require __DIR__ . '/_head.php';
                             </ul>
                             <?php endif; ?>
 
-                            <!-- Guía de envío -->
-                            <form method="POST" class="guia-form">
-                                <input type="hidden" name="accion" value="guia">
-                                <input type="hidden" name="pedido_id" value="<?= (int)$p['id'] ?>">
-                                <div style="display:flex;gap:.4rem;align-items:center;flex-wrap:wrap;padding:.5rem 0 .25rem">
-                                    <input type="text"
-                                           name="guia_envio"
-                                           value="<?= htmlspecialchars($guiaActual) ?>"
-                                           placeholder="Número de guía (ej: TCC-123456)"
-                                           style="width:220px;font-size:.8rem;padding:.3rem .6rem">
-                                    <button type="submit" class="btn-primary btn-sm" style="white-space:nowrap">
-                                        <?= $guiaActual !== '' ? '↺ Actualizar y reenviar' : '✉ Guardar y notificar' ?>
-                                    </button>
-                                </div>
-                                <?php if ($guiaActual !== ''): ?>
-                                <p style="font-size:.75rem;color:var(--muted);margin:.2rem 0 0">
-                                    Guía actual: <strong><?= htmlspecialchars($guiaActual) ?></strong>
-                                </p>
-                                <?php endif; ?>
-                            </form>
                         </details>
                     </td>
                 </tr>
