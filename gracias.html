@@ -181,13 +181,18 @@
     <a href="./index.html" class="btn-volver">Volver a la tienda</a>
 
     <script>
-        const ref = new URLSearchParams(window.location.search).get('ref');
+        const params = new URLSearchParams(window.location.search);
+        const ref = params.get('ref');
         if (ref) document.getElementById('ref-pedido').textContent = ref;
         localStorage.removeItem('ycaps-carrito');
 
+        // El valor real de la compra lo envía wompi/confirmacion.php en la URL.
+        // Si no llegara, se usa 90000 como respaldo para no reportar $0.
+        const valorCompra = parseInt(params.get('valor'), 10) || 90000;
+
         gtag('event', 'conversion', {
             'send_to': 'AW-18270158959/2A2uCMHNkcUcEO-A8odE',
-            'value': 90000,
+            'value': valorCompra,
             'currency': 'COP',
             'transaction_id': ref || ''
         });

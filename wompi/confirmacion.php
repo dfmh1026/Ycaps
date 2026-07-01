@@ -28,12 +28,14 @@ $respuesta  = curl_exec($ch);
 $codigoHttp = curl_getinfo($ch, CURLINFO_HTTP_CODE);
 curl_close($ch);
 
-$estado     = '';
-$referencia = '';
+$estado        = '';
+$referencia    = '';
+$montoCentavos = 0;
 if ($respuesta !== false && $codigoHttp >= 200 && $codigoHttp < 300) {
-    $data       = json_decode($respuesta, true);
-    $estado     = $data['data']['status']    ?? '';
-    $referencia = $data['data']['reference'] ?? '';
+    $data          = json_decode($respuesta, true);
+    $estado        = $data['data']['status']          ?? '';
+    $referencia    = $data['data']['reference']       ?? '';
+    $montoCentavos = (int) ($data['data']['amount_in_cents'] ?? 0);
 }
 
 // Si el pago fue aprobado, intentar actualizar el pedido en la DB.
@@ -149,7 +151,12 @@ $refParam = $referencia !== '' ? '&ref=' . urlencode($referencia) : '';
 
 switch ($estado) {
     case 'APPROVED':
-        header('Location: ../gracias.html' . ($referencia !== '' ? '?ref=' . urlencode($referencia) : ''));
+        // Pasamos el monto real cobrado (en pesos) para que Google Ads registre
+        // el valor exacto de cada venta, no un valor fijo.
+        $paramsGracias = [];
+        if ($referencia !== '')    { $paramsGracias['ref']   = $referencia; }
+        if ($montoCentavos > 0)    { $paramsGracias['valor'] = (int) round($montoCentavos / 100); }
+        header('Location: ../gracias.html' . ($paramsGracias ? '?' . http_build_query($paramsGracias) : ''));
         break;
     case 'PENDING':
         header('Location: ../index.html?pago=pendiente' . $refParam);
