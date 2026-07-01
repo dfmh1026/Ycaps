@@ -578,13 +578,9 @@ header {
     font-size: 0.66rem;
     line-height: 1.3;
     margin: 0 0 0.7rem 0;
-    text-shadow: 0 0 10px rgba(37, 211, 102, 0.8);
-    animation: aviso-dto-pulso 2.2s ease-in-out infinite;
-}
-
-@keyframes aviso-dto-pulso {
-    0%, 100% { text-shadow: 0 0 8px rgba(37, 211, 102, 0.6); }
-    50%      { text-shadow: 0 0 14px rgba(37, 211, 102, 1); }
+    /* Resplandor verde fijo y sutil: sigue destacando por el color, pero sin
+       el parpadeo infinito que cansaba la vista y gastaba batería en celular. */
+    text-shadow: 0 0 9px rgba(37, 211, 102, 0.7);
 }
 
 .btn-favorito {
